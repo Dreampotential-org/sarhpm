@@ -2,11 +2,94 @@
 {% block body_block %}
 <div class="container">
   <div class="jumbotron">
-    <h1>Welcome to the Djungle !</h1>
     {% if user.is_authenticated %}
         <h2>Hello {{ user.username }}</h2>
+
+    <div class="mainContainer">
+        <ol class="chat">
+            <li class="other">
+                <div class="avatar"><img src="static/avater.png" draggable="false"/></div>
+                <div class="msg">
+                    <p>Hi, I’m Pam from Origins. What would you like to do?</p>
+                </div>
+            </li>
+        </ol>
+    </div>
+    <div class="secAction">
+        <div class="mainContainer">
+            <button class="actionBtn btnVideo">Take a Video</button>
+            <button class="actionBtn btnEvent">Attend Event<span>(Check-In/Check-Out)</span></button>
+        </div>
+    </div>
+
     {% else %}
-        <h2>Register or Login if you'd like to</h2>
+
+    <div class="mainContainer">
+        <ol class="chat">
+            <li class="other">
+                <div class="avatar"><img src="static/avater.png" draggable="false"/></div>
+                <div class="msg">
+                    <p>Welcome to your Personal Accountability Manager from origins</p>
+                </div>
+            </li>
+            <li class="other">
+                <div class="avatar"><img src="static/avater.png" draggable="false"/></div>
+                <div class="msg">
+                    <p>Are you new or would you like to sign in?</p>
+                </div>
+            </li>
+        </ol>
+    </div>
+    <div class="secAction">
+        <div class="mainContainer">
+            <button class="actionBtn" id="signin">Sign in</button>
+            <button class="actionBtn" id="signup">I am new</button>
+        </div>
+    </div>
+    <div class="modal" id="signinModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-wrapper modal-transition">
+            <div class="modal-header">
+                <img src="static/modalLogo.png" alt="Modal Logo" class="modalLogo">
+                <h2 class="modal-heading">Hello, Please login</h2>
+            </div>
+            <div class="modal-body">
+                <div class="modal-content">
+                    <form class="popupForm">
+                        <input type="Email" placeholder="Email">
+                        <input type="password" placeholder="Password">
+                        <p class="textCenter"><a href="#">Forgot password?</a></p>
+                        <input type="submit" value="Login" class="btnSubmit">
+                    </form>
+                    <p class="textCenter signupNeed">Don’t have an account? <a href="#">Sign Up</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="signupModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-wrapper modal-transition">
+            <div class="modal-header">
+                <img src="static/modalLogo.png" alt="Modal Logo" class="modalLogo">
+                <h2 class="modal-heading">Create an account</h2>
+            </div>
+            <div class="modal-body">
+                <div class="modal-content">
+                    <form class="popupForm">
+                        <input type="text" placeholder="Full Name">
+                        <input type="Email" placeholder="Email">
+                        <input type="tel" placeholder="Phone">
+                        <input type="password" placeholder="Password">
+                        <input type="password" placeholder="Confirm Password">
+                        <input type="submit" value="Sign Up" class="btnSubmit">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     {% endif %}
   </div>
 </div>
