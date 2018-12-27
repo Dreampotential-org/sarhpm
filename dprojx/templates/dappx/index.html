@@ -76,19 +76,23 @@
             </div>
             <div class="modal-body">
                 <div class="modal-content">
-                    <form class="popupForm">
+                    <form class="popupForm" enctype=multipart/form-data method="POST">
+							  {% csrf_token %}
+							  {{ user_form.as_p }}
+							  {{ profile_form.as_p }}
+                        <input type="submit" value="Sign Up" class="btnSubmit">
+								<!--
                         <input type="text" placeholder="Full Name">
                         <input type="Email" placeholder="Email">
                         <input type="tel" placeholder="Phone">
                         <input type="password" placeholder="Password">
                         <input type="password" placeholder="Confirm Password">
-                        <input type="submit" value="Sign Up" class="btnSubmit">
+								-->
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
 
     {% endif %}
   </div>

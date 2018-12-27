@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
 
-def index(request):
+def register(request):
     return render(request, 'dappx/index.html')
 
 
@@ -21,9 +21,10 @@ def user_logout(request):
     return HttpResponseRedirect(reverse('index'))
 
 
-def register(request):
+def index(request):
     registered = False
     if request.method == 'POST':
+        print ("Create user request!!!")
         user_form = UserForm(data=request.POST)
         profile_form = UserProfileInfoForm(data=request.POST)
         if user_form.is_valid() and profile_form.is_valid():
@@ -42,7 +43,7 @@ def register(request):
     else:
         user_form = UserForm()
         profile_form = UserProfileInfoForm()
-    return render(request, 'dappx/registration.html',
+    return render(request, 'dappx/index.html',
                            {'user_form': user_form,
                             'profile_form': profile_form,
                             'registered': registered})
