@@ -33,9 +33,7 @@ def index(request):
             user.save()
             profile = profile_form.save(commit=False)
             profile.user = user
-            if 'profile_pic' in request.FILES:
-                print('found it')
-                profile.profile_pic = request.FILES['profile_pic']
+            profile.phone = request.POST.get("phone", "")
             profile.save()
             registered = True
         else:
