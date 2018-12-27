@@ -1,9 +1,23 @@
+import logging
+
+from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render
+
 from dappx.forms import UserForm, UserProfileInfoForm
+from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from .models import VideoUpload
+from rest_framework.status import (
+    HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND,
+    HTTP_200_OK
+)
+from rest_framework.response import Response
+
+logger = logging.getLogger(__name__)
 
 
 def register(request):
@@ -19,6 +33,36 @@ def special(request):
 def user_logout(request):
     logout(request)
     return HttpResponseRedirect(reverse('index'))
+
+
+@login_required
+def record_video(request):
+    files = request.data.get("file")
+    # lat = request.data.get("lat")
+    # lng = request.data.get("lng")
+    userId = request.data.get('userId')
+    fs = FileSystemStorage()
+    try:
+        filename = fs.save(files.name, files)
+        uploaded_file_url = fs.url(filename)
+    except Exception:
+        logger.exception("Error")
+        return Response({'error': 'Error uploading file'},
+                        status=HTTP_400_BAD_REQUEST)
+    print(type(files))
+    print(uploaded_file_url)
+
+    user = User.objects.get(id=userId)
+    try:
+        VideoUpload.objects.create(videoUrl=uploaded_file_url,
+                                   user=user)
+    except Exception:
+        logger.exception("Error")
+        return Response({'error': 'Error uploading file'},
+                        status=HTTP_400_BAD_REQUEST)
+    return Response({
+        'message', 'Success'
+    }, status=HTTP_200_OK)
 
 
 def index(request):

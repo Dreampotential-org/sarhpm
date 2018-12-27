@@ -3,14 +3,13 @@
 <div class="container">
   <div class="jumbotron">
     {% if user.is_authenticated %}
-        <h2>Hello {{ user.username }}</h2>
 
     <div class="mainContainer">
         <ol class="chat">
             <li class="other">
                 <div class="avatar"><img src="static/avater.png" draggable="false"/></div>
                 <div class="msg">
-                    <p>Hi, I’m Pam from Origins. What would you like to do?</p>
+                    <p>Hi {{user.username}}, I’m Pam from Origins. What would you like to do?</p>
                 </div>
             </li>
         </ol>

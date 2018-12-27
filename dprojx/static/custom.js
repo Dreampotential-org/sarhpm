@@ -1,5 +1,9 @@
 function init_all() {
 
+    $(".secAction .btnVideo").on('click', function(e) {
+        window.location = '/record-video
+    });
+
     $('#signin').on('click', function(e) {
       e.preventDefault();
       $('#signinModal').addClass('is-visible');
