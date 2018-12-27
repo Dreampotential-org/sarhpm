@@ -34,6 +34,9 @@ def user_logout(request):
     logout(request)
     return HttpResponseRedirect(reverse('index'))
 
+def record_video_screen(request):
+    return render(request, 'dappx/record.html')
+
 
 @login_required
 def record_video(request):
