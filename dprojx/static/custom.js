@@ -46,7 +46,37 @@ function init_all() {
     });
 
     handle_video();
+    handle_gps()
 }
+
+
+function handle_gps() {
+    if (!(window.location.pathname == '/gps-checkin/')) {
+        return
+    }
+
+   function geo_error() {
+      alert("Sorry, no position available.");
+    }
+
+    var geo_options = {
+      enableHighAccuracy: true,
+      maximumAge        : 30000,
+      timeout           : 27000
+    };
+
+    var wpid = navigator.geolocation.watchPosition(
+        geo_success, geo_error, geo_options
+    );
+    function geo_success(position) {
+        CURRENT_POSITION = position
+        console.log(position.coords.latitude +
+                    " " +  position.coords.longitude);
+    }
+}
+
+
+
 
 function handle_video() {
 
