@@ -49,6 +49,11 @@ function init_all() {
 }
 
 function handle_video() {
+
+    if (!(window.location.pathname == '/record/')) {
+        return
+    }
+
     var videoBlob;
     const uploadBtn = document.getElementById('btn-upload');
     var options = {

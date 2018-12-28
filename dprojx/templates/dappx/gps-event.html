@@ -1,16 +1,32 @@
 {% extends "dappx/base.html" %}
-{% block video_block %}
+{% block gps_block %}
     <div class="mainContainer">
-        <video id="myVideo" width="100%" height="340" controls="false">
-            Your browser does not support the video tag.
-        </video>
+        <div class="eventBox">
+            <label>Enter a note</label>
+            <textarea placeholder="Add Description of Event"></textarea>
+        </div>
     </div>
     <div class="secAction">
         <div class="mainContainer">
-            <button class="actionBtn singleBtn">Start Recording</button>
+            <button class="actionBtn" id="locationAuth">Submit</button>
         </div>
     </div>
-	<button id='btn-upload' style='display:none'>upload</button>
-	<button id='start' style='display:none'>start</button>
-	<button id='stop' style='display:none'>stop</button>
+    <div class="modal" id="LocationModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-wrapper modal-transition">
+            <div class="modal-header">
+                <img src="images/avater.png"images/modalLogo.png""  class="modalLogo">
+            </div>
+            <div class="modal-body">
+                <div class="modal-content">
+                    <div class="textCenter">
+                        <img src="images/location.png">
+                        <h3 class="locAuthTitle">Location Permission</h3>
+                        <p class="locAuthDesc">Please allow permissions for accessing your location through GPS.</p>
+                        <button class="btnSubmit">Allow</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
