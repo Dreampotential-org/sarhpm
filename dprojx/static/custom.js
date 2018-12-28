@@ -160,6 +160,8 @@ function handle_video() {
 
     setTimeout(function() {
         $(".vjs-control-bar").hide()
+        $(".mainContainer").css("max-width", "100%")
+
     }, 100);
 
 }

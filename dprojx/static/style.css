@@ -449,7 +449,7 @@ video::-webkit-media-controls {
         top: 13px;
     }
     .btnVideo {
-        padding: 5px 30px 5px 60px;        
+        padding: 5px 30px 5px 60px;
     }
     .btnEvent::before {
         width: 24px;
