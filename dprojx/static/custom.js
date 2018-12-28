@@ -1,7 +1,11 @@
 function init_all() {
 
     $(".secAction .btnVideo").on('click', function(e) {
-        window.location = '/record-video';
+        window.location = '/record';
+    });
+
+    $(".secAction .btnEvent").on('click', function(e) {
+        window.location = '/gps-event';
     });
 
     $('#signin').on('click', function(e) {

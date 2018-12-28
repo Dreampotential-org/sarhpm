@@ -37,6 +37,9 @@ def user_logout(request):
 def record_video_screen(request):
     return render(request, 'dappx/record.html')
 
+def gps_check_in(request):
+    return render(request, 'dappx/gps-event.html')
+
 
 @login_required
 def record_video(request):
