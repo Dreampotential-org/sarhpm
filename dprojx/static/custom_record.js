@@ -38,8 +38,8 @@ function handle_video() {
     const uploadBtn = document.getElementById('btn-upload');
     var options = {
         controls: true,
-        width: '100%',
-        height: '340',
+       // width: '100%',
+       // height: '340',
         fluid: false,
         plugins: {
             record: {
