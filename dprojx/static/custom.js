@@ -49,8 +49,8 @@ function handle_video() {
     const uploadBtn = document.getElementById('btn-upload');
     var options = {
         controls: true,
-        width: 340,
-        height: 340,
+        width: '100%',
+        height: '340',
         fluid: false,
         plugins: {
             record: {
@@ -119,6 +119,9 @@ function handle_video() {
         xhr.send(data);
     });
 
+    setTimeout(function() {
+        $(".vjs-control-bar").hide()
+    }, 100);
 
 }
 
