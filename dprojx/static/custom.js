@@ -5,7 +5,7 @@ function init_all() {
     });
 
     $(".secAction .btnEvent").on('click', function(e) {
-        window.location = '/gps-event';
+        window.location = '/gps-checkin';
     });
 
     $('#signin').on('click', function(e) {
