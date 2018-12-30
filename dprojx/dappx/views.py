@@ -37,6 +37,7 @@ def user_logout(request):
 def record_video_screen(request):
     return render(request, 'dappx/record.html')
 
+
 def gps_check_in(request):
     return render(request, 'dappx/gps-event.html')
 
@@ -86,6 +87,16 @@ def index(request):
             profile.phone = request.POST.get("phone", "")
             profile.save()
             registered = True
+
+            # log user in!
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            user = authenticate(username=username, password=password)
+            if user:
+                if user.is_active:
+                    login(request, user)
+                    return HttpResponseRedirect(reverse('index'))
+
         else:
             print(user_form.errors, profile_form.errors)
     else:
