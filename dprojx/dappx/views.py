@@ -97,6 +97,7 @@ def record_video(request):
 
 def index(request):
     registered = False
+    name = ''
     if request.method == 'POST':
         #request.POST['username'] = request.POST.get('email')
         print ("Create user request!!!")
@@ -132,16 +133,15 @@ def index(request):
         user_form = UserForm()
         profile_form = UserProfileInfoForm()
 
-    # need to get the name XXX fix this
-    users = (UserProfileInfo.objects.all())
+        # need to get the name XXX fix this
+        users = (UserProfileInfo.objects.all())
 
-    name = ''
-    print ("REQUEST: %s" % request.user.email)
-    for user in users:
-        if user.user.email == request.user.email:
-            name = (user.name)
-            print (name)
-            break
+        print ("REQUEST: %s" % request.user.email)
+        for user in users:
+            if user.user.email == request.user.email:
+                name = (user.name)
+                print (name)
+                break
 
     return render(request, 'dappx/index.html',
                            {'user_form': user_form,
