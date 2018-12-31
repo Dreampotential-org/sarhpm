@@ -18,7 +18,7 @@ function init_all() {
         //data.append("userId", userObj.userId);
 
         var xhr = new XMLHttpRequest();
-        //xhr.withCredentials = true;
+        // xhr.withCredentials = true;
 
         xhr.addEventListener("readystatechange", function() {
             if (this.readyState === 4) {
@@ -31,7 +31,7 @@ function init_all() {
             }
         });
 
-        xhr.open("POST", "/upload");
+        xhr.open("POST", "/upload/");
         //xhr.setRequestHeader("authorization", `Token ${userObj.token}`);
         xhr.send(data);
     });

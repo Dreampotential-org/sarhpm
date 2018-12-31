@@ -1,5 +1,7 @@
 import logging
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render
 
@@ -41,7 +43,27 @@ def record_video_screen(request):
 def gps_check_in(request):
     return render(request, 'dappx/gps-event.html')
 
+@csrf_exempt
+@login_required
+def upload(request):
 
+    if request.method == 'POST' and request.FILES['file']:
+        myfile = request.FILES['file']
+        fs = FileSystemStorage()
+        filename = fs.save(myfile.name, myfile)
+        uploaded_file_url = fs.url(filename)
+        print (uploaded_file_url)
+        return JsonResponse({'error': 'Some error'}, status=200)
+
+    print(request.FILES)
+    print(request)
+    print (dir(request))
+    print("UPLOAD")
+    files = request.data.get("file")
+    print(files)
+
+
+# @csrf_exempt
 @login_required
 def record_video(request):
     files = request.data.get("file")
@@ -93,9 +115,8 @@ def index(request):
             password = request.POST.get('password')
             user = authenticate(username=username, password=password)
             if user:
-                if user.is_active:
-                    login(request, user)
-                    return HttpResponseRedirect(reverse('index'))
+                login(request, user)
+                return HttpResponseRedirect(reverse('index'))
 
         else:
             print(user_form.errors, profile_form.errors)

@@ -17,7 +17,6 @@
     <div class="secAction">
         <div class="mainContainer">
 				<form id='upload_vid_form' method='post' enctype="multipart/form-data">
-					{% csrf_token %}
 					<input type="file" accept="video/*" id='upload-vid'
 					       capture="environment" style='display:none;'>
 					<button class="actionBtn btnVideo">
