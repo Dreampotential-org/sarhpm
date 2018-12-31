@@ -1,7 +1,47 @@
+var GLOBAL_FILE = null;
 function init_all() {
 
     $(".secAction .btnVideo").on('click', function(e) {
+        e.preventDefault();
         $('#upload-vid').click()
+    });
+
+    $('#upload_vid_form').submit(function(e) {
+        e.preventDefault();
+        alert('About to upload video.');
+        // uploadBtn.disabled = true;
+        // const userObj = JSON.parse(localStorage.getItem('user'));
+        var data = new FormData();
+        data.append("file", GLOBAL_FILE, GLOBAL_FILE.name);
+        //data.append("lat", document.getElementById('lat').innerHTML);
+        //data.append("lng", document.getElementById('lng').innerHTML);
+        //data.append("userId", userObj.userId);
+
+        var xhr = new XMLHttpRequest();
+        //xhr.withCredentials = true;
+
+        xhr.addEventListener("readystatechange", function() {
+            if (this.readyState === 4) {
+                if (this.status == 200) {
+                    alert('data uploaded');
+                } else {
+                    alert('data upload failed');
+                }
+
+            }
+        });
+
+        xhr.open("POST", "/upload");
+        //xhr.setRequestHeader("authorization", `Token ${userObj.token}`);
+        xhr.send(data);
+    });
+
+    $('#upload-vid').on('change', function(e) {
+        e.preventDefault();
+        var file = e.target.files[0];
+        GLOBAL_FILE = file;
+        alert("trigger submit")
+        $("#upload_vid_form").submit()
     });
 
     $(".secAction .btnEvent").on('click', function(e) {

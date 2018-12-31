@@ -14,12 +14,19 @@
             </li>
         </ol>
     </div>
-	<input type="file" accept="video/*" id='upload-vid'
-			 capture="environment" style='display:none;'>
     <div class="secAction">
         <div class="mainContainer">
-            <button class="actionBtn btnVideo">Take a Video</button>
-            <button class="actionBtn btnEvent">Attend Event<span>(Check-In/Check-Out)</span></button>
+				<form id='upload_vid_form' method='post' enctype="multipart/form-data">
+					{% csrf_token %}
+					<input type="file" accept="video/*" id='upload-vid'
+					       capture="environment" style='display:none;'>
+					<button class="actionBtn btnVideo">
+						Take a Video
+					</button>
+				</form>
+            <button class="actionBtn btnEvent">
+					Attend Event<span>(Check-In/Check-Out)</span>
+				</button>
         </div>
     </div>
 
