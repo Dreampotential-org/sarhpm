@@ -12,6 +12,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from .models import VideoUpload
+from .models import UserProfileInfo
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_404_NOT_FOUND,
@@ -97,8 +98,14 @@ def record_video(request):
 def index(request):
     registered = False
     if request.method == 'POST':
+        #request.POST['username'] = request.POST.get('email')
         print ("Create user request!!!")
-        user_form = UserForm(data=request.POST)
+        print (request.POST)
+        data = request.POST.copy()
+        data['username'] = request.POST.get('email')
+        print ('after')
+        print (data)
+        user_form = UserForm(data)
         profile_form = UserProfileInfoForm(data=request.POST)
         if user_form.is_valid() and profile_form.is_valid():
             user = user_form.save()
@@ -107,11 +114,12 @@ def index(request):
             profile = profile_form.save(commit=False)
             profile.user = user
             profile.phone = request.POST.get("phone", "")
+            profile.name = request.POST.get("name", "")
             profile.save()
             registered = True
 
             # log user in!
-            username = request.POST.get('username')
+            username = request.POST.get('email')
             password = request.POST.get('password')
             user = authenticate(username=username, password=password)
             if user:
@@ -123,9 +131,22 @@ def index(request):
     else:
         user_form = UserForm()
         profile_form = UserProfileInfoForm()
+
+    # need to get the name XXX fix this
+    users = (UserProfileInfo.objects.all())
+
+    name = ''
+    print ("REQUEST: %s" % request.user.email)
+    for user in users:
+        if user.user.email == request.user.email:
+            name = (user.name)
+            print (name)
+            break
+
     return render(request, 'dappx/index.html',
                            {'user_form': user_form,
                             'profile_form': profile_form,
+                            'name': name,
                             'registered': registered})
 
 
