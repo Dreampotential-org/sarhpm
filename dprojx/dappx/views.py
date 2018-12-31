@@ -137,11 +137,12 @@ def index(request):
         users = (UserProfileInfo.objects.all())
 
         print ("REQUEST: %s" % request.user.email)
-        for user in users:
-            if user.user.email == request.user.email:
-                name = (user.name)
-                print (name)
-                break
+        if request.user and request.user.email:
+            for user in users:
+                if user.user.email == request.user.email:
+                    name = (user.name)
+                    print (name)
+                    break
 
     return render(request, 'dappx/index.html',
                            {'user_form': user_form,
