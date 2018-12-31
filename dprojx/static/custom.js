@@ -1,12 +1,13 @@
 function init_all() {
 
     $(".secAction .btnVideo").on('click', function(e) {
-        window.location = '/record';
+        $('#upload-vid').click()
     });
 
     $(".secAction .btnEvent").on('click', function(e) {
         window.location = '/gps-checkin';
     });
+
 
     $('#signin').on('click', function(e) {
       e.preventDefault();
