@@ -136,7 +136,6 @@ def index(request):
         # need to get the name XXX fix this
         users = (UserProfileInfo.objects.all())
 
-        print ("REQUEST: %s" % request.user.email)
         if request.user and request.user.email:
             for user in users:
                 if user.user.email == request.user.email:
