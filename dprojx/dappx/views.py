@@ -51,7 +51,7 @@ def gps_check_in(request):
 def post_slack_errors(request):
     url = 'https://hooks.slack.com/services/'
     url += 'TF6H12JQY/BF6H2L0M6/RMuFLttV91aKvlUXydV2yJgv'
-    data = (str (request.POST))
+    data = (str(request.POST))
     body = {"text": "%s" % data,
             'username': 'js-logger'}
     requests.put(url, data=json.dumps(body))
@@ -64,24 +64,26 @@ def post_slack_errors(request):
 def upload(request):
 
     if request.method == 'POST' and request.FILES['file']:
+
+        # save file to disk
         myfile = request.FILES['file']
         fs = FileSystemStorage()
         filename = fs.save(myfile.name, myfile)
         uploaded_file_url = fs.url(filename)
         print (uploaded_file_url)
-        return JsonResponse({'error': 'Some error'}, status=200)
+        # now lets create the db entry
 
-    print(request.FILES)
-    print(request)
-    print (dir(request))
-    print("UPLOAD")
-    files = request.data.get("file")
-    print(files)
+        user = User.objects.get(id=request.user.id)
+        VideoUpload.objects.create(videoUrl=uploaded_file_url,
+                                   user=user)
+
+        return JsonResponse({'error': 'Some error'}, status=200)
 
 
 # @csrf_exempt
 @login_required
 def record_video(request):
+    print (request.user)
     files = request.data.get("file")
     # lat = request.data.get("lat")
     # lng = request.data.get("lng")
@@ -111,6 +113,7 @@ def record_video(request):
 
 
 def index(request):
+    print (request.user.id)
     registered = False
     name = ''
     if request.method == 'POST':
