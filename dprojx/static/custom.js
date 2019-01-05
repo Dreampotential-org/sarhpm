@@ -1,3 +1,34 @@
+// capture all errors and send to slack
+window.onerror = function (msg, url, lineNo, columnNo, error) {
+    var string = msg.toLowerCase();
+    var substring = "script error";
+    if (string.indexOf(substring) > -1){
+        alert('Script Error: See Browser Console for Detail');
+    } else {
+        var message = [
+            'Message: ' + msg,
+            'URL: ' + url,
+            'Line: ' + lineNo,
+            'Column: ' + columnNo,
+            'Error object: ' + JSON.stringify(error)
+        ].join(' - ');
+
+
+        $.ajax({
+            url: '/log-errors/',
+            data: JSON.stringify({
+              'error': message,
+            }),
+            type: 'post',
+            success: function(results) {
+                //callback(JSON.parse(results))
+            }
+        })
+    }
+    return false;
+};
+
+
 var GLOBAL_FILE = null;
 function init_all() {
 

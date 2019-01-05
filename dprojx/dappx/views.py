@@ -1,4 +1,6 @@
+import requests
 import logging
+import json
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -43,6 +45,19 @@ def record_video_screen(request):
 
 def gps_check_in(request):
     return render(request, 'dappx/gps-event.html')
+
+
+@csrf_exempt
+def post_slack_errors(request):
+    url = 'https://hooks.slack.com/services/'
+    url += 'TF6H12JQY/BF6H2L0M6/RMuFLttV91aKvlUXydV2yJgv'
+    data = (str (request.POST))
+    body = {"text": "%s" % data,
+            'username': 'js-logger'}
+    requests.put(url, data=json.dumps(body))
+
+    return JsonResponse({'error': 'Some error'}, status=200)
+
 
 @csrf_exempt
 @login_required

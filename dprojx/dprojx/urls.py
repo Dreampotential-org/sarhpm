@@ -22,6 +22,7 @@ from dappx import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^$', views.index, name='index'),
+    url(r'^log-errors/', views.post_slack_errors, name='log-errors'),
     url(r'^record/', views.record_video_screen, name='record'),
     url(r'^upload/', views.upload, name='upload'),
     url(r'^gps-checkin/', views.gps_check_in, name='gps-checkin'),
