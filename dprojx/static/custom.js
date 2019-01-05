@@ -117,6 +117,25 @@ function handle_gps() {
         return
     }
 
+
+    $('#locationAuth').on('click', function(e) {
+        var text = $(".mainContainer textarea").val()
+
+        $.ajax({
+            url: '/gps-checkin/',
+            data: {
+              'msg': text,
+            },
+            type: 'post',
+            success: function(results) {
+                alert("success")
+                //callback(JSON.parse(results))
+            }
+        })
+
+    });
+
+
    function geo_error() {
       alert("Sorry, no position available.");
     }

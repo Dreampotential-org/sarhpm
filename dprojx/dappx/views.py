@@ -45,6 +45,7 @@ def record_video_screen(request):
 
 
 def gps_check_in(request):
+    print (request.POST)
     return render(request, 'dappx/gps-event.html')
 
 
