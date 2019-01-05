@@ -1,3 +1,4 @@
+import uuid
 import requests
 import logging
 import json
@@ -64,11 +65,10 @@ def post_slack_errors(request):
 def upload(request):
 
     if request.method == 'POST' and request.FILES['file']:
-
         # save file to disk
         myfile = request.FILES['file']
         fs = FileSystemStorage()
-        filename = fs.save(myfile.name, myfile)
+        filename = fs.save("%s-%s" % (uuid.uuid4(), myfile.name), myfile)
         uploaded_file_url = fs.url(filename)
         print (uploaded_file_url)
         # now lets create the db entry

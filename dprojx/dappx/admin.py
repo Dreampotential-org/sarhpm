@@ -7,7 +7,7 @@ from dappx.models import VideoUpload
 from django.utils.html import format_html
 
 class CustomVideoUpload(admin.ModelAdmin):
-    list_display = ['id', 'user', 'display_link']
+    list_display = ['id', 'user', 'display_link', 'uploaded_at']
 
     def display_link(self, obj):
         return format_html(
