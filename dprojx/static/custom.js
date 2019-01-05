@@ -39,7 +39,6 @@ function init_all() {
 
     $('#upload_vid_form').submit(function(e) {
         e.preventDefault();
-        alert('About to upload video.');
         // uploadBtn.disabled = true;
         // const userObj = JSON.parse(localStorage.getItem('user'));
         var data = new FormData();
@@ -59,14 +58,18 @@ function init_all() {
         xhr.addEventListener("readystatechange", function() {
             if (this.readyState === 4) {
                 if (this.status == 200) {
-                    alert('data uploaded');
+                    swal({
+                      title: "Good job!",
+                      text: "Video submitted successfully!",
+                      icon: "success",
+                    });
+                    $("#overlay_loading").hide()
                 } else {
                     alert('data upload failed');
                 }
-
             }
         });
-
+        $("#overlay_loading").show()
         xhr.open("POST", "/upload/");
         //xhr.setRequestHeader("authorization", `Token ${userObj.token}`);
         xhr.send(data);
@@ -76,7 +79,6 @@ function init_all() {
         e.preventDefault();
         var file = e.target.files[0];
         GLOBAL_FILE = file;
-        alert("trigger submit")
         $("#upload_vid_form").submit()
     });
 
