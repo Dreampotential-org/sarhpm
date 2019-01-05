@@ -50,6 +50,11 @@ function init_all() {
 
         var xhr = new XMLHttpRequest();
         // xhr.withCredentials = true;
+        xhr.onprogress = function (e) {
+            if (e.lengthComputable) {
+                console.log(e.loaded+  " / " + e.total)
+            }
+        }
 
         xhr.addEventListener("readystatechange", function() {
             if (this.readyState === 4) {
