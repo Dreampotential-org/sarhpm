@@ -60,7 +60,7 @@ def gps_check_in(request):
         user = User.objects.get(id=request.user.id)
         GpsCheckin.objects.create(lat=lat, lng=lng, msg=msg,
                                   user=user)
-        return JsonResponse({'okay': 'gps_and_message submitted'}, status=200)
+        return JsonResponse({'status': 'okay'}, status=200)
 
 
 @csrf_exempt

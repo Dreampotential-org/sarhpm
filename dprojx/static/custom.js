@@ -31,6 +31,7 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
 
 var GLOBAL_FILE = null;
 var CURRENT_POSITION = null;
+
 function init_all() {
 
     $(".secAction .btnVideo").on('click', function(e) {
@@ -96,10 +97,10 @@ function init_all() {
       e.preventDefault();
       $('#signupModal').addClass('is-visible');
     });
-    $('#locationAuth').on('click', function(e) {
-      e.preventDefault();
-      $('#LocationModal').addClass('is-visible');
-    });
+    //$('#locationAuth').on('click', function(e) {
+    //  e.preventDefault();
+      //$('#LocationModal').addClass('is-visible');
+    //});
     $('.modal-overlay').on('click', function(e) {
       $('.modal').removeClass('is-visible');
     });
@@ -126,6 +127,7 @@ function handle_gps() {
             return
         }
 
+        $("#overlay_loading").show()
         $.ajax({
             url: '/gps-checkin/',
             data: {
@@ -135,8 +137,20 @@ function handle_gps() {
             },
             type: 'post',
             success: function(results) {
-                alert("success")
-                //callback(JSON.parse(results))
+                if (results.status && results.status == 'okay') {
+                    console.log(results)
+                    swal({
+                      title: "Good job!",
+                      text: "Gps and Note submitted successfully!",
+                      showCancelButton: false,
+                      confirmButtonText: "ok",
+                      allowOutsideClick: false,
+                      type: "success",
+                    }).then(function() {
+                        window.location = '/';
+                    })
+                    $("#overlay_loading").hide()
+                }
             }
         });
     });
