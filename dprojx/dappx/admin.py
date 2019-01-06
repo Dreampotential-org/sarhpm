@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from dappx.models import UserProfileInfo
+from dappx.models import GpsCheckin
 from dappx.models import User
 from dappx.models import VideoUpload
 
@@ -19,11 +20,17 @@ class CustomVideoUpload(admin.ModelAdmin):
     list_filter = ['user']
     model = VideoUpload
 
+class CustomGpsCheckin(admin.ModelAdmin):
+    list_display = ['user', 'lat', 'lng', 'user']
+    list_filter = ['user']
+    model = GpsCheckin
+
 
 
 
 # Register your models here.
 admin.site.register(UserProfileInfo)
+admin.site.register(GpsCheckin, CustomGpsCheckin)
 admin.site.register(VideoUpload, CustomVideoUpload)
 
 

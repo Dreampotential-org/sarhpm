@@ -15,10 +15,10 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from .models import VideoUpload
+from .models import GpsCheckin
 from .models import UserProfileInfo
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
-    HTTP_404_NOT_FOUND,
     HTTP_200_OK
 )
 from rest_framework.response import Response
@@ -44,9 +44,23 @@ def record_video_screen(request):
     return render(request, 'dappx/record.html')
 
 
+@csrf_exempt
 def gps_check_in(request):
-    print (request.POST)
-    return render(request, 'dappx/gps-event.html')
+    if request.method == 'GET':
+        return render(request, 'dappx/gps-event.html')
+
+    if request.method == 'POST':
+        print ("A CHECKIN HAS OCC")
+        print (request.POST)
+
+        msg = request.POST.get("msg")
+        lat = request.POST.get("lat")
+        lng = request.POST.get("long")
+
+        user = User.objects.get(id=request.user.id)
+        GpsCheckin.objects.create(lat=lat, lng=lng, msg=msg,
+                                  user=user)
+        return JsonResponse({'okay': 'gps_and_message submitted'}, status=200)
 
 
 @csrf_exempt

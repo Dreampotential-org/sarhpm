@@ -30,6 +30,7 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
 
 
 var GLOBAL_FILE = null;
+var CURRENT_POSITION = null;
 function init_all() {
 
     $(".secAction .btnVideo").on('click', function(e) {
@@ -120,21 +121,25 @@ function handle_gps() {
 
     $('#locationAuth').on('click', function(e) {
         var text = $(".mainContainer textarea").val()
+        if (CURRENT_POSITION == null) {
+            alert("No GPS Signal. Try again");
+            return
+        }
 
         $.ajax({
             url: '/gps-checkin/',
             data: {
               'msg': text,
+              'lat': CURRENT_POSITION.coords.latitude,
+              'long': CURRENT_POSITION.coords.longitude,
             },
             type: 'post',
             success: function(results) {
                 alert("success")
                 //callback(JSON.parse(results))
             }
-        })
-
+        });
     });
-
 
    function geo_error() {
       alert("Sorry, no position available.");

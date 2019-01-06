@@ -2,6 +2,14 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class GpsCheckin(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    msg = models.CharField(max_length=2000, default='')
+    lat = models.CharField(max_length=500, default='')
+    lng = models.CharField(max_length=500, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
 class VideoUpload(models.Model):
     videoUrl = models.CharField(max_length=500)
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
@@ -16,7 +24,6 @@ class UserProfileInfo(models.Model):
     phone = models.CharField(max_length=17, blank=True)
     name = models.CharField(max_length=17, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
 
     def __str__(self):
         return self.user.username
