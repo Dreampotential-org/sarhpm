@@ -114,7 +114,7 @@ header{
     content: "";
     width: 34px;
     height: 30px;
-    background: url(../images/movie.png) no-repeat;
+    background: url(../static/movie.png) no-repeat;
     position: absolute;
     background-size: 100% auto;
     left: 25px;
@@ -124,7 +124,7 @@ header{
     content: "";
     width: 30px;
     height: 34px;
-    background: url(../images/calender.png) no-repeat;
+    background: url(../static/calender.png) no-repeat;
     background-size: 100% auto;
     position: absolute;
     left: 25px;
@@ -142,7 +142,7 @@ header{
     font-weight: 600;
     margin-bottom: 15px;
     position: relative;
-    background: url(../images/pen.png) no-repeat center right;
+    background: url(../static/pen.png) no-repeat center right;
 }
 .eventBox textarea{
     width: 100%;
@@ -193,7 +193,7 @@ header{
     left: 80px;
     width: 32px;
     height: 23px;
-    background: url(../images/bubbleAngle.png) no-repeat;
+    background: url(../static/bubbleAngle.png) no-repeat;
 }
 
 .self {

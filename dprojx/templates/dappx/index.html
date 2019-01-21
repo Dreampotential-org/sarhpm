@@ -1,35 +1,29 @@
 {% extends "dappx/base.html" %}
 {% block body_block %}
-<div class="container">
-  <div class="jumbotron">
-    {% if user.is_authenticated %}
 
-    <div class="mainContainer">
+	{% if user.is_authenticated %}
+		<div class="mainContainer">
         <ol class="chat">
             <li class="other">
-                <div class="avatar"><img src="static/avater.png" draggable="false"/></div>
+                <div class="avatar"><img src="static/avater.png" draggable="false"></div>
                 <div class="msg">
-                    <p>Hi {{name}}, I’m Pam from Origins. What would you like to do?</p>
+						  <p>Hi {{name}}, I’m Pam from Origins. What would you like to do?</p>
                 </div>
             </li>
         </ol>
     </div>
-    <div class="secAction">
+
+	<div class="secAction">
         <div class="mainContainer">
 				<form id='upload_vid_form' method='post' style='display: inline;'
 						enctype="multipart/form-data">
 					<input type="file" accept="video/*" id='upload-vid'
 					       capture="environment" style='display:none;'>
-					<button class="actionBtn btnVideo">
-						Take a Video
-					</button>
+					<button class="actionBtn btnVideo">Take a Video</button>
 				</form>
-            <button class="actionBtn btnEvent">
-					Attend Event<span>(Check-In/Check-Out)</span>
-				</button>
+            <button class="actionBtn btnEvent">Attend Event<br><span>(Check-In/Check-Out)</span></button>
         </div>
     </div>
-
     {% else %}
 
     <div class="mainContainer">
@@ -101,8 +95,5 @@
             </div>
         </div>
     </div>
-
-    {% endif %}
-  </div>
-</div>
+	{% endif %}
 {% endblock %}
