@@ -53,12 +53,16 @@ function init_all() {
 
         var xhr = new XMLHttpRequest();
         // xhr.withCredentials = true;
-        xhr.onprogress = function (e) {
+        function updateProgress(e) {
             if (e.lengthComputable) {
+                console.log(e.loaded)
                 console.log(e.loaded+  " / " + e.total)
-                $(".swal-title").text(e.loaded/e.total*100 + "%")
+                $(".swal-title").text(parseInt(e.loaded/e.total*100) + "%")
             }
         }
+        xhr.upload.addEventListener('progress', updateProgress, false)
+
+
 
         xhr.addEventListener("readystatechange", function() {
             if (this.readyState === 4) {
