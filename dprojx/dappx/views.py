@@ -103,7 +103,7 @@ def upload(request):
 
         url = 'https://hooks.slack.com/services/'
         url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
-        data = (str("VideoUpload: %s - https://app.usespam.com%s" %
+        data = (str("VideoUpload: %s - https://app.usepam.com%s" %
                 (request.user.email, uploaded_file_url)))
         body = {"text": "%s" % data,
                 'username': 'pam-server'}
