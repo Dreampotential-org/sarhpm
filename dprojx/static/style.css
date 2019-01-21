@@ -1,10 +1,14 @@
 @import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans:400,500,600,700');
+html {
+  height: 100%;
+  width: 100%;
+}
 body{
     margin:0;
     padding: 0;
     position: relative;
-    min-height: 100vh;
-    overflow-x: hidden;
+    min-height: 100%;
+    overflow: hidden;
     font-family: 'IBM Plex Sans', sans-serif;
     background: #9014ee;
     background: -moz-linear-gradient(left, #9014ee 0%, #3905cd 100%);
@@ -72,8 +76,7 @@ header{
 }
 .secAction {
 	text-align: center;
-	position: absolute;
-	bottom: 50px;
+	margin-top: 30px;
     width: 100%;
 }
 .actionBtn{
@@ -81,7 +84,8 @@ header{
     color: #0d0e10;
     padding:5px;
     margin: 0px 15px;
-    display: inline-block;
+    /*display: inline-grid;*/
+    vertical-align: middle;
     min-width: 250px;
     height: 60px;
     border-radius: 40px;
@@ -95,11 +99,11 @@ header{
 }
 .actionBtn span{
     font-size: 12px;
-    display: block;
+    /*display: block;*/
 }
 .btnVideo{
     padding:  5px 30px 5px 75px;
-    /*top: -8px;*/
+    /*top: 8px;*/
     margin-left: 0;
 }
 .btnEvent{
@@ -110,7 +114,7 @@ header{
     content: "";
     width: 34px;
     height: 30px;
-    background: url(/static/movie.png) no-repeat;
+    background: url(../images/movie.png) no-repeat;
     position: absolute;
     background-size: 100% auto;
     left: 25px;
@@ -120,14 +124,14 @@ header{
     content: "";
     width: 30px;
     height: 34px;
-    background: url(/static/calender.png) no-repeat;
+    background: url(../images/calender.png) no-repeat;
     background-size: 100% auto;
     position: absolute;
     left: 25px;
 }
 .eventBox{
     background: #fff;
-    padding: 40px;
+    padding: 25px;
     border-radius: 20px;
     margin-top: 80px;
 }
@@ -138,10 +142,11 @@ header{
     font-weight: 600;
     margin-bottom: 15px;
     position: relative;
-    background: url(/static/pen.png) no-repeat center right;
+    background: url(../images/pen.png) no-repeat center right;
 }
 .eventBox textarea{
     width: 100%;
+    height:90px;
     border: 0;
     resize: none;
     color: #343434;
@@ -188,7 +193,7 @@ header{
     left: 80px;
     width: 32px;
     height: 23px;
-    background: url(/static/bubbleAngle.png) no-repeat;
+    background: url(../images/bubbleAngle.png) no-repeat;
 }
 
 .self {
@@ -282,7 +287,7 @@ header{
 .modal-wrapper {
   position: absolute;
   z-index: 9999;
-  top: 7em;
+  top: 55px;
   left: 0;
     right: 0;
     margin: auto;
@@ -305,17 +310,17 @@ header{
 }
 
 .modal-header{
-    padding: 120px 20px 20px;
+    padding: 70px 20px 10px;
 }
 .modal-content {
-  padding:0 40px 30px;
+  padding:0 20px 20px;
 }
 .modalLogo{
-    width: 200px;
+    width: 100px;
     position: absolute;
     left: 0;
     right: 0;
-    top: -100px;
+    top: -50px;
     margin: auto;
 }
 #LocationModal .modalLogo{
@@ -364,10 +369,10 @@ input[type=tel],
 input[type=password]{
     border: 0;
     font-size: 24px;
-    margin-bottom: 25px;
+    margin-bottom: 10px;
     width: 100%;
     box-shadow: 0px -1px 0px 0px rgba(230, 232, 234, 1) inset;
-    padding:20px 0px;
+    padding:15px 0px;
 }
 .btnSubmit{
     width: 100%;
@@ -415,6 +420,18 @@ video{
 video::-webkit-media-controls {
   display: none;
 }
+.backBtn {
+	width: 50px;
+	height: 50px;
+	background: #fff;
+	text-align: center;
+	font-size: 30px;
+	line-height: 45px;
+	border-radius: 50%;
+	-webkit-border-radius: 50%;
+	float: left;
+	color: #770fe5;
+}
 @media screen and (max-width: 640px) {
     .actionBtn {
         min-width: 200px;
@@ -440,7 +457,7 @@ video::-webkit-media-controls {
         min-width: 160px;
         height: 50px;
         font-size: 18px;
-        margin: 0px 10px;
+        margin: 0px 5px;
     }
     .btnVideo::before {
         width: 24px;
@@ -449,7 +466,7 @@ video::-webkit-media-controls {
         top: 13px;
     }
     .btnVideo {
-        padding: 5px 30px 5px 60px;
+        padding: 5px 30px 5px 60px;        
     }
     .btnEvent::before {
         width: 24px;
@@ -553,17 +570,44 @@ video::-webkit-media-controls {
         font-size: 18px;
     }
     .modal-heading {
-    	font-size: 30px;
+    	font-size: 26px;
     }
     .modalLogo {
-    	width: 120px;
-    	top: -60px;
+    	width: 100px;
+    	top: -50px;
     }
-    input[type="text"], input[type="email"], input[type="password"] {
-    	font-size: 20px;
+    input[type="text"], input[type="email"], input[type="password"], input[type="tel"] {
+    	font-size: 16px;
+    }
+    .locAuthTitle {
+    	font-size: 24px;
+    }
+    .locAuthDesc {
+    	font-size: 18px;
     }
 }
-
+@media screen and (max-width: 360px) {
+    .btnVideo::before {
+        width: 14px;
+        left: 15px;
+    }
+    .btnVideo {
+        padding: 5px 15px 5px 35px;   
+        font-size: 12px
+    }
+    .btnEvent::before {
+        width: 14px;
+        left: 15px;
+    }
+    .btnEvent {
+        padding: 5px 15px 5px 35px;
+        font-size: 12px
+    }
+    .actionBtn span {
+        font-size: 8px;
+    }    
+    
+}
 
 #overlay_loading {
   position: fixed; /* Sit on top of the page content */
@@ -580,3 +624,4 @@ video::-webkit-media-controls {
 
 
 }
+
