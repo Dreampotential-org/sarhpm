@@ -27,3 +27,8 @@ class UserProfileInfo(models.Model):
 
     def __str__(self):
         return self.user.username
+
+
+def get_user_profile_info_from_user(user_id):
+    user = User.objects.get(id=user_id)
+

@@ -60,6 +60,15 @@ def gps_check_in(request):
         user = User.objects.get(id=request.user.id)
         GpsCheckin.objects.create(lat=lat, lng=lng, msg=msg,
                                   user=user)
+
+        url = 'https://hooks.slack.com/services/'
+        url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
+        data = (str("GspCheckin: %s - %s (%s, %s)" %
+                (request.user.email, msg, lat, lng)))
+        body = {"text": "%s" % data,
+                'username': 'pam-server'}
+        requests.put(url, data=json.dumps(body))
+
         return JsonResponse({'status': 'okay'}, status=200)
 
 
@@ -92,6 +101,14 @@ def upload(request):
         VideoUpload.objects.create(videoUrl=uploaded_file_url,
                                    user=user)
 
+        url = 'https://hooks.slack.com/services/'
+        url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
+        data = (str("VideoUpload: %s - %s" %
+                (request.user.email, uploaded_file_url)))
+        body = {"text": "%s" % data,
+                'username': 'pam-server'}
+        requests.put(url, data=json.dumps(body))
+
         return JsonResponse({'error': 'Some error'}, status=200)
 
 
@@ -100,8 +117,6 @@ def upload(request):
 def record_video(request):
     print (request.user)
     files = request.data.get("file")
-    # lat = request.data.get("lat")
-    # lng = request.data.get("lng")
     userId = request.data.get('userId')
     fs = FileSystemStorage()
     try:
@@ -114,6 +129,7 @@ def record_video(request):
     print(type(files))
     print(uploaded_file_url)
 
+
     user = User.objects.get(id=userId)
     try:
         VideoUpload.objects.create(videoUrl=uploaded_file_url,
@@ -122,6 +138,9 @@ def record_video(request):
         logger.exception("Error")
         return Response({'error': 'Error uploading file'},
                         status=HTTP_400_BAD_REQUEST)
+
+
+
     return Response({
         'message', 'Success'
     }, status=HTTP_200_OK)
