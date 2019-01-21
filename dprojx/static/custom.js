@@ -33,7 +33,8 @@ var GLOBAL_FILE = null;
 var CURRENT_POSITION = null;
 
 function init_all() {
-
+    // hack email to fix validation
+    $("input[name='email']").attr("type", "email")
     $(".secAction .btnVideo").on('click', function(e) {
         e.preventDefault();
         $('#upload-vid').click()
