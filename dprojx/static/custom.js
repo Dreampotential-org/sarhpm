@@ -33,6 +33,7 @@ var GLOBAL_FILE = null;
 var CURRENT_POSITION = null;
 
 function init_all() {
+
     // hack email to fix validation
     $("input[name='email']").attr("type", "email")
     $(".secAction .btnVideo").on('click', function(e) {
@@ -55,6 +56,7 @@ function init_all() {
         xhr.onprogress = function (e) {
             if (e.lengthComputable) {
                 console.log(e.loaded+  " / " + e.total)
+                $(".swal-title").text(e.loaded/e.total*100 + "%")
             }
         }
 
@@ -83,6 +85,14 @@ function init_all() {
         var file = e.target.files[0];
         GLOBAL_FILE = file;
         $("#upload_vid_form").submit()
+        swal({
+            title: "0%",
+            text: "Video uploading please wait.",
+            icon: "info",
+            buttons: false,
+            closeOnEsc: false,
+            closeOnClickOutside: false,
+        });
     });
 
     $(".secAction .btnEvent").on('click', function(e) {
