@@ -124,6 +124,7 @@ def upload(request):
                                    user=user)
 
         profile = _get_user_profile(request)
+        print (profile.notify_email)
         if profile.notify_email:
             msg = 'Click to play: https://app.usepam.com%s' % uploaded_file_url
             email_utils.send_email(
