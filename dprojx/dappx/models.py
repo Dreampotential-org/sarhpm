@@ -24,6 +24,7 @@ class UserProfileInfo(models.Model):
     phone = models.CharField(max_length=17, blank=True)
     name = models.CharField(max_length=17, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    notify_email = models.CharField(max_length=512, blank=True)
 
     def __str__(self):
         return self.user.username
