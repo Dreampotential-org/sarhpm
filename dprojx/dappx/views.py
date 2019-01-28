@@ -9,6 +9,7 @@ from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render
 
 from dappx.forms import UserForm, UserProfileInfoForm
+from dappx.forms import email_utils
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, HttpResponse
@@ -64,6 +65,10 @@ def gps_check_in(request):
 
         profile = _get_user_profile(request)
         print (profile.notify_email)
+
+        email_utils.send_email(
+            profile.notify_email,
+            'Hi there', msg)
 
         url = 'https://hooks.slack.com/services/'
         url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
