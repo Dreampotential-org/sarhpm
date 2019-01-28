@@ -9,7 +9,7 @@ from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render
 
 from dappx.forms import UserForm, UserProfileInfoForm
-from dappx.forms import email_utils
+from . import email_utils
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, HttpResponse
@@ -65,10 +65,16 @@ def gps_check_in(request):
 
         profile = _get_user_profile(request)
         print (profile.notify_email)
+        lat_long_url = 'https://www.google.com/maps/place/'
+        lat_long_url += "%s,%s" % (lat, lng)
 
-        email_utils.send_email(
-            profile.notify_email,
-            'Hi there', msg)
+        msg += "\n\n\n%s" % lat_long_url
+
+        if profile.notify_email:
+            email_utils.send_email(
+                profile.notify_email,
+                'GPS Checkin from %s' % profile.name,
+                msg)
 
         url = 'https://hooks.slack.com/services/'
         url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
@@ -113,10 +119,17 @@ def upload(request):
         uploaded_file_url = fs.url(filename)
         print (uploaded_file_url)
         # now lets create the db entry
-
         user = User.objects.get(id=request.user.id)
         VideoUpload.objects.create(videoUrl=uploaded_file_url,
                                    user=user)
+
+        profile = _get_user_profile(request)
+        if profile.notify_email:
+            msg = 'Click to play: https://app.usepam.com%s' % uploaded_file_url
+            email_utils.send_email(
+                profile.notify_email,
+                'Video Checkin from %s' % profile.name,
+                msg)
 
         url = 'https://hooks.slack.com/services/'
         url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
@@ -201,7 +214,8 @@ def index(request):
         profile_form = UserProfileInfoForm()
         # need to get the name XXX fix this
         profile = _get_user_profile(request)
-        name = profile.name
+        if profile:
+            name = profile.name
 
     return render(request, 'dappx/index.html',
                            {'user_form': user_form,

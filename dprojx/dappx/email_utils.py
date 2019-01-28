@@ -37,7 +37,7 @@ def send_email(to_email, subject, message):
 
     # Try to send the email.
     try:
-        #Provide the contents of the email.
+        # Provide the contents of the email.
         response = client.send_email(
             Destination={
                 'ToAddresses': [
@@ -67,4 +67,3 @@ def send_email(to_email, subject, message):
     else:
         print("Email sent! Message ID:"),
         print(response['MessageId'])
-
