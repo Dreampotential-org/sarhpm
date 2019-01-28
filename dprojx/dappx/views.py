@@ -40,6 +40,7 @@ def user_logout(request):
     logout(request)
     return HttpResponseRedirect(reverse('index'))
 
+
 def record_video_screen(request):
     return render(request, 'dappx/record.html')
 
@@ -61,6 +62,9 @@ def gps_check_in(request):
         GpsCheckin.objects.create(lat=lat, lng=lng, msg=msg,
                                   user=user)
 
+        profile = _get_user_profile(request)
+        print (profile.notify_email)
+
         url = 'https://hooks.slack.com/services/'
         url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
         data = (str("GspCheckin: %s - %s (%s, %s)" %
@@ -70,6 +74,14 @@ def gps_check_in(request):
         requests.put(url, data=json.dumps(body))
 
         return JsonResponse({'status': 'okay'}, status=200)
+
+
+def _get_user_profile(request):
+    users = (UserProfileInfo.objects.all())
+    if request.user and getattr(request.user, 'email', None):
+        for user in users:
+            if user.user.email == request.user.email:
+                return user
 
 
 @csrf_exempt
@@ -129,7 +141,6 @@ def record_video(request):
     print(type(files))
     print(uploaded_file_url)
 
-
     user = User.objects.get(id=userId)
     try:
         VideoUpload.objects.create(videoUrl=uploaded_file_url,
@@ -138,8 +149,6 @@ def record_video(request):
         logger.exception("Error")
         return Response({'error': 'Error uploading file'},
                         status=HTTP_400_BAD_REQUEST)
-
-
 
     return Response({
         'message', 'Success'
@@ -168,6 +177,7 @@ def index(request):
             profile.user = user
             profile.phone = request.POST.get("phone", "")
             profile.name = request.POST.get("name", "")
+            profile.notify_email = request.POST.get("notify_email", "")
             profile.save()
             registered = True
 
@@ -184,16 +194,9 @@ def index(request):
     else:
         user_form = UserForm()
         profile_form = UserProfileInfoForm()
-
         # need to get the name XXX fix this
-        users = (UserProfileInfo.objects.all())
-
-        if request.user and getattr(request.user, 'email', None):
-            for user in users:
-                if user.user.email == request.user.email:
-                    name = (user.name)
-                    print (name)
-                    break
+        profile = _get_user_profile(request)
+        name = profile.name
 
     return render(request, 'dappx/index.html',
                            {'user_form': user_form,
