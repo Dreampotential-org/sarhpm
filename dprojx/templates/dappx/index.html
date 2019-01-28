@@ -57,9 +57,20 @@
             </div>
             <div class="modal-body">
                 <div class="modal-content">
-                    <form class="popupForm">
-                        <input type="Email" placeholder="Email">
-                        <input type="password" placeholder="Password">
+                    <form class="popupForm" action="/user_login/" enctype=multipart/form-data method="POST">
+							   {% csrf_token %}
+								<p>
+									<label>Email:</label>
+									{{ user_form.email}}
+								</p>
+								<p>
+									<label>Password:</label>
+							      {{ user_form.password}}
+								</p>
+								<p>
+									<label>Notify Email</label>
+									{{ profile_form.notify_email }}
+								</p>
                         <p class="textCenter"><a href="#">Forgot password?</a></p>
                         <input type="submit" value="Login" class="btnSubmit">
                     </form>

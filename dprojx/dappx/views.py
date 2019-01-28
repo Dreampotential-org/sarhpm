@@ -226,12 +226,19 @@ def index(request):
 
 def user_login(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
+        username = request.POST.get('email')
         password = request.POST.get('password')
+        notify_email = request.POST.get('notify_email', "")
         user = authenticate(username=username, password=password)
         if user:
             if user.is_active:
                 login(request, user)
+                profile = _get_user_profile(request)
+                print (notify_email)
+                profile.notify_email = notify_email
+                profile.save()
+                # update notify_email
+
                 return HttpResponseRedirect(reverse('index'))
             else:
                 return HttpResponse("Your account was inactive.")

@@ -31,4 +31,5 @@ urlpatterns = [
     url(r'^special/', views.special, name='special'),
     url(r'^dappx/', include('dappx.urls')),
     url(r'^logout/$', views.user_logout, name='logout'),
+    url(r'^user_login/$', views.user_login, name='user_login'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
