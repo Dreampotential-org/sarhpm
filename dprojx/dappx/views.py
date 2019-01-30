@@ -132,7 +132,7 @@ def upload(request):
         if profile.notify_email:
             msg = (
                 'Click to play: https://app.usepam.com/video?id=%s'
-                % uploaded_file_url[:7]
+                % uploaded_file_url[7:]
             )
             email_utils.send_email(
                 profile.notify_email,
