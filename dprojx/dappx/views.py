@@ -119,7 +119,15 @@ def upload(request):
         # save file to disk
         myfile = request.FILES['file']
         fs = FileSystemStorage()
+
+        uploaded_name = ("%s-%s" % (uuid.uuid4(), myfile.name)).lower()
+        print (uploaded_name)
+        if uploaded_name[-4:] == '.mov':
+            print ("AAAH MOVE FILE")
+
         filename = fs.save("%s-%s" % (uuid.uuid4(), myfile.name), myfile)
+        print (filename)
+
         uploaded_file_url = fs.url(filename)
         print (uploaded_file_url)
         # now lets create the db entry
