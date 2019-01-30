@@ -31,6 +31,10 @@ def register(request):
     return render(request, 'dappx/index.html')
 
 
+def video(request):
+    print(request.GET.get("id"))
+    return render(request, 'dappx/video.html', {'id': request.GET.get('id')})
+
 @login_required
 def special(request):
     return HttpResponse("You are logged in !")
