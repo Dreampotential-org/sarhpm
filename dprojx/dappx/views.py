@@ -213,7 +213,7 @@ def upload(request):
         print (uploaded_name)
         if uploaded_name[-4:] == '.mov':
             # ffmpeg!
-            #uploaded_file_url = convert_file(uploaded_file_url)
+            uploaded_file_url = convert_file(uploaded_file_url)
             print ("AAAH MOVE FILE")
 
         print (uploaded_file_url)
