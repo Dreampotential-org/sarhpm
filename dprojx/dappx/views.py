@@ -158,7 +158,7 @@ def upload(request):
         if profile.notify_email:
             msg = (
                 'Click to play: https://app.usepam.com/video?id=%s&user=%s'
-                % (uploaded_file_url[7:], user_hash)
+                % (uploaded_file_url[7:].split("/", 1)[1], user_hash)
             )
             email_utils.send_email(
                 profile.notify_email,
