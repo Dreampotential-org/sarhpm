@@ -34,8 +34,10 @@ def register(request):
 
 
 def video(request):
-    print(request.GET.get("id"))
-    return render(request, 'dappx/video.html', {'id': request.GET.get('id')})
+    return render(request, 'dappx/video.html', {
+        'id': request.GET.get('id'),
+        'user': request.GET.get('user')
+    })
 
 @login_required
 def special(request):
@@ -133,9 +135,10 @@ def upload(request):
         myfile = request.FILES['file']
         fs = FileSystemStorage()
 
-        user_hash = hashlib.sha1(request.user.email).hexdigest()
+        user_hash = hashlib.sha1(request.user.email.encode('utf-8')).hexdigest()
+        print (user_hash)
 
-        uploaded_name = ("%s-%s" % (uuid.uuid4(), myfile.name)).lower()
+        uploaded_name = ("%s/%s-%s" % (user_hash, uuid.uuid4(), myfile.name)).lower()
         filename = fs.save(uploaded_name, myfile)
         uploaded_file_url = fs.url(filename)
         print (uploaded_name)
