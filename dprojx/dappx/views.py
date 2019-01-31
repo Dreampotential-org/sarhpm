@@ -119,9 +119,9 @@ def convert_file(uploaded_file_url):
     outfile = "%s.mp4" % uploaded_file_url.rsplit(".", 1)[0]
 
     command = (
-        "ffmpeg -an -i %s -vcodec libx264 -codec:a libmp3lame "
+        "ffmpeg -an -i ./%s -vcodec libx264 -codec:a libmp3lame "
         "-qscale:a 1 -pix_fmt yuv420p -profile:v baseline "
-        "-level 3 %s" % (uploaded_file_url, outfile))
+        "-level 3 ./%s" % (uploaded_file_url, outfile))
     #command = (
     #    'ffmpeg -i ./%s -vcodec copy -acodec copy ./%s'
     #    % (uploaded_file_url, outfile)
