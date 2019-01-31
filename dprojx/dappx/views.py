@@ -72,10 +72,9 @@ def register(request):
 
 
 def video(request):
-    return render(request, 'dappx/video.html', {
-        'id': request.GET.get('id'),
-        'user': request.GET.get('user')
-    })
+    path = './media/%s/%s' % (request.GET.get("user"), request.GET.get("id"))
+    print (path)
+    return stream_video(request, path)
 
 @login_required
 def special(request):
