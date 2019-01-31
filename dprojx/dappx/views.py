@@ -1,3 +1,4 @@
+import os
 import uuid
 import requests
 import logging
@@ -111,6 +112,17 @@ def post_slack_errors(request):
     return JsonResponse({'error': 'Some error'}, status=200)
 
 
+def convert_file(uploaded_file_url):
+    outfile = "%s.mp4" % uploaded_file_url.rsplit(".", 1)[0]
+    command = (
+        'ffmpeg -i ./%s -vcodec copy -acodec copy ./%s'
+        % (uploaded_file_url, outfile)
+    )
+    print (command)
+    os.system(command)
+    return outfile
+
+
 @csrf_exempt
 @login_required
 def upload(request):
@@ -120,15 +132,17 @@ def upload(request):
         myfile = request.FILES['file']
         fs = FileSystemStorage()
 
+        user_hash = hashlib.sha1(request.user.email).hexdigest()
+
         uploaded_name = ("%s-%s" % (uuid.uuid4(), myfile.name)).lower()
+        filename = fs.save(uploaded_name, myfile)
+        uploaded_file_url = fs.url(filename)
         print (uploaded_name)
         if uploaded_name[-4:] == '.mov':
+            # ffmpeg!
+            uploaded_file_url = convert_file(uploaded_file_url)
             print ("AAAH MOVE FILE")
 
-        filename = fs.save("%s-%s" % (uuid.uuid4(), myfile.name), myfile)
-        print (filename)
-
-        uploaded_file_url = fs.url(filename)
         print (uploaded_file_url)
         # now lets create the db entry
         user = User.objects.get(id=request.user.id)
