@@ -34,6 +34,14 @@ var CURRENT_POSITION = null;
 
 function init_all() {
 
+    if ($("#user_taken").val() == 'True') {
+        swal({
+          title: "Email already taken.",
+          text: "Please try signing in.",
+          icon: "error",
+        });
+    }
+
     // hack email to fix validation
     $("input[name='email']").attr("type", "email")
     $(".secAction .btnVideo").on('click', function(e) {

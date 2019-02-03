@@ -277,53 +277,64 @@ def record_video(request):
     }, status=HTTP_200_OK)
 
 
+
+
+def _create_user(request):
+    print ("Create user request!!!")
+    print (request.POST)
+    data = request.POST.copy()
+    data['username'] = request.POST.get('email')
+    print ('after')
+    print (data)
+    user_form = UserForm(data)
+    profile_form = UserProfileInfoForm(data=request.POST)
+    if user_form.is_valid() and profile_form.is_valid():
+        user = user_form.save()
+        print ("UERERERE %s" % user)
+        user.set_password(user.password)
+        user.save()
+        profile = profile_form.save(commit=False)
+        profile.user = user
+        profile.phone = request.POST.get("phone", "")
+        profile.name = request.POST.get("name", "")
+        profile.notify_email = request.POST.get("notify_email", "")
+        profile.save()
+        registered = True
+
+        # log user in!
+        username = request.POST.get('email')
+        password = request.POST.get('password')
+        user = authenticate(username=username, password=password)
+        if user:
+            login(request, user)
+            return HttpResponseRedirect(reverse('index'))
+
+    elif (user_form.errors):
+        return 'error'
+
+
 def index(request):
-    print (request.user.id)
     registered = False
+    user_taken = False
     name = ''
     if request.method == 'POST':
-        #request.POST['username'] = request.POST.get('email')
-        print ("Create user request!!!")
-        print (request.POST)
-        data = request.POST.copy()
-        data['username'] = request.POST.get('email')
-        print ('after')
-        print (data)
-        user_form = UserForm(data)
-        profile_form = UserProfileInfoForm(data=request.POST)
-        if user_form.is_valid() and profile_form.is_valid():
-            user = user_form.save()
-            user.set_password(user.password)
-            user.save()
-            profile = profile_form.save(commit=False)
-            profile.user = user
-            profile.phone = request.POST.get("phone", "")
-            profile.name = request.POST.get("name", "")
-            profile.notify_email = request.POST.get("notify_email", "")
-            profile.save()
-            registered = True
-
-            # log user in!
-            username = request.POST.get('email')
-            password = request.POST.get('password')
-            user = authenticate(username=username, password=password)
-            if user:
-                login(request, user)
-                return HttpResponseRedirect(reverse('index'))
-
+        user = _create_user(request)
+        if user == 'error':
+            user_taken = True
         else:
-            print(user_form.errors, profile_form.errors)
-    else:
-        user_form = UserForm()
-        profile_form = UserProfileInfoForm()
-        # need to get the name XXX fix this
-        profile = _get_user_profile(request)
-        if profile:
-            name = profile.name
+            return user
+
+    user_form = UserForm()
+    profile_form = UserProfileInfoForm()
+    # need to get the name XXX fix this
+    profile = _get_user_profile(request)
+    if profile:
+        name = profile.name
 
     return render(request, 'dappx/index.html',
                            {'user_form': user_form,
                             'profile_form': profile_form,
+                            'user_taken': user_taken,
                             'name': name,
                             'registered': registered})
 
