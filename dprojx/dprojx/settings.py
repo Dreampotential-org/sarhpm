@@ -29,6 +29,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+EMAIL_BACKEND = 'django_ses.SESBackend'
+AWS_ACCESS_KEY_ID = 'AKIAIHFAW4CMLKGZJWQQ'
+AWS_SECRET_ACCESS_KEY = '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'
+DEFAULT_FROM_EMAIL = 'noreply@app.usepam.com'
+
 
 # Application definition
 
