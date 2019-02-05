@@ -35,6 +35,7 @@ AWS_ACCESS_KEY_ID = 'AKIAIHFAW4CMLKGZJWQQ'
 AWS_SECRET_ACCESS_KEY = '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'
 DEFAULT_FROM_EMAIL = 'noreply@app.usepam.com'
 
+SITE_ID = 1
 
 # Application definition
 
@@ -46,6 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+
 ]
 
 MIDDLEWARE = [
