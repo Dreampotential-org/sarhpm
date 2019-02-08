@@ -1,4 +1,3 @@
-import re
 import hashlib
 import os
 import uuid
@@ -17,6 +16,7 @@ from django.shortcuts import render
 
 from dappx.forms import UserForm, UserProfileInfoForm
 from . import email_utils
+from . import video_utils
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, HttpResponse
@@ -34,39 +34,6 @@ from rest_framework.response import Response
 logger = logging.getLogger(__name__)
 
 
-range_re = re.compile(r'bytes\s*=\s*(\d+)\s*-\s*(\d*)', re.I)
-class RangeFileWrapper(object):
-    def __init__(self, filelike, blksize=8192, offset=0, length=None):
-        self.filelike = filelike
-        self.filelike.seek(offset, os.SEEK_SET)
-        self.remaining = length
-        self.blksize = blksize
-
-    def close(self):
-        if hasattr(self.filelike, 'close'):
-            self.filelike.close()
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if self.remaining is None:
-            # If remaining is None, we're reading the entire file.
-            data = self.filelike.read(self.blksize)
-            if data:
-                return data
-            raise StopIteration()
-        else:
-            if self.remaining <= 0:
-                raise StopIteration()
-            data = self.filelike.read(min(self.remaining, self.blksize))
-            if not data:
-                raise StopIteration()
-            self.remaining -= len(data)
-            return data
-
-
-
 def register(request):
     return render(request, 'dappx/index.html')
 
@@ -75,6 +42,7 @@ def video(request):
     path = './media/%s/%s' % (request.GET.get("user"), request.GET.get("id"))
     print (path)
     return stream_video(request, path)
+
 
 @login_required
 def special(request):
@@ -154,15 +122,8 @@ def post_slack_errors(request):
 
 def convert_file(uploaded_file_url):
     outfile = "%s.mp4" % uploaded_file_url.rsplit(".", 1)[0]
-
-    # command = (
-    #     "ffmpeg -i ./%s -c:v libx264 -crf 28 -preset veryslow -tune fastdecode "
-    #     "-profile:v baseline -level 3.0 -movflags +faststart -c:a libfdk_aac -ac 2 "
-    #     "-ar 44100 -ab 64k -threads 0 -f mp4 ./%s" % (uploaded_file_url, outfile))
     command = (
-        #'ffmpeg -i ./%s -vcodec copy -acodec copy ./%s'
-	'avconv -i ./%s -codec copy ./%s'
-        % (uploaded_file_url, outfile)
+        'avconv -i ./%s -codec copy ./%s' % (uploaded_file_url, outfile)
     )
     print (command)
     os.system(command)
@@ -171,7 +132,7 @@ def convert_file(uploaded_file_url):
 
 def stream_video(request, path):
     range_header = request.META.get('HTTP_RANGE', '').strip()
-    range_match = range_re.match(range_header)
+    range_match = video_utils.range_re.match(range_header)
     size = os.path.getsize(path)
     content_type, encoding = mimetypes.guess_type(path)
     content_type = content_type or 'application/octet-stream'
@@ -182,18 +143,19 @@ def stream_video(request, path):
         if last_byte >= size:
             last_byte = size - 1
         length = last_byte - first_byte + 1
-        resp = StreamingHttpResponse(RangeFileWrapper(open(path, 'rb'),
-                                     offset=first_byte, length=length),
-                                     status=206, content_type=content_type)
+        resp = StreamingHttpResponse(video_utils.RangeFileWrapper(
+            open(path, 'rb'), offset=first_byte, length=length), status=206,
+            content_type=content_type
+        )
         resp['Content-Length'] = str(length)
-        resp['Content-Range'] = 'bytes %s-%s/%s' % (first_byte, last_byte, size)
+        resp['Content-Range'] = 'bytes %s-%s/%s' % (first_byte, last_byte,
+                                                    size)
     else:
-        resp = StreamingHttpResponse(FileWrapper(open(path, 'rb')), content_type=content_type)
+        resp = StreamingHttpResponse(
+            FileWrapper(open(path, 'rb')), content_type=content_type)
         resp['Content-Length'] = str(size)
     resp['Accept-Ranges'] = 'bytes'
     return resp
-
-
 
 
 @csrf_exempt
@@ -204,11 +166,10 @@ def upload(request):
         # save file to disk
         myfile = request.FILES['file']
         fs = FileSystemStorage()
-
-        user_hash = hashlib.sha1(request.user.email.encode('utf-8')).hexdigest()
-        print (user_hash)
-
-        uploaded_name = ("%s/%s-%s" % (user_hash, uuid.uuid4(), myfile.name)).lower()
+        user_hash = hashlib.sha1(
+            request.user.email.encode('utf-8')).hexdigest()
+        uploaded_name = ("%s/%s-%s" % (user_hash, uuid.uuid4(),
+                                       myfile.name)).lower()
         filename = fs.save(uploaded_name, myfile)
         uploaded_file_url = fs.url(filename)
         print (uploaded_name)
@@ -277,8 +238,6 @@ def record_video(request):
     }, status=HTTP_200_OK)
 
 
-
-
 def _create_user(request):
     print ("Create user request!!!")
     print (request.POST)
@@ -299,7 +258,6 @@ def _create_user(request):
         profile.name = request.POST.get("name", "")
         profile.notify_email = request.POST.get("notify_email", "")
         profile.save()
-        registered = True
 
         # log user in!
         username = request.POST.get('email')
