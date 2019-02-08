@@ -1,3 +1,4 @@
+import datetime
 import hashlib
 import os
 import uuid
@@ -105,7 +106,18 @@ def _get_user_profile(request):
     if request.user and getattr(request.user, 'email', None):
         for user in users:
             if user.user.email == request.user.email:
+                print (type(user.user.date_joined))
+                print (user.user.date_joined)
                 return user
+
+
+def days_sober(date_joined):
+    date_joined = (str(date_joined).split(" "))[0].split("-")
+    current = datetime.datetime.now()
+    joined = datetime.datetime(int(date_joined[0]),
+                               int(date_joined[1]),
+                               int(date_joined[2]))
+    return (current - joined).days
 
 
 @csrf_exempt
@@ -185,7 +197,6 @@ def upload(request):
                                    user=user)
 
         profile = _get_user_profile(request)
-        print (profile.notify_email)
         if profile.notify_email:
             msg = (
                 'Click to play: https://app.usepam.com/video?id=%s&user=%s'
@@ -286,13 +297,16 @@ def index(request):
     profile_form = UserProfileInfoForm()
     # need to get the name XXX fix this
     profile = _get_user_profile(request)
+    sober_days = 0
     if profile:
         name = profile.name
+        sober_days = (days_sober(profile.user.date_joined))
 
     return render(request, 'dappx/index.html',
                            {'user_form': user_form,
                             'profile_form': profile_form,
                             'user_taken': user_taken,
+                            'sober_days': sober_days,
                             'name': name,
                             'registered': registered})
 
