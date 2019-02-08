@@ -29,7 +29,7 @@ server {
 server {
         listen 443 ssl http2;
         listen [::]:443 ssl http2;
-        server_name stagging.postmunk.me;
+        server_name beachcomber.usepam.com;
 
         server_tokens off;
 
