@@ -22,11 +22,13 @@
     <div id='overlay_loading'></div>
     <header>
         <div class="mainContainer">
+          {% if user.is_authenticated %}
             <nav class="toggleBar">
                 <span class="bar bar1"></span>
                 <span class="bar bar2"></span>
                 <span class="bar bar3"></span>
             </nav>
+          {% endif %}
             <div class="logo"><img src="/static/beachlogo.png" alt="logo"></div>
         </div>
     </header>
@@ -47,9 +49,13 @@
     {% endblock %}
     {% block gps_block %}
     {% endblock %}
+
+   {% if user.is_authenticated %}
     <div class="slideMenu">
         <h4 class="textCenter">Days Sober: 0</h4>
         <h4 class="textCenter"><a href="/logout">Logout</a></h4>
     </div>
+   {% endif %}
+
   </body>
 </html>

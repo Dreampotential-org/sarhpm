@@ -22,9 +22,3 @@ services:
         command: python3 manage.py runserver 0.0.0.0:8001
         entrypoint: /entrypoint.sh
         restart: always
-
-    nginx:
-        image: nginx:latest
-        depends_on:
-            - project
-
