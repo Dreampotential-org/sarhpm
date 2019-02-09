@@ -11,9 +11,12 @@ class CustomVideoUpload(admin.ModelAdmin):
     list_display = ['id', 'user', 'display_link', 'uploaded_at']
 
     def display_link(self, obj):
+        user_hash = obj.videoUrl.split("/media/")[1].split("/")[0]
+        video_id = obj.videoUrl[7:].split("/", 1)[1]
+        url = '/video?id=%s&user=%s' % (video_id, user_hash)
         return format_html(
-            '<a href="%s" target="_blank">%s</a>' % (
-                obj.videoUrl, obj.videoUrl))
+            '<a href="%s" target="_blank">Play Video</a>' % (url)
+	     )
 
     display_link.mark_safe = True
     display_link.short_description = "URL"
@@ -21,11 +24,24 @@ class CustomVideoUpload(admin.ModelAdmin):
     model = VideoUpload
 
 class CustomGpsCheckin(admin.ModelAdmin):
-    list_display = ['user', 'lat', 'lng', 'user']
+    list_display = ['view_map', 'lat', 'lng', 'user']
     list_filter = ['user']
     model = GpsCheckin
 
 
+    def user(self, obj):
+        return obj.user.name
+
+    def view_map(self, obj):
+        print (obj.lat)
+        print (obj.lng)
+
+        map_url = 'https://www.google.com/maps/place/'
+        map_url += "%s,%s" % (obj.lat, obj.lng)
+
+        return format_html(
+            '<a href="%s" target="_blank">View Map</a>' % map_url
+	     )
 
 
 # Register your models here.
