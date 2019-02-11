@@ -74,8 +74,8 @@ def gps_check_in(request):
         lng = request.POST.get("long")
 
         user = User.objects.get(id=request.user.id)
-        GpsCheckin.objects.create(lat=lat, lng=lng, msg=msg,
-                                  user=user)
+        GpsCheckin.objects.create(lat=lat, lng=lng,
+                                  msg=msg, user=user)
 
         profile = _get_user_profile(request)
         print (profile.notify_email)
@@ -266,6 +266,7 @@ def _create_user(request):
         profile = profile_form.save(commit=False)
         profile.user = user
         profile.phone = request.POST.get("phone", "")
+        profile.days_sober = request.POST.get("days_sober", 0)
         profile.name = request.POST.get("name", "")
         profile.notify_email = request.POST.get("notify_email", "")
         profile.save()
@@ -300,7 +301,10 @@ def index(request):
     sober_days = 0
     if profile:
         name = profile.name
-        sober_days = (days_sober(profile.user.date_joined))
+        print (dir(profile))
+        print (profile.days_sober)
+        sober_days = (profile.days_sober +
+                      days_sober(profile.user.date_joined))
 
     return render(request, 'dappx/index.html',
                            {'user_form': user_form,

@@ -25,6 +25,7 @@ class UserProfileInfo(models.Model):
     name = models.CharField(max_length=17, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     notify_email = models.CharField(max_length=512, blank=True)
+    days_sober = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.user.username
@@ -32,4 +33,3 @@ class UserProfileInfo(models.Model):
 
 def get_user_profile_info_from_user(user_id):
     user = User.objects.get(id=user_id)
-
