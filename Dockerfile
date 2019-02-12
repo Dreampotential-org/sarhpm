@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:xenial
 
 RUN apt-get update
 RUN apt-get install -y python3
@@ -6,6 +6,7 @@ RUN apt-get install -y python3-pip
 RUN apt-get install -y libmysqlclient-dev
 RUN apt-get install -y locales
 RUN apt-get install -y ffmpeg
+RUN apt-get install -y libav-tools
 
 RUN pip3 install --upgrade pip
 
