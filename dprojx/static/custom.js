@@ -145,6 +145,19 @@ function handle_gps() {
 
     $('#locationAuth').on('click', function(e) {
         var text = $(".mainContainer textarea").val()
+        if (text.length == 0) {
+            $(".eventBox textarea").css("border-color", "red")
+            $(".eventBox textarea").css("border", "1")
+
+
+            swal({
+              title: "Note required",
+              text: "Please enter description of event",
+              type: "warning",
+            })
+            return
+        }
+
         if (CURRENT_POSITION == null) {
             alert("No GPS Signal. Try again");
             return
