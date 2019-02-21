@@ -24,7 +24,7 @@ class CustomVideoUpload(admin.ModelAdmin):
     model = VideoUpload
 
 class CustomGpsCheckin(admin.ModelAdmin):
-    list_display = ['view_map', 'lat', 'lng', 'user']
+    list_display = ['view_map', 'msg', 'user']
     list_filter = ['user']
     model = GpsCheckin
 
