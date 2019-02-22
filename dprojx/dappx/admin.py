@@ -15,9 +15,10 @@ class CustomVideoUpload(admin.ModelAdmin):
         video_id = obj.videoUrl[7:].split("/", 1)[1]
         url = '/video?id=%s&user=%s' % (video_id, user_hash)
         return format_html(
-            '<a href="%s" target="_blank">Play Video</a>' % (url)
+            "<video controls autoplay name='media'>"
+                "<source src='%s' type='video/mp4'>"
+            "</video>" % url
 	     )
-
     display_link.mark_safe = True
     display_link.short_description = "URL"
     list_filter = ['user']
@@ -33,9 +34,6 @@ class CustomGpsCheckin(admin.ModelAdmin):
         return obj.user.name
 
     def view_map(self, obj):
-        print (obj.lat)
-        print (obj.lng)
-
         map_url = 'https://www.google.com/maps/place/'
         map_url += "%s,%s" % (obj.lat, obj.lng)
 
