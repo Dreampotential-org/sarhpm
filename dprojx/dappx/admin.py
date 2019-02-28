@@ -15,6 +15,12 @@ class CustomVideoUpload(admin.ModelAdmin):
         video_id = obj.videoUrl[7:].split("/", 1)[1]
         url = '/video?id=%s&user=%s' % (video_id, user_hash)
         return format_html(
+            '<video controls="" name="media" width="320" height="240">'
+                '<source src="/video/?id=%s&amp;user=%s" type="video/mp4"></video>' % (video_id, user_hash)
+        )
+
+
+        return format_html(
             '<a href="%s" target="_blank">Play Video</a>' % (url)
 	     )
 
