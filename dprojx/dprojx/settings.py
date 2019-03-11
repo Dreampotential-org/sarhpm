@@ -27,7 +27,7 @@ SECRET_KEY = '6xcxxio+$*i^*u*-tj$#zgajf!sjv#rf7l6s4jm^l@s#zv%)!3'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['beachcomber.usepam.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*', 'beachcomber.usepam.com', 'localhost', '127.0.0.1']
 
 BASE_URL = 'app.usepam.com'
 EMAIL_BACKEND = 'django_ses.SESBackend'
