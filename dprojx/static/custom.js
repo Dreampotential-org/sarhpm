@@ -31,6 +31,7 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
 
 var GLOBAL_FILE = null;
 var CURRENT_POSITION = null;
+var CURRENT_POSITION_LOW = null;
 
 function init_all() {
 
@@ -158,9 +159,17 @@ function handle_gps() {
             return
         }
 
-        if (CURRENT_POSITION == null) {
+        if (CURRENT_POSITION == null && CURRENT_POSITION_LOW == null) {
             alert("No GPS Signal. Try again");
             return
+        }
+
+        var current_loc = null;
+
+        if (CURRENT_POSITION == null) {
+            current_loc = CURRENT_POSITION_LOW;
+        } else {
+            current_loc = CURRENT_POSITION;
         }
 
         $("#overlay_loading").show()
@@ -168,8 +177,8 @@ function handle_gps() {
             url: '/gps-checkin/',
             data: {
               'msg': text,
-              'lat': CURRENT_POSITION.coords.latitude,
-              'long': CURRENT_POSITION.coords.longitude,
+              'lat': current_loc.coords.latitude,
+              'long': current_loc.coords.longitude,
             },
             type: 'post',
             success: function(results) {
@@ -191,8 +200,18 @@ function handle_gps() {
         });
     });
 
+    var geo_options_low = {
+        enableHighAccuracy: false,
+        maximumAge        : 30000,
+        timeout           : 27000
+    };
+
+    var wpid = navigator.geolocation.watchPosition(
+        geo_success_low, geo_error, geo_options_low
+    );
+
    function geo_error() {
-      alert("Sorry, no position available.");
+      //alert("Sorry, no position available.");
     }
 
     var geo_options = {
@@ -204,6 +223,13 @@ function handle_gps() {
     var wpid = navigator.geolocation.watchPosition(
         geo_success, geo_error, geo_options
     );
+
+    function geo_success_low(position) {
+        CURRENT_POSITION_LOW = position
+        console.log(position.coords.latitude +
+                    " " +  position.coords.longitude);
+    }
+
     function geo_success(position) {
         CURRENT_POSITION = position
         console.log(position.coords.latitude +
