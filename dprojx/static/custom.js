@@ -189,7 +189,7 @@ function handle_gps() {
 
             swal({
                 title: "GPS Location Found",
-                text: "Enter event",
+                text: "Now, enter event and submit",
                 icon: "success",
             });
             clearInterval(i);
