@@ -200,8 +200,6 @@ function handle_gps() {
         }
     }, 200);
 
-
-
     $('#locationAuth').on('click', function(e) {
         var text = $(".mainContainer textarea").val()
         if (text.length == 0) {
