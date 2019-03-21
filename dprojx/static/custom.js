@@ -202,7 +202,7 @@ function handle_gps() {
                     clearInterval(i);
                 }
             }, 200);
-        }, 8000);
+        }, 2000);
 
     })
 
