@@ -52,13 +52,8 @@ function init_all() {
 
     $('#upload_vid_form').submit(function(e) {
         e.preventDefault();
-        // uploadBtn.disabled = true;
-        // const userObj = JSON.parse(localStorage.getItem('user'));
         var data = new FormData();
         data.append("file", GLOBAL_FILE, GLOBAL_FILE.name);
-        //data.append("lat", document.getElementById('lat').innerHTML);
-        //data.append("lng", document.getElementById('lng').innerHTML);
-        //data.append("userId", userObj.userId);
 
         var xhr = new XMLHttpRequest();
         // xhr.withCredentials = true;
@@ -70,9 +65,6 @@ function init_all() {
             }
         }
         xhr.upload.addEventListener('progress', updateProgress, false)
-
-
-
         xhr.addEventListener("readystatechange", function() {
             if (this.readyState === 4) {
                 if (this.status == 200) {
@@ -89,7 +81,6 @@ function init_all() {
         });
         $("#overlay_loading").show()
         xhr.open("POST", "/upload/");
-        //xhr.setRequestHeader("authorization", `Token ${userObj.token}`);
         xhr.send(data);
     });
 
@@ -137,11 +128,78 @@ function init_all() {
     handle_gps()
 }
 
+function init_gps() {
+    var geo_options_low = {
+        enableHighAccuracy: false,
+        maximumAge        : 30000,
+        timeout           : 27000
+    };
+
+    var wpid = navigator.geolocation.watchPosition(
+        geo_success_low, geo_error, geo_options_low
+    );
+
+   function geo_error() {
+      //alert("Sorry, no position available.");
+    }
+
+    var geo_options = {
+      enableHighAccuracy: true,
+      maximumAge        : 30000,
+      timeout           : 27000
+    };
+
+    var wpid = navigator.geolocation.watchPosition(
+        geo_success, geo_error, geo_options
+    );
+
+    function geo_success_low(position) {
+        CURRENT_POSITION_LOW = position
+        console.log(position.coords.latitude +
+                    " " +  position.coords.longitude);
+    }
+
+    function geo_success(position) {
+        CURRENT_POSITION = position
+        console.log(position.coords.latitude +
+                    " " +  position.coords.longitude);
+    }
+}
 
 function handle_gps() {
     if (!(window.location.pathname == '/gps-checkin/')) {
         return
     }
+    init_gps()
+
+    swal({
+        title: "Checking for GPS Signal",
+        text: "Please wait while we find GSP location",
+        icon: "info",
+        buttons: false,
+        closeOnEsc: false,
+        closeOnClickOutside: false,
+    });
+
+    var counter = 0;
+    var i = setInterval(function(){
+        if (CURRENT_POSITION == null && CURRENT_POSITION_LOW == null) {
+            console.log("No GPS Signal. Try again");
+        } else {
+
+            swal({
+                title: "GPS Location Found",
+                text: "Enter event",
+                icon: "success",
+            });
+            clearInterval(i);
+        }
+        counter++;
+        if(counter === 10) {
+            // clearInterval(i);
+        }
+    }, 200);
+
 
 
     $('#locationAuth').on('click', function(e) {
@@ -200,41 +258,6 @@ function handle_gps() {
         });
     });
 
-    var geo_options_low = {
-        enableHighAccuracy: false,
-        maximumAge        : 30000,
-        timeout           : 27000
-    };
-
-    var wpid = navigator.geolocation.watchPosition(
-        geo_success_low, geo_error, geo_options_low
-    );
-
-   function geo_error() {
-      //alert("Sorry, no position available.");
-    }
-
-    var geo_options = {
-      enableHighAccuracy: true,
-      maximumAge        : 30000,
-      timeout           : 27000
-    };
-
-    var wpid = navigator.geolocation.watchPosition(
-        geo_success, geo_error, geo_options
-    );
-
-    function geo_success_low(position) {
-        CURRENT_POSITION_LOW = position
-        console.log(position.coords.latitude +
-                    " " +  position.coords.longitude);
-    }
-
-    function geo_success(position) {
-        CURRENT_POSITION = position
-        console.log(position.coords.latitude +
-                    " " +  position.coords.longitude);
-    }
 }
 
 window.addEventListener("DOMContentLoaded", init_all, false);
