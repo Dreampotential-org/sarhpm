@@ -624,4 +624,10 @@ video::-webkit-media-controls {
 
 
 }
-
+button {
+   outline:none;
+   border: 0;
+}
+input[type="button"]::-moz-focus-inner {
+   border: 0;
+}

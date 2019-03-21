@@ -34,7 +34,6 @@ var CURRENT_POSITION = null;
 var CURRENT_POSITION_LOW = null;
 
 function init_all() {
-
     if ($("#user_taken").val() == 'True') {
         swal({
           title: "Email already taken.",
@@ -112,10 +111,6 @@ function init_all() {
       e.preventDefault();
       $('#signupModal').addClass('is-visible');
     });
-    //$('#locationAuth').on('click', function(e) {
-    //  e.preventDefault();
-      //$('#LocationModal').addClass('is-visible');
-    //});
     $('.modal-overlay').on('click', function(e) {
       $('.modal').removeClass('is-visible');
     });
@@ -170,35 +165,46 @@ function handle_gps() {
     if (!(window.location.pathname == '/gps-checkin/')) {
         return
     }
-    init_gps()
+    // show gps
+    $('#LocationModal').addClass('is-visible');
+    // setup event
+    $(".modal-body .btnSubmit").on('click', function(e) {
+        e.preventDefault();
+        $('#LocationModal').removeClass('is-visible');
+        init_gps()
 
-    swal({
-        title: "Checking for GPS Signal",
-        text: "Please wait while we find GSP location",
-        icon: "info",
-        buttons: false,
-        closeOnEsc: false,
-        closeOnClickOutside: false,
-    });
+        swal({
+            title: "Checking for GPS Signal",
+            text: "Please wait while we find GSP location",
+            icon: "info",
+            buttons: false,
+            closeOnEsc: false,
+            closeOnClickOutside: false,
+        });
 
-    var counter = 0;
-    var i = setInterval(function(){
-        if (CURRENT_POSITION == null && CURRENT_POSITION_LOW == null) {
-            console.log("No GPS Signal. Try again");
-        } else {
+        setTimeout(function() {
+            var counter = 0;
+            var i = setInterval(function() {
+                if (CURRENT_POSITION == null && CURRENT_POSITION_LOW == null) {
+                    console.log("No GPS Signal. Try again");
+                } else {
 
-            swal({
-                title: "GPS Location Found",
-                text: "Now, enter event and submit",
-                icon: "success",
-            });
-            clearInterval(i);
-        }
-        counter++;
-        if(counter === 10) {
-            // clearInterval(i);
-        }
-    }, 200);
+                    swal({
+                        title: "GPS Location Found",
+                        text: "Now, enter event and submit",
+                        icon: "success",
+                    });
+
+                    clearInterval(i);
+                }
+                counter++;
+                if(counter === 10) {
+                    clearInterval(i);
+                }
+            }, 200);
+        }, 8000);
+
+    })
 
     $('#locationAuth').on('click', function(e) {
         var text = $(".mainContainer textarea").val()
