@@ -10,15 +10,6 @@ services:
             - 5436:5432
         environment:
           POSTGRES_DB: db
-    db_future:
-        restart: always
-        image: postgres
-        volumes:
-            - ../postgres-data-future:/var/lib/postgresql/data
-        ports:
-            - 5436:5432
-        environment:
-          POSTGRES_DB: db_future
     project:
         build: .
         volumes:
@@ -29,19 +20,5 @@ services:
         depends_on:
             - db
         command: python3 manage.py runserver 0.0.0.0:8001
-        entrypoint: /entrypoint.sh
-        restart: always
-
-
-    project_future:
-        build: .
-        volumes:
-            - ./dprojx_future:/home/web/pam
-            - ./sock_future:/home/sock
-        ports:
-            - 8002:8002
-        depends_on:
-            - db_future
-        command: python3 manage.py runserver 0.0.0.0:8002
         entrypoint: /entrypoint.sh
         restart: always
