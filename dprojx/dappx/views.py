@@ -77,14 +77,12 @@ def gps_check_in(request):
         GpsCheckin.objects.create(lat=lat, lng=lng,
                                   msg=msg, user=user)
 
-        profile = _get_user_profile(request)
-        print (profile.notify_email)
         lat_long_url = 'https://www.google.com/maps/place/'
         lat_long_url += "%s,%s" % (lat, lng)
-
         msg += "\n\n\n%s" % lat_long_url
 
-        if profile.notify_email:
+        profile = _get_user_profile(request)
+        if hasattr(profile, 'notify_email') and profile.notify_email:
             email_utils.send_email(
                 profile.notify_email,
                 'GPS Checkin from %s' % profile.name,
@@ -197,7 +195,7 @@ def upload(request):
                                    user=user)
 
         profile = _get_user_profile(request)
-        if profile.notify_email:
+        if hasattr(profile, 'notify_email') and profile.notify_email:
             msg = (
                 'Click to play: https://app.usepam.com/video?id=%s&user=%s'
                 % (uploaded_file_url[7:].split("/", 1)[1], user_hash)
