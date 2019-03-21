@@ -198,9 +198,6 @@ function handle_gps() {
                     clearInterval(i);
                 }
                 counter++;
-                if(counter === 10) {
-                    clearInterval(i);
-                }
             }, 200);
         }, 2000);
 
