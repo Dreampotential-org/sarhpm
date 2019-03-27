@@ -1,7 +1,35 @@
+from email.mime.text import MIMEText
 import boto3
 
+from email.mime.multipart import MIMEMultipart
 from botocore.exceptions import ClientError
 
+
+def send_raw_email(to_email, reply_to, subject, message):
+    SENDER = "Pam Report <no-reply@app.usepam.com>"
+    msg = MIMEMultipart()
+    msg.set_charset("utf-8")
+    msg['Subject'] = subject
+    msg['From'] = SENDER
+    msg['To'] = to_email
+    msg['Reply-to'] = reply_to
+
+    msg.attach(MIMEText(message))
+
+    # attachmensts
+    # XXX remove hard coded client
+    client = boto3.client(
+        'ses', aws_access_key_id='AKIAIHFAW4CMLKGZJWQQ',
+        aws_secret_access_key='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',
+        region_name='us-east-1')
+    print(
+        client.send_raw_email(
+            RawMessage={'Data': msg.as_string()},
+            Source=SENDER, Destinations=[to_email]))
+
+
+# send_raw_email("aaronorosen@gmail.com", 'aaronorose.n@gmail.com',
+#               'subject', 'message')
 
 def send_email(to_email, subject, message):
     SENDER = "Pam Report <no-reply@app.usepam.com>"
