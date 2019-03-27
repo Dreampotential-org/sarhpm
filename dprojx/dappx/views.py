@@ -83,10 +83,16 @@ def gps_check_in(request):
 
         profile = _get_user_profile(request)
         if hasattr(profile, 'notify_email') and profile.notify_email:
-            email_utils.send_email(
-                profile.notify_email,
+            email_utils.send_raw_email(
+                profile.notify_email, # send report here
+                request.user.email, # replies to goes here
                 'GPS Checkin from %s' % profile.name,
                 msg)
+
+            # email_utils.send_email(
+            #    profile.notify_email,
+            #    'GPS Checkin from %s' % profile.name,
+            #    msg)
 
         url = 'https://hooks.slack.com/services/'
         url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
