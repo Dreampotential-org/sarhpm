@@ -206,8 +206,9 @@ def upload(request):
                 'Click to play: https://app.usepam.com/video?id=%s&user=%s'
                 % (uploaded_file_url[7:].split("/", 1)[1], user_hash)
             )
-            email_utils.send_email(
-                profile.notify_email,
+            email_utils.send_raw_email(
+                profile.notify_email, # send report here
+                request.user.email, # replies to goes here
                 'Video Checkin from %s' % profile.name,
                 msg)
 
