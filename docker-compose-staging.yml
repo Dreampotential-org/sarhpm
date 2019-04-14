@@ -5,7 +5,7 @@ services:
         restart: always
         image: postgres
         volumes:
-            - ../postgres-data:/var/lib/postgresql/data
+            - /opt/var/postgres-data:/var/lib/postgresql/data
         ports:
             - 5436:5432
         environment:
@@ -14,7 +14,7 @@ services:
         build: .
         volumes:
             - ./dprojx:/home/web/pam
-            - ./sock:/home/sock
+            - /opt/var/sock:/home/sock
         ports:
             - 8001:8001
         depends_on:
@@ -27,7 +27,7 @@ services:
         image: nginx
         volumes:
             - ./config/nginx/site-enabled/default:/etc/nginx/conf.d/default.conf
-            - ./sock:/home/sock
+            - /opt/var/sock:/home/sock
             - ./dprojx/static:/var/data/dprojx/static
             - /opt/var/certbot-etc:/etc/letsencrypt
             - /opt/var/ssl-certs:/etc/ssl/certs
