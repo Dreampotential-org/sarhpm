@@ -4,3 +4,6 @@ dprojx/db.sqlite3
 dprojx/dappx/__pycache__/
 dprojx/dappx/migrations/__pycache__/
 dprojx/dprojx/__pycache__/
+.DS_Store
+*.pyc
+denvx
