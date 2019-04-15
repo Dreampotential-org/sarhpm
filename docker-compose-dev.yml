@@ -5,7 +5,7 @@ services:
         restart: always
         image: postgres
         volumes:
-            - /opt/var/postgres-data:/var/lib/postgresql/data
+            - /opt/var/postgres-data-dev:/var/lib/postgresql/data
         environment:
             POSTGRES_DB: db
     project:
