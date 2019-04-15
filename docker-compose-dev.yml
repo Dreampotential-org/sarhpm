@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-    db:
+    dev-db:
         restart: always
         image: postgres
         volumes:
@@ -14,7 +14,7 @@ services:
             - ./dprojx:/home/web/pam
             - /opt/var/sock:/home/sock
         depends_on:
-            - db
+            - dev-db
         command: /usr/local/bin/gunicorn --env DJANGO_SETTINGS_MODULE=dprojx.settings dprojx.wsgi --workers 16 --bind=unix:/home/sock/dprojx-dev.sock
         entrypoint: /entrypoint.sh
         restart: always
