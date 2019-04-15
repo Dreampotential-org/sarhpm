@@ -42,6 +42,12 @@ def register(request):
 
 
 def video(request):
+    video_id = request.GET.get('id')
+    user_hash = request.GET.get('user')
+    if video_id and user_hash:
+        path = '/media/%s/%s' % (user_hash, video_id)
+        return stream_video(request, path)
+
     video = VideoUpload.objects.filter(user=request.user).first()
     if not video:
         raise Http404
