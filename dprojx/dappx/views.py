@@ -10,17 +10,19 @@ from wsgiref.util import FileWrapper
 from django.http.response import StreamingHttpResponse
 
 
+from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render
+
 
 from dappx.forms import UserForm, UserProfileInfoForm
 from . import email_utils
 from . import video_utils
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from .models import VideoUpload
@@ -40,9 +42,11 @@ def register(request):
 
 
 def video(request):
-    path = './media/%s/%s' % (request.GET.get("user"), request.GET.get("id"))
-    print (path)
-    return stream_video(request, path)
+    video = VideoUpload.objects.filter(user=request.user).first()
+    if not video:
+        raise Http404
+
+    return stream_video(request, video.videoUrl)
 
 
 @login_required
@@ -147,6 +151,7 @@ def convert_file(uploaded_file_url):
 
 
 def stream_video(request, path):
+    path = settings.BASE_DIR + path
     range_header = request.META.get('HTTP_RANGE', '').strip()
     range_match = video_utils.range_re.match(range_header)
     size = os.path.getsize(path)

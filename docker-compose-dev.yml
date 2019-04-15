@@ -7,7 +7,7 @@ services:
         volumes:
             - /opt/var/postgres-data:/var/lib/postgresql/data
         environment:
-          POSTGRES_DB: db
+            POSTGRES_DB: db
     project:
         build: .
         volumes:
