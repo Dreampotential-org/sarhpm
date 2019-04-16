@@ -52,7 +52,7 @@ def video(request):
     ).hexdigest()
 
     if user_hash != email_hash:
-        if not request.user.is_staff:
+        if not request.user.is_superuser:
             raise Http404
 
     if video_id and user_hash:
