@@ -7,6 +7,7 @@ RUN apt-get install -y python3-pip
 
 RUN apt-get install -y locales
 RUN apt-get install -y ffmpeg
+RUN apt-get install -y libav-tools
 RUN pip3 install --upgrade pip
 
 
