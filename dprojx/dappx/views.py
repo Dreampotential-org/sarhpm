@@ -42,8 +42,18 @@ def register(request):
 
 
 def video(request):
+    if request.user.is_anonymous:
+        raise Http404
+
     video_id = request.GET.get('id')
     user_hash = request.GET.get('user')
+    email_hash = hashlib.sha1(
+        request.user.email.encode('utf-8')
+    ).hexdigest()
+
+    if user_hash != email_hash and not request.user.is_staff:
+        raise Http404
+
     if video_id and user_hash:
         path = '/media/%s/%s' % (user_hash, video_id)
         return stream_video(request, path)
