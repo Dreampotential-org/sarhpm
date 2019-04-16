@@ -13,7 +13,7 @@ services:
         volumes:
             - ./dprojx:/home/web/pam
             - /opt/var/sock:/home/sock
-            - /opt/var/media-dev:/home/web/pam/dprojx/media
+            - /opt/var/media-dev:/home/web/pam/media
         depends_on:
             - dev-db
         command: /usr/local/bin/gunicorn --env DJANGO_SETTINGS_MODULE=dprojx.settings dprojx.wsgi --workers 16 --bind=unix:/home/sock/dprojx-dev.sock

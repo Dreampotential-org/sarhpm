@@ -12,7 +12,8 @@ services:
         build: .
         volumes:
             - ./dprojx:/home/web/pam
-            - /opt/var/media:/home/web/pam/dprojx/media
+              # - /opt/var/media:/home/web/pam/dprojx/media
+            - /opt/var/media:/home/web/pam/media
             - /opt/var/sock:/home/sock
         ports:
             - 8001:8001
