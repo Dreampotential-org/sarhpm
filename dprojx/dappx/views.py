@@ -51,8 +51,9 @@ def video(request):
         request.user.email.encode('utf-8')
     ).hexdigest()
 
-    if user_hash != email_hash and not request.user.is_staff:
-        raise Http404
+    if user_hash != email_hash:
+        if not request.user.is_staff:
+            raise Http404
 
     if video_id and user_hash:
         path = '/media/%s/%s' % (user_hash, video_id)
