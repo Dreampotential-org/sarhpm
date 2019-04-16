@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 
 
 class GpsCheckin(models.Model):
@@ -17,6 +18,13 @@ class VideoUpload(models.Model):
 
     def __str__(self):
         return self.videoUrl
+
+    def video_link(self):
+        domain_name = Site.objects.last().domain
+        url = self.videoUrl.split('/')
+        video_id = url[-1]
+        user_id = url[2]
+        return '%s/video/?id=%s&user=%s' % (domain_name, video_id, user_id)
 
 
 class UserProfileInfo(models.Model):

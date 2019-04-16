@@ -194,34 +194,40 @@ def upload(request):
         myfile = request.FILES['file']
         fs = FileSystemStorage()
         user_hash = hashlib.sha1(
-            request.user.email.encode('utf-8')).hexdigest()
-        uploaded_name = ("%s/%s-%s" % (user_hash, uuid.uuid4(),
-                                       myfile.name)).lower()
+            request.user.email.encode('utf-8')
+        ).hexdigest()
+        uploaded_name = (
+            "%s/%s-%s" % (user_hash, uuid.uuid4(), myfile.name)
+        ).lower()
+
         filename = fs.save(uploaded_name, myfile)
         uploaded_file_url = fs.url(filename)
-        print (uploaded_name)
+        print(uploaded_name)
         if uploaded_name[-4:] == '.mov':
             # ffmpeg!
             uploaded_file_url = convert_file(uploaded_file_url)
-            print ("AAAH MOVE FILE")
+            print("AAAH MOVE FILE")
 
-        print (uploaded_file_url)
+        print(uploaded_file_url)
         # now lets create the db entry
         user = User.objects.get(id=request.user.id)
-        VideoUpload.objects.create(videoUrl=uploaded_file_url,
-                                   user=user)
+        video = VideoUpload.objects.create(
+            videoUrl=uploaded_file_url, user=user
+        )
 
         profile = _get_user_profile(request)
         if hasattr(profile, 'notify_email') and profile.notify_email:
             msg = (
-                'Click to play: https://app.usepam.com/video?id=%s&user=%s'
-                % (uploaded_file_url[7:].split("/", 1)[1], user_hash)
+                'Click to play: https://%s' %
+                video.video_link()
             )
+            print(msg)
             email_utils.send_raw_email(
-                profile.notify_email, # send report here
-                request.user.email, # replies to goes here
+                profile.notify_email,  # send report here
+                request.user.email,  # replies to goes here
                 'Video Checkin from %s' % profile.name,
-                msg)
+                msg
+            )
 
         url = 'https://hooks.slack.com/services/'
         url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
