@@ -140,3 +140,9 @@ CSRF_COOKIE_HTTPONLY = False
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
+
+try:
+    from .settings_local import *
+except:
+    pass
+

@@ -6,8 +6,6 @@ services:
         image: postgres
         volumes:
             - /opt/var/postgres-data:/var/lib/postgresql/data
-        ports:
-            - 5436:5432
         environment:
           POSTGRES_DB: db
     project:
