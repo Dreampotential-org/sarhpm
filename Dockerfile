@@ -1,5 +1,5 @@
-FROM ubuntu:latest
-# FROM ubuntu:xenial
+# FROM ubuntu:latest
+FROM ubuntu:xenial
 
 RUN apt-get update --fix-missing
 RUN apt-get install -y python3
