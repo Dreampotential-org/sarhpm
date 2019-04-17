@@ -33,6 +33,7 @@ from rest_framework.status import (
     HTTP_200_OK
 )
 from rest_framework.response import Response
+from utils import superuser_only
 
 logger = logging.getLogger(__name__)
 
@@ -41,29 +42,10 @@ def register(request):
     return render(request, 'dappx/index.html')
 
 
+@superuser_only
 def video(request):
-    # only admin can view video
-    # XXX fixme
-    # if not request.user.is_superuser:
-    #    raise Http404
     path = '/media/%s/%s' % (request.GET.get("user"), request.GET.get("id"))
     return stream_video(request, path)
-
-    video_id = request.GET.get('id')
-    user_hash = request.GET.get('user')
-    email_hash = hashlib.sha1(
-        request.user.email.encode('utf-8')
-    ).hexdigest()
-
-    if video_id and user_hash:
-        path = '/media/%s/%s' % (user_hash, video_id)
-        return stream_video(request, path)
-
-    video = VideoUpload.objects.filter(user=request.user).first()
-    if not video:
-        raise Http404
-
-    return stream_video(request, video.videoUrl)
 
 
 @login_required
