@@ -15,11 +15,14 @@ services:
               # - /opt/var/media:/home/web/pam/dprojx/media
             - /opt/var/media:/home/web/pam/media
             - /opt/var/sock:/home/sock
+            - ./config/newrelic/dev.ini:/config/newrelic/prod.ini
+        environment:
+            - NEW_RELIC_CONFIG_FILE=/config/newrelic/prod.ini
         ports:
             - 8001:8001
         depends_on:
             - db
-        command: /usr/local/bin/gunicorn --env DJANGO_SETTINGS_MODULE=dprojx.settings dprojx.wsgi --workers 16 --bind=unix:/home/sock/dprojx.sock
+        command: newrelic-admin run-program /usr/local/bin/gunicorn --env DJANGO_SETTINGS_MODULE=dprojx.settings dprojx.wsgi --workers 16 --bind=unix:/home/sock/dprojx.sock
         entrypoint: /entrypoint.sh
         restart: always
 
