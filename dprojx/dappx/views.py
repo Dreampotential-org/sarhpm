@@ -46,6 +46,8 @@ def video(request):
     # XXX fixme
     # if not request.user.is_superuser:
     #    raise Http404
+    path = './media/%s/%s' % (request.GET.get("user"), request.GET.get("id"))
+    return stream_video(request, path)
 
     video_id = request.GET.get('id')
     user_hash = request.GET.get('user')
