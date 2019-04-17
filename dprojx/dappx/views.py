@@ -42,7 +42,8 @@ def register(request):
 
 
 def video(request):
-    if request.user.is_anonymous:
+    # only admin can view video
+    if not request.user.is_superuser:
         raise Http404
 
     video_id = request.GET.get('id')
@@ -51,11 +52,7 @@ def video(request):
         request.user.email.encode('utf-8')
     ).hexdigest()
 
-    if user_hash != email_hash:
-        if not request.user.is_superuser:
-            raise Http404
-
-    if video_id and user_hash:
+   if video_id and user_hash:
         path = '/media/%s/%s' % (user_hash, video_id)
         return stream_video(request, path)
 
