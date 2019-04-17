@@ -15,7 +15,7 @@ services:
               # - /opt/var/media:/home/web/pam/dprojx/media
             - /opt/var/media:/home/web/pam/media
             - /opt/var/sock:/home/sock
-            - ./config/newrelic/dev.ini:/config/newrelic/prod.ini
+            - ./config/newrelic/prod.ini:/config/newrelic/prod.ini
         environment:
             - NEW_RELIC_CONFIG_FILE=/config/newrelic/prod.ini
         ports:
