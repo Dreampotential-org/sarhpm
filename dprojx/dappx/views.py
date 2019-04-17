@@ -52,7 +52,7 @@ def video(request):
         request.user.email.encode('utf-8')
     ).hexdigest()
 
-   if video_id and user_hash:
+    if video_id and user_hash:
         path = '/media/%s/%s' % (user_hash, video_id)
         return stream_video(request, path)
 
