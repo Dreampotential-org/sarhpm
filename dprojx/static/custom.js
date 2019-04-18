@@ -136,9 +136,12 @@ function init_gps() {
         geo_success_low, geo_error, geo_options_low
     );
 
-   function geo_error() {
-      //alert("Sorry, no position available.");
+   function geo_error(err) {
        console.log("errror no gps")
+       console.warn('ERROR(' + err.code + '): ' + err.message);
+       alert('ERROR(' + err.code + '): ' + err.message);
+       log_error_to_slack(
+            'ERROR(' + err.code + '): ' + err.message);
        init_gps()
     }
 
