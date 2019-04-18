@@ -138,6 +138,9 @@ function init_gps() {
     );
 
    function geo_error(err) {
+        if (err.code  == 1) {
+            alert("NEED LOCATION SERVICES iphone")
+        }
        console.log("errror no gps")
        console.warn('ERROR(' + err.code + '): ' + err.message);
        alert('ERROR(' + err.code + '): ' + err.message);
