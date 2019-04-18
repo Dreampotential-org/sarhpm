@@ -126,13 +126,14 @@ function init_all() {
 }
 
 function init_gps() {
+    log_error_to_slack("GSP INIT")
     var geo_options_low = {
         enableHighAccuracy: false,
         maximumAge        : 30000,
         timeout           : 27000
     };
 
-    var wpid = navigator.geolocation.watchPosition(
+    navigator.geolocation.watchPosition(
         geo_success_low, geo_error, geo_options_low
     );
 
@@ -145,13 +146,13 @@ function init_gps() {
        // init_gps()
     }
 
-    var geo_options = {
+    geo_options = {
       enableHighAccuracy: true,
       maximumAge        : 30000,
       timeout           : 27000
     };
 
-    var wpid = navigator.geolocation.watchPosition(
+    navigator.geolocation.watchPosition(
         geo_success, geo_error, geo_options
     );
 
