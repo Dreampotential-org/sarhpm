@@ -135,7 +135,7 @@ function init_gps() {
     );
 
    function geo_error() {
-      //alert("Sorry, no position available.");
+      alert("Sorry, no position available.");
     }
 
     var geo_options = {
