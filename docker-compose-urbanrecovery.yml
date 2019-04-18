@@ -16,6 +16,7 @@ services:
             - /opt/var/media-urbanrecovery:/home/web/pam/media
             - /opt/var/sock:/home/sock
             - ./config/newrelic/prod.ini:/config/newrelic/prod.ini
+            - ./logos/urbanrecovery.png:/home/web/pam/static/stan-white.png
         environment:
             - NEW_RELIC_CONFIG_FILE=/config/newrelic/prod.ini
         depends_on:
