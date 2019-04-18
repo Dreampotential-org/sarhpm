@@ -10,6 +10,7 @@ services:
             - ./config/nginx/site-enabled/urbanrecovery:/etc/nginx/conf.d/urbanrecovery.conf
             - /opt/var/sock:/home/sock
             - ./dprojx/static:/var/data/dprojx/static
+            - ./logos:/var/data/dprojx/logos
             - /opt/var/certbot-etc:/etc/letsencrypt
             - /opt/var/ssl-certs:/etc/ssl/certs
             - /opt/var/certbot-var:/var/lib/letsencrypt

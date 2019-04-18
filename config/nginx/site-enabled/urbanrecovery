@@ -66,6 +66,10 @@ server {
       ssl_stapling_verify on;
       resolver 8.8.8.8;
 
+      location /static/stan-white.png { 
+        alias /var/data/dprojx/logos/urbanrecovery.png;
+      }
+
       location / {
          proxy_set_header Host $http_host;
          proxy_set_header X-Real-IP $remote_addr;
