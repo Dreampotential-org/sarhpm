@@ -22,3 +22,9 @@ docker-compose -f docker-compose-staging.yml down
 docker-compose build
 docker-compose -f docker-compose-staging.yml up -d
 
+## urbanrecovery.usepam.com
+
+```
+username: admin
+password: bHyMN14I
+```
