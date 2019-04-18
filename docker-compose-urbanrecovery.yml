@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+    db:
+        restart: always
+        image: postgres
+        volumes:
+            - /opt/var/postgres-data-urbanrecovery:/var/lib/postgresql/data
+        environment:
+          POSTGRES_DB: db
+    project:
+        build: .
+        volumes:
+            - ./dprojx:/home/web/pam
+              # - /opt/var/media:/home/web/pam/dprojx/media
+            - /opt/var/media-urbanrecovery:/home/web/pam/media
+            - /opt/var/sock:/home/sock
+            - ./config/newrelic/urbanrecovery.ini:/config/newrelic/prod.ini
+        environment:
+            - NEW_RELIC_CONFIG_FILE=/config/newrelic/prod.ini
+        depends_on:
+            - db
+        command: newrelic-admin run-program /usr/local/bin/gunicorn --env DJANGO_SETTINGS_MODULE=dprojx.settings dprojx.wsgi --workers 16 --bind=unix:/home/sock/urbanrecovery.sock
+        entrypoint: /entrypoint.sh
+        restart: always
+
