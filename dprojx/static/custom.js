@@ -139,11 +139,15 @@ function init_gps() {
 
    function geo_error(err) {
         if (err.code  == 1) {
-            alert("NEED LOCATION SERVICES iphone")
+            swal({
+              title: "GPS Disabled.",
+              text: "Please enable this for Safari to Allow GPS checkin.",
+              icon: "error",
+            });
         }
        console.log("errror no gps")
        console.warn('ERROR(' + err.code + '): ' + err.message);
-       alert('ERROR(' + err.code + '): ' + err.message);
+       // alert('ERROR(' + err.code + '): ' + err.message);
        log_error_to_slack(
             'ERROR(' + err.code + '): ' + err.message);
        // init_gps()
