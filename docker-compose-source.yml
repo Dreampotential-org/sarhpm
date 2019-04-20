@@ -5,21 +5,21 @@ services:
         restart: always
         image: postgres
         volumes:
-            - /opt/var/postgres-data-urbanrecovery:/var/lib/postgresql/data
+            - /opt/var/postgres-data-source:/var/lib/postgresql/data
         environment:
           POSTGRES_DB: db
     project:
         build: .
         volumes:
             - ./dprojx:/home/web/pam
-            - /opt/var/media-urbanrecovery:/home/web/pam/media
+            - /opt/var/media-source:/home/web/pam/media
             - /opt/var/sock:/home/sock
             - ./config/newrelic/prod.ini:/config/newrelic/prod.ini
         environment:
             - NEW_RELIC_CONFIG_FILE=/config/newrelic/prod.ini
         depends_on:
             - db
-        command: newrelic-admin run-program /usr/local/bin/gunicorn --env DJANGO_SETTINGS_MODULE=dprojx.settings dprojx.wsgi --workers 16 --bind=unix:/home/sock/urbanrecovery.sock
+        command: newrelic-admin run-program /usr/local/bin/gunicorn --env DJANGO_SETTINGS_MODULE=dprojx.settings dprojx.wsgi --workers 16 --bind=unix:/home/sock/source.sock
         entrypoint: /entrypoint.sh
         restart: always
 
