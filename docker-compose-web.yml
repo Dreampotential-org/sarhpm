@@ -5,7 +5,7 @@ services:
     web-server:
         image: nginx
         volumes:
-            - ./config/nginx/site-enabled/*.conf:/etc/nginx/conf.d/
+            - ./config/nginx/site-enabled:/etc/nginx/conf.d
             - /opt/var/sock:/home/sock
             - ./dprojx/static:/var/data/dprojx/static
             - ./logos:/var/data/dprojx/logos
