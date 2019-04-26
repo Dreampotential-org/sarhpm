@@ -89,7 +89,7 @@ def gps_check_in(request):
         profile = _get_user_profile(request)
         if hasattr(profile, 'notify_email') and profile.notify_email:
             print ("WAS STAN Sending email to stan")
-            if request.user.email.strip().lower() == default_email:
+            if profile.notify_email == default_email:
                 is_stan_email = True
 
             email_utils.send_raw_email(
@@ -221,7 +221,7 @@ def upload(request):
         profile = _get_user_profile(request)
         if hasattr(profile, 'notify_email') and profile.notify_email:
             print ("WAS STAN Sending email to stan")
-            if request.user.email.strip().lower() == default_email:
+            if profile.notify_email == default_email:
                 is_stan_email = True
 
             msg = (
