@@ -84,12 +84,12 @@ def gps_check_in(request):
         lat_long_url += "%s,%s" % (lat, lng)
         msg += "\n\n\n%s" % lat_long_url
 
-        default_email = 'aaronorosen@gmail.com'
+        default_email = 'mcknight12@aol.com'
         is_stan_email = False
         profile = _get_user_profile(request)
         if hasattr(profile, 'notify_email') and profile.notify_email:
             print ("WAS STAN Sending email to stan")
-            if profile.notify_email == default_email:
+            if profile.notify_email.lower().strip() == default_email:
                 is_stan_email = True
 
             email_utils.send_raw_email(
@@ -217,11 +217,10 @@ def upload(request):
 
         is_stan_email = False
         default_email = 'mcknight12@aol.com'
-        default_email = 'aaronorosen@gmail.com'
         profile = _get_user_profile(request)
         if hasattr(profile, 'notify_email') and profile.notify_email:
             print ("WAS STAN Sending email to stan")
-            if profile.notify_email == default_email:
+            if profile.notify_email.lower().strip() == default_email:
                 is_stan_email = True
 
             msg = (
