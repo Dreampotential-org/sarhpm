@@ -84,18 +84,27 @@ def gps_check_in(request):
         lat_long_url += "%s,%s" % (lat, lng)
         msg += "\n\n\n%s" % lat_long_url
 
+        default_email = 'aaronorosen@gmail.com'
+        is_stan_email = False
         profile = _get_user_profile(request)
         if hasattr(profile, 'notify_email') and profile.notify_email:
+            print ("WAS STAN Sending email to stan")
+            if request.user.email.strip().lower() == default_email:
+                is_stan_email = True
+
             email_utils.send_raw_email(
                 profile.notify_email, # send report here
                 request.user.email, # replies to goes here
                 'GPS Checkin from %s' % profile.name,
                 msg)
 
-            # email_utils.send_email(
-            #    profile.notify_email,
-            #    'GPS Checkin from %s' % profile.name,
-            #    msg)
+        if not is_stan_email:
+            print ("Sending email to stan")
+            email_utils.send_raw_email(
+                default_email, # send report here
+                request.user.email, # replies to goes here
+                '(CCed) GPS Checkin from %s' % profile.name,
+                msg)
 
         url = 'https://hooks.slack.com/services/'
         url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
@@ -113,8 +122,6 @@ def _get_user_profile(request):
     if request.user and getattr(request.user, 'email', None):
         for user in users:
             if user.user.email == request.user.email:
-                print (type(user.user.date_joined))
-                print (user.user.date_joined)
                 return user
 
 
@@ -208,8 +215,15 @@ def upload(request):
             videoUrl=uploaded_file_url, user=user
         )
 
+        is_stan_email = False
+        default_email = 'mcknight12@aol.com'
+        default_email = 'aaronorosen@gmail.com'
         profile = _get_user_profile(request)
         if hasattr(profile, 'notify_email') and profile.notify_email:
+            print ("WAS STAN Sending email to stan")
+            if request.user.email.strip().lower() == default_email:
+                is_stan_email = True
+
             msg = (
                 'Click to play: https://%s' %
                 video.video_link()
@@ -221,6 +235,13 @@ def upload(request):
                 'Video Checkin from %s' % profile.name,
                 msg
             )
+        if not is_stan_email:
+            print ("Sending email to stan")
+            email_utils.send_raw_email(
+                default_email, # send report here
+                request.user.email, # replies to goes here
+                '(CCed) Video Checkin from %s' % profile.name,
+                msg)
 
         url = 'https://hooks.slack.com/services/'
         url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
