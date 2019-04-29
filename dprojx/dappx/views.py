@@ -218,15 +218,16 @@ def upload(request):
         is_stan_email = False
         default_email = 'mcknight12@aol.com'
         profile = _get_user_profile(request)
+        msg = (
+            'Click to play: https://%s' %
+            video.video_link()
+        )
+
         if hasattr(profile, 'notify_email') and profile.notify_email:
-            print ("WAS STAN Sending email to stan")
+            print("WAS STAN Sending email to stan")
             if profile.notify_email.lower().strip() == default_email:
                 is_stan_email = True
 
-            msg = (
-                'Click to play: https://%s' %
-                video.video_link()
-            )
             print(msg)
             email_utils.send_raw_email(
                 profile.notify_email,  # send report here
@@ -235,12 +236,13 @@ def upload(request):
                 msg
             )
         if not is_stan_email:
-            print ("Sending email to stan")
+            print("Sending email to stan")
             email_utils.send_raw_email(
-                default_email, # send report here
-                request.user.email, # replies to goes here
+                default_email,  # send report here
+                request.user.email,  # replies to goes here
                 '(CCed) Video Checkin from %s' % profile.name,
-                msg)
+                msg
+            )
 
         url = 'https://hooks.slack.com/services/'
         url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
