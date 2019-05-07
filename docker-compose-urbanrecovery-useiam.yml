@@ -19,6 +19,6 @@ services:
             - NEW_RELIC_CONFIG_FILE=/config/newrelic/prod.ini
         depends_on:
             - db
-        command: newrelic-admin run-program /usr/local/bin/gunicorn --env DJANGO_SETTINGS_MODULE=dprojx.settings dprojx.wsgi --workers 16 --bind=unix:/home/sock/urbanrecovery_useiam.sock
+        command: newrelic-admin run-program /usr/local/bin/gunicorn --env DJANGO_SETTINGS_MODULE=dprojx.settings dprojx.wsgi --workers 8 --bind=unix:/home/sock/urbanrecovery_useiam.sock
         entrypoint: /entrypoint.sh
         restart: always
