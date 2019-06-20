@@ -20,5 +20,5 @@ class UserProfileInfoForm(forms.ModelForm):
 
     class Meta():
         model = UserProfileInfo
-        notify_email = forms.CharField(label='Notify Email')
+        notify_email = forms.EmailField(label='Notify Email')
         fields = ('name', 'notify_email', 'days_sober')
