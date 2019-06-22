@@ -63,57 +63,61 @@ def record_video_screen(request):
     return render(request, 'dappx/record.html')
 
 
+def save_checkin(request):
+    print("A CHECKIN HAS OCC")
+    print(request.POST)
+
+    msg = request.POST.get("msg")
+    lat = request.POST.get("lat")
+    lng = request.POST.get("long")
+
+    if not all([msg, lat, lng]):
+        return False
+
+    user = User.objects.get(id=request.user.id)
+    GpsCheckin.objects.create(lat=lat, lng=lng, msg=msg, user=user)
+
+    lat_long_url = 'https://www.google.com/maps/place/%s,%s' % (lat, lng)
+    msg += "\n\n\n%s" % lat_long_url
+
+    default_email = 'mcknight12@aol.com'
+    is_stan_email = False
+    profile = _get_user_profile(request)
+    if hasattr(profile, 'notify_email') and profile.notify_email:
+        print("WAS STAN Sending email to stan")
+        if profile.notify_email.lower().strip() == default_email:
+            is_stan_email = True
+
+        email_utils.send_raw_email(
+            profile.notify_email,  # send report here
+            request.user.email,  # replies to goes here
+            'GPS Checkin from %s' % profile.name,
+            msg)
+
+    if not is_stan_email:
+        print("Sending email to stan")
+        email_utils.send_raw_email(
+            default_email,  # send report here
+            request.user.email,  # replies to goes here
+            '(CCed) GPS Checkin from %s' % profile.name,
+            msg)
+
+    url = 'https://hooks.slack.com/services/'
+    url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
+    data = (
+        "GspCheckin: %s - %s (%s, %s)" % (request.user.email, msg, lat, lng)
+    )
+    body = {"text": "%s" % data, 'username': 'pam-server'}
+    requests.put(url, data=json.dumps(body))
+
+
 @csrf_exempt
 def gps_check_in(request):
     if request.method == 'GET':
         return render(request, 'dappx/gps-event.html')
 
     if request.method == 'POST':
-        print ("A CHECKIN HAS OCC")
-        print (request.POST)
-
-        msg = request.POST.get("msg")
-        lat = request.POST.get("lat")
-        lng = request.POST.get("long")
-
-        user = User.objects.get(id=request.user.id)
-        GpsCheckin.objects.create(lat=lat, lng=lng,
-                                  msg=msg, user=user)
-
-        lat_long_url = 'https://www.google.com/maps/place/'
-        lat_long_url += "%s,%s" % (lat, lng)
-        msg += "\n\n\n%s" % lat_long_url
-
-        default_email = 'mcknight12@aol.com'
-        is_stan_email = False
-        profile = _get_user_profile(request)
-        if hasattr(profile, 'notify_email') and profile.notify_email:
-            print ("WAS STAN Sending email to stan")
-            if profile.notify_email.lower().strip() == default_email:
-                is_stan_email = True
-
-            email_utils.send_raw_email(
-                profile.notify_email, # send report here
-                request.user.email, # replies to goes here
-                'GPS Checkin from %s' % profile.name,
-                msg)
-
-        if not is_stan_email:
-            print ("Sending email to stan")
-            email_utils.send_raw_email(
-                default_email, # send report here
-                request.user.email, # replies to goes here
-                '(CCed) GPS Checkin from %s' % profile.name,
-                msg)
-
-        url = 'https://hooks.slack.com/services/'
-        url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
-        data = (str("GspCheckin: %s - %s (%s, %s)" %
-                (request.user.email, msg, lat, lng)))
-        body = {"text": "%s" % data,
-                'username': 'pam-server'}
-        requests.put(url, data=json.dumps(body))
-
+        save_checkin(request)
         return JsonResponse({'status': 'okay'}, status=200)
 
 
@@ -190,6 +194,9 @@ def stream_video(request, path):
 def upload(request):
 
     if request.method == 'POST' and request.FILES['file']:
+        print(request.POST)
+        save_checkin(request)
+
         # save file to disk
         myfile = request.FILES['file']
         fs = FileSystemStorage()
@@ -252,13 +259,14 @@ def upload(request):
                 'username': 'pam-server'}
         requests.put(url, data=json.dumps(body))
 
+
         return JsonResponse({'error': 'Some error'}, status=200)
 
 
 # @csrf_exempt
 @login_required
 def record_video(request):
-    print (request.user)
+    print(request.user)
     files = request.data.get("file")
     userId = request.data.get('userId')
     fs = FileSystemStorage()

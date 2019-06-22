@@ -1,18 +1,37 @@
 {% extends "dappx/base.html" %}
 {% block gps_block %}
+		<form id="upload_vid_form" method="post" style="display: inline;" enctype="multipart/form-data">
+      <input type='hidden' name='lat'>
+      <input type='hidden' name='long'>
     <div class="mainContainer">
         <div class="eventBox">
-            <label>Enter a note</label>
-            <textarea placeholder="Add Description of Event"></textarea>
+						{% if request.GET.action == 'takevideo' %}
+            	<h2>1) Ensure you are connected to Wifi</h2>
+							<h2>2) When you click record:</h2>
+							<h2>3) Show the your medicine prescription bottle to the camera</h2>
+							<h2>4) Take your pill.</h2>
+							<h2>5) Submit Short video.</h2>
+						{% else %}
+							<label>Enter a note</label>
+							<textarea placeholder="Add Description of Event" name='msg'></textarea>
+						{% endif %}
         </div>
     </div>
+
     <div class="secAction">
         <div class="mainContainer">
-            <button class="actionBtn is-visible" id="locationAuth">
-					Submit
-				</button>
+					{% if request.GET.action == 'takevideo' %}
+						<input type="file" accept="video/*" id="upload-vid" capture="environment" style="display:none;">
+						<button class="actionBtn btnVideo">Take a Video</button>
+					{% else %}
+						<button class="actionBtn is-visible" id="locationAuth">Submit Checkin</button>
+					{% endif %}
         </div>
     </div>
+
+		</form>
+
+
     <div class="modal" id="LocationModal">
         <div class="modal-overlay"></div>
         <div class="modal-wrapper modal-transition">

@@ -65,6 +65,7 @@ function init_all() {
                 $(".swal-title").text(parseInt(e.loaded/e.total*100) + "%")
             }
         }
+
         xhr.upload.addEventListener('progress', updateProgress, false)
         xhr.addEventListener("readystatechange", function() {
             if (this.readyState === 4) {
@@ -266,7 +267,7 @@ function handle_gps() {
                       allowOutsideClick: false,
                       type: "success",
                     }).then(function() {
-                        window.location = '/';
+                        window.location = '/gps-checkin/?action=takevideo';
                     })
                     $("#overlay_loading").hide()
                 }
