@@ -104,15 +104,16 @@ def save_checkin(request):
 
     url = 'https://hooks.slack.com/services/'
     url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
-    data = (
-        "GspCheckin: %s - %s (%s, %s)" % (request.user.email, msg, lat, lng)
-    )
+    data = "GspCheckin: %s - %s (%s, %s)" % (request.user.email, msg, lat, lng)
+    data += "\nSite: %s" % request.META['HTTP_HOST']
+
     body = {"text": "%s" % data, 'username': 'pam-server'}
     requests.put(url, data=json.dumps(body))
 
 
 @csrf_exempt
 def gps_check_in(request):
+
     if request.method == 'GET':
         return render(request, 'dappx/gps-event.html')
 
@@ -143,8 +144,10 @@ def post_slack_errors(request):
     url = 'https://hooks.slack.com/services/'
     url += 'TF6H12JQY/BF6H2L0M6/RMuFLttV91aKvlUXydV2yJgv'
     data = (str(request.POST))
+    data += '\nSite: %s' % request.META['HTTP_HOST']
     body = {"text": "%s" % data,
             'username': 'js-logger'}
+
     requests.put(url, data=json.dumps(body))
 
     return JsonResponse({'error': 'Some error'}, status=200)
@@ -155,7 +158,7 @@ def convert_file(uploaded_file_url):
     command = (
         'avconv -i ./%s -codec copy ./%s' % (uploaded_file_url, outfile)
     )
-    print (command)
+    print(command)
     os.system(command)
     return outfile
 
@@ -192,7 +195,6 @@ def stream_video(request, path):
 @csrf_exempt
 @login_required
 def upload(request):
-
     if request.method == 'POST' and request.FILES['file']:
         print(request.POST)
         save_checkin(request)
@@ -253,12 +255,14 @@ def upload(request):
 
         url = 'https://hooks.slack.com/services/'
         url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
-        data = (str("VideoUpload: %s - https://app.usepam.com%s" %
-                (request.user.email, uploaded_file_url)))
-        body = {"text": "%s" % data,
-                'username': 'pam-server'}
+        data = (
+            str("VideoUpload: %s - https://%s%s" % (
+                request.user.email,
+                request.META['HTTP_HOST'],
+                uploaded_file_url)
+                ))
+        body = {"text": "%s" % data, 'username': 'pam-server'}
         requests.put(url, data=json.dumps(body))
-
 
         return JsonResponse({'error': 'Some error'}, status=200)
 
@@ -295,17 +299,17 @@ def record_video(request):
 
 
 def _create_user(request):
-    print ("Create user request!!!")
-    print (request.POST)
+    print("Create user request!!!")
+    print(request.POST)
     data = request.POST.copy()
     data['username'] = request.POST.get('email')
-    print ('after')
-    print (data)
+    print('after')
+    print(data)
     user_form = UserForm(data)
     profile_form = UserProfileInfoForm(data=request.POST)
     if user_form.is_valid() and profile_form.is_valid():
         user = user_form.save()
-        print ("UERERERE %s" % user)
+        print("UERERERE %s" % user)
         user.set_password(user.password)
         user.save()
         profile = profile_form.save(commit=False)
@@ -346,8 +350,8 @@ def index(request):
     sober_days = 0
     if profile:
         name = profile.name
-        print (dir(profile))
-        print (profile.days_sober)
+        print(dir(profile))
+        print(profile.days_sober)
         sober_days = (profile.days_sober +
                       days_sober(profile.user.date_joined))
 
@@ -370,7 +374,7 @@ def user_login(request):
             if user.is_active:
                 login(request, user)
                 profile = _get_user_profile(request)
-                print (notify_email)
+                print(notify_email)
                 profile.notify_email = notify_email
                 profile.save()
                 # update notify_email
