@@ -18,6 +18,7 @@ services:
             - 80:80
             - 443:443
         restart: always
+        entrypoint: /entrypoint-web.sh
     certbot:
         image: certbot/certbot
         container_name: certbot
