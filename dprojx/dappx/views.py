@@ -107,6 +107,7 @@ def save_checkin(request):
 
 
 @csrf_exempt
+@login_required
 def gps_check_in(request):
 
     if request.method == 'GET':
