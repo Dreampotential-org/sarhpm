@@ -122,8 +122,9 @@ function init_all() {
         $(this).toggleClass('toggleClose');
     });
 
-
+  if (window.location.search.substr(1) != 'action=takevideo') {
     handle_gps()
+  }
 }
 
 function init_gps() {
