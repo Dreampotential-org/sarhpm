@@ -1,38 +1,33 @@
 import datetime
 import hashlib
-import os
-import uuid
-import requests
-import logging
 import json
+import logging
 import mimetypes
-from wsgiref.util import FileWrapper
-from django.http.response import StreamingHttpResponse
-
+import os
+import requests
+import uuid
 
 from django.conf import settings
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
+from django.http import HttpResponseRedirect, HttpResponse
+from django.http import JsonResponse
+from django.http.response import StreamingHttpResponse
 from django.shortcuts import render
+from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.response import Response
+from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_200_OK
+from wsgiref.util import FileWrapper
 
-
-from dappx.forms import UserForm, UserProfileInfoForm
 from . import email_utils
 from . import video_utils
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponseRedirect, HttpResponse, Http404
-from django.urls import reverse
-from django.contrib.auth.decorators import login_required
-from .models import VideoUpload
 from .models import GpsCheckin
 from .models import UserProfileInfo
-from rest_framework.status import (
-    HTTP_400_BAD_REQUEST,
-    HTTP_200_OK
-)
-from rest_framework.response import Response
+from .models import VideoUpload
+from dappx.forms import UserForm, UserProfileInfoForm
 from utils import superuser_only
 
 logger = logging.getLogger(__name__)
