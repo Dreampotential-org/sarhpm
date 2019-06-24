@@ -8,6 +8,7 @@ services:
             - ./config/nginx/site-enabled:/etc/nginx/conf.d
             - /opt/var/sock:/home/sock
             - ./dprojx/static:/var/data/dprojx/static
+            - ../static-staging:/var/data/dprojx/static-staging
             - ./logos:/var/data/dprojx/logos
             - /opt/var/certbot-etc:/etc/letsencrypt
             - /opt/var/ssl-certs:/etc/ssl/certs
