@@ -1,6 +1,6 @@
-from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.db import models
 
 
 class GpsCheckin(models.Model):
@@ -38,6 +38,3 @@ class UserProfileInfo(models.Model):
     def __str__(self):
         return self.user.username
 
-
-def get_user_profile_info_from_user(user_id):
-    user = User.objects.get(id=user_id)
