@@ -77,7 +77,7 @@ def save_checkin(request):
 
     default_email = 'mcknight12@aol.com'
     is_stan_email = False
-    profile = _get_user_profile(request)
+    profile = get_user_profile(request)
     if hasattr(profile, 'notify_email') and profile.notify_email:
         print("WAS STAN Sending email to stan")
         if profile.notify_email.lower().strip() == default_email:
@@ -117,12 +117,13 @@ def gps_check_in(request):
         return JsonResponse({'status': 'okay'}, status=200)
 
 
-def _get_user_profile(request):
-    users = (UserProfileInfo.objects.all())
-    if request.user and getattr(request.user, 'email', None):
-        for user in users:
-            if user.user.email == request.user.email:
-                return user
+def get_user_profile(request):
+    if not hasattr(request.user, 'email'):
+        return False
+
+    return UserProfileInfo.objects.filter(
+        user__username=request.user.email
+    ).first()
 
 
 def days_sober(date_joined):
@@ -192,6 +193,8 @@ def stream_video(request, path):
 def upload(request):
     if request.method == 'POST' and request.FILES['file']:
         print(request.POST)
+        import pdb
+        pdb.set_trace()
         save_checkin(request)
 
         # save file to disk
@@ -221,7 +224,7 @@ def upload(request):
 
         is_stan_email = False
         default_email = 'mcknight12@aol.com'
-        profile = _get_user_profile(request)
+        profile = get_user_profile(request)
         msg = (
             'Click to play: https://%s' %
             video.video_link()
@@ -341,7 +344,7 @@ def index(request):
     user_form = UserForm()
     profile_form = UserProfileInfoForm()
     # need to get the name XXX fix this
-    profile = _get_user_profile(request)
+    profile = get_user_profile(request)
     sober_days = 0
     if profile:
         name = profile.name
@@ -368,7 +371,7 @@ def user_login(request):
         if user:
             if user.is_active:
                 login(request, user)
-                profile = _get_user_profile(request)
+                profile = get_user_profile(request)
                 print(notify_email)
                 profile.notify_email = notify_email
                 profile.save()
