@@ -14,6 +14,7 @@ services:
             - /opt/var/ssl-certs:/etc/ssl/certs
             - /opt/var/certbot-var:/var/lib/letsencrypt
             - /opt/var/acme-challenge:/var/data/acme-challenge
+            - ./entrypoint-web.sh:/entrypoint-web.sh
         ports:
             - 80:80
             - 443:443
