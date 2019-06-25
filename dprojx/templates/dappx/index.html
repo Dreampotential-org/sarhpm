@@ -24,6 +24,30 @@
             <button class="actionBtn btnEvent">Attend Event<br><span>(Check-In/Check-Out)</span></button>
         </div>
     </div>
+
+
+    <div class="modal" id="takeavideoModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-wrapper modal-transition">
+            <div class="modal-header">
+                <h2 class="modal-heading">Take a Video</h2>
+            </div>
+            <div class="modal-body">
+                <div class="modal-content">
+            	    <h2>1) Ensure you are connected to Wifi</h2>
+							    <h2>2) When you click record:</h2>
+							    <h2>3) Show the your medicine prescription bottle to the camera</h2>
+							    <h2>4) Take your pill.</h2>
+							    <h2>5) Submit Short video.</h2>
+                  <div style='text-align:center'>
+						      <button class="actionBtn btnVideo" id="takevideobtn">Take a video</button>
+                  </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     {% else %}
 	 <input type="hidden" id="user_taken" name="variable" value="{{ user_taken }}">
     <div class="mainContainer">
@@ -79,6 +103,7 @@
             </div>
         </div>
     </div>
+
 
     <div class="modal" id="signupModal">
         <div class="modal-overlay"></div>

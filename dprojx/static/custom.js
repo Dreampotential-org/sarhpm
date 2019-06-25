@@ -48,7 +48,12 @@ function init_all() {
     $("input[name='email']").attr("type", "email")
     $(".secAction .btnVideo").on('click', function(e) {
         e.preventDefault();
-        $('#upload-vid').click()
+        $('#takeavideoModal').addClass('is-visible');
+    });
+
+    $("#takevideobtn").on("click", function(e){
+      e.preventDefault();
+      $('#upload-vid').click()
     });
 
     $('#upload_vid_form').submit(function(e) {
@@ -122,9 +127,7 @@ function init_all() {
         $(this).toggleClass('toggleClose');
     });
 
-  if (window.location.search.substr(1) != 'action=takevideo') {
     handle_gps()
-  }
 }
 
 function init_gps() {
@@ -268,7 +271,7 @@ function handle_gps() {
                       allowOutsideClick: false,
                       type: "success",
                     }).then(function() {
-                        window.location = '/gps-checkin/?action=takevideo';
+                        window.location = '/';
                     })
                     $("#overlay_loading").hide()
                 }

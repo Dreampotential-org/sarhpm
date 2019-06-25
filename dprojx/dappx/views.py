@@ -194,8 +194,6 @@ def stream_video(request, path):
 def upload(request):
     if request.method == 'POST' and request.FILES['file']:
         print(request.POST)
-        import pdb
-        pdb.set_trace()
         save_checkin(request)
 
         # save file to disk

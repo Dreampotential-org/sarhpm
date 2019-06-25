@@ -5,27 +5,14 @@
       <input type='hidden' name='long'>
     <div class="mainContainer">
         <div class="eventBox">
-						{% if request.GET.action == 'takevideo' %}
-            	<h2>1) Ensure you are connected to Wifi</h2>
-							<h2>2) When you click record:</h2>
-							<h2>3) Show the your medicine prescription bottle to the camera</h2>
-							<h2>4) Take your pill.</h2>
-							<h2>5) Submit Short video.</h2>
-						{% else %}
-							<label>Enter a note</label>
-							<textarea placeholder="Add Description of Event" name='msg'></textarea>
-						{% endif %}
+						<label>Enter a note</label>
+						<textarea placeholder="Add Description of Event" name='msg'></textarea>
         </div>
     </div>
 
     <div class="secAction">
         <div class="mainContainer">
-					{% if request.GET.action == 'takevideo' %}
-						<input type="file" accept="video/*" id="upload-vid" capture="environment" style="display:none;">
-						<button class="actionBtn btnVideo">Take a Video</button>
-					{% else %}
-						<button class="actionBtn is-visible" id="locationAuth">Submit Checkin</button>
-					{% endif %}
+				  <button class="actionBtn is-visible" id="locationAuth">Submit Checkin</button>
         </div>
     </div>
 
