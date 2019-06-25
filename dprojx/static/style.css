@@ -366,6 +366,7 @@ header{
 input[type=text],
 input[type=email],
 input[type=tel],
+input[type=number],
 input[type=password]{
     border: 0;
     font-size: 24px;
