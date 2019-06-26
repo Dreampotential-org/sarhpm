@@ -2,6 +2,8 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.db import models
 
+import hashlib
+
 
 class GpsCheckin(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
@@ -49,3 +51,10 @@ class UserProfileInfo(models.Model):
 
     def __str__(self):
         return self.user.username
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.user_hash = hashlib.sha1(
+                self.user.email.encode('utf-8')
+            ).hexdigest()
+        super(UserProfileInfo, self).save(*args, **kwargs)
