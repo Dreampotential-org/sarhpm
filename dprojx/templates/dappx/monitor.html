@@ -1,0 +1,22 @@
+{% extends "dappx/base.html" %}
+{% block body_block %}
+<div class="mainContainer">
+  <ol class="chat">
+      <li class="other">
+          <div class="avatar"><img src="/static/pam2.png" draggable="false"></div>
+          <div class="msg" style='text-align:center'>
+            <h3>Video Monitor - {{ request.user.email }}</h3>
+            {% for video in videos %}
+            <div>
+              User: {{ video.user.email }}
+              <br />
+              <video controls="" name="media" width="320" height="240">
+                <source src="http://{{ video.video_monitor_link }}" type="video/mp4">
+              </video>
+            </div>
+            {% endfor %}
+          </div>
+      </li>
+  </ol>
+</div>
+{% endblock %}

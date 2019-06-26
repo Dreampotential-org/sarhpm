@@ -12,7 +12,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.http import JsonResponse
 from django.http.response import StreamingHttpResponse
 from django.shortcuts import render
@@ -44,6 +44,17 @@ def video(request):
 
 
 @login_required
+def video_monitor(request):
+    path = '/media/%s/%s' % (request.GET.get("user"), request.GET.get("id"))
+    video = VideoUpload.objects.filter(videoUrl=path).first()
+
+    if not video and video.user != request.user:
+        raise Http404
+
+    return stream_video(request, path)
+
+
+@login_required
 def special(request):
     return HttpResponse("You are logged in !")
 
@@ -52,6 +63,17 @@ def special(request):
 def user_logout(request):
     logout(request)
     return HttpResponseRedirect(reverse('index'))
+
+
+@login_required
+def monitor(request):
+    user_ids = [
+        user.user.id for user in UserProfileInfo.objects.filter(
+            notify_email=request.user.email)
+    ]
+    videos = VideoUpload.objects.filter(user__id__in=user_ids)
+
+    return render(request, 'dappx/monitor.html', {'videos': videos})
 
 
 def record_video_screen(request):

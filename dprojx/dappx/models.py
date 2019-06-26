@@ -26,6 +26,17 @@ class VideoUpload(models.Model):
         user_id = url[2]
         return '%s/video/?id=%s&user=%s' % (domain_name, video_id, user_id)
 
+    def video_monitor_link(self):
+        domain_name = Site.objects.last().domain
+        url = self.videoUrl.split('/')
+        url = self.videoUrl.split('/')
+        video_id = url[-1]
+        user_id = url[2]
+
+        return '%s/video-monitor/?id=%s&user=%s' % (
+            domain_name, video_id, user_id
+        )
+
 
 class UserProfileInfo(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -34,6 +45,7 @@ class UserProfileInfo(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     notify_email = models.EmailField(max_length=512, blank=True, null=True)
     days_sober = models.PositiveIntegerField(default=0)
+    user_hash = models.CharField(max_length=256, blank=True, null=True)
 
     def __str__(self):
         return self.user.username

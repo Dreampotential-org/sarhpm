@@ -28,11 +28,13 @@ urlpatterns = [
     url(r'^log-errors/', views.post_slack_errors, name='log-errors'),
     url(r'^record/', views.record_video_screen, name='record'),
     url(r'^video/', views.video, name='video'),
+    url(r'^video-monitor/', views.video_monitor, name='video-monitor'),
     url(r'^upload/', views.upload, name='upload'),
     url(r'^gps-checkin/', views.gps_check_in, name='gps-checkin'),
     url(r'^special/', views.special, name='special'),
     url(r'^dappx/', include('dappx.urls')),
     url(r'^logout/$', views.user_logout, name='logout'),
     url(r'^user_login/$', views.user_login, name='user_login'),
+    url(r'^monitor/$', views.monitor, name='monitor'),
     url('^', include('django.contrib.auth.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
