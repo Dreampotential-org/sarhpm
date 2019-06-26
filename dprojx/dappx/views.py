@@ -248,7 +248,7 @@ def upload(request):
         profile = get_user_profile(request)
         msg = (
             'Click to play: https://%s' %
-            video.video_link()
+            video.video_monitor_link()
         )
 
         if hasattr(profile, 'notify_email') and profile.notify_email:
