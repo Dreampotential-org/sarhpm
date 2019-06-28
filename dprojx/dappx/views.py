@@ -15,7 +15,7 @@ from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.http import JsonResponse
 from django.http.response import StreamingHttpResponse
-from django.shortcuts import render
+# from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
@@ -29,6 +29,8 @@ from .models import UserProfileInfo
 from .models import VideoUpload
 from dappx.forms import UserForm, UserProfileInfoForm
 from utils import superuser_only
+from utils import custom_render as render
+
 
 logger = logging.getLogger(__name__)
 
