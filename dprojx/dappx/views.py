@@ -387,10 +387,7 @@ def index(request):
 
 def user_login(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
-        if not username:
-            username = request.POST.get('email')
-
+        username = request.POST.get('email')
         password = request.POST.get('password')
         notify_email = request.POST.get('notify_email', '')
         user = authenticate(username=username, password=password)
