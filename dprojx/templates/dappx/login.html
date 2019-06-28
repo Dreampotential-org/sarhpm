@@ -3,7 +3,7 @@
 <div class="mainContainer" style='margin-top:25px'>
     <div class="modal-content" style="padding: 20px; background: none no-repeat scroll 0 0 #fff; position: relative;">
       <h1>Login here</h1>
-      <form method="post" action="{% url 'dappx:user_login' %}">
+      <form method="post" action="{% url 'dappx:user_login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}">
           {% csrf_token %}
           {# A more "HTML" way of creating the login form#}
           <p>

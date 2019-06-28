@@ -387,20 +387,25 @@ def index(request):
 
 def user_login(request):
     if request.method == 'POST':
-        username = request.POST.get('email')
+        username = request.POST.get('username')
         password = request.POST.get('password')
-        notify_email = request.POST.get('notify_email', "")
+        notify_email = request.POST.get('notify_email', '')
         user = authenticate(username=username, password=password)
         if user:
             if user.is_active:
                 login(request, user)
-                profile = get_user_profile(request)
-                print(notify_email)
-                profile.notify_email = notify_email
-                profile.save()
+                if notify_email:
+                    profile = get_user_profile(request)
+                    profile.notify_email = notify_email
+                    profile.save()
                 # update notify_email
 
-                return HttpResponseRedirect(reverse('index'))
+                if request.GET.get('next'):
+                    redirect_uri = request.GET.get('next')
+                else:
+                    redirect_uri = reverse('index')
+
+                return HttpResponseRedirect(redirect_uri)
             else:
                 return HttpResponse("Your account was inactive.")
         else:
