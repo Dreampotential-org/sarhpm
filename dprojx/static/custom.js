@@ -81,6 +81,7 @@ function init_all() {
                       icon: "success",
                     });
                     $("#overlay_loading").hide()
+                    $("#takeavideoModal").removeClass("is-visible")
                 } else {
                     alert('data upload failed');
                 }
