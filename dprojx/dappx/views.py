@@ -50,7 +50,11 @@ def video_monitor(request):
     path = '/media/%s/%s' % (request.GET.get("user"), request.GET.get("id"))
     video = VideoUpload.objects.filter(videoUrl=path).first()
 
-    if not video or video.user != request.user:
+    monitor_user = UserProfileInfo.objects.filter(
+        notify_email=video.user.email
+    ).first()
+
+    if video and monitor_user and monitor_user.user != request.user:
         raise Http404
 
     return stream_video(request, path)
