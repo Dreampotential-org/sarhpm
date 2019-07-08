@@ -48,6 +48,7 @@ class UserProfileInfo(models.Model):
     notify_email = models.EmailField(max_length=512, blank=True, null=True)
     days_sober = models.PositiveIntegerField(default=0)
     user_hash = models.CharField(max_length=256, blank=True, null=True)
+    is_monitor_user = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username

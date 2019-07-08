@@ -51,7 +51,7 @@ def video_monitor(request):
     video = VideoUpload.objects.filter(videoUrl=path).first()
 
     monitor_user = UserProfileInfo.objects.filter(
-        notify_email=video.user.email
+        notify_email=video.user.email, is_monitor_user=True
     ).first()
 
     if video and monitor_user and monitor_user.user != request.user:

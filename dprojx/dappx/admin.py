@@ -51,7 +51,11 @@ class CustomGpsCheckin(admin.ModelAdmin):
         )
 
 
+class UserProfileInfoAdmin(admin.ModelAdmin):
+    list_display = ['user', 'notify_email', 'created_at', 'is_monitor_user']
+
+
 # Register your models here.
-admin.site.register(UserProfileInfo)
+admin.site.register(UserProfileInfo, UserProfileInfoAdmin)
 admin.site.register(GpsCheckin, CustomGpsCheckin)
 admin.site.register(VideoUpload, CustomVideoUpload)
