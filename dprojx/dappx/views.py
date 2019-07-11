@@ -407,7 +407,9 @@ def user_login(request):
                 # update notify_email
 
                 if request.GET.get('next'):
-                    redirect_uri = request.GET.get('next')
+                    full_path = request.get_full_path()
+                    val = full_path.split('next=')
+                    redirect_uri = val[1]
                 else:
                     redirect_uri = reverse('index')
 
