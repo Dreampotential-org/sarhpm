@@ -28,9 +28,6 @@ def send_raw_email(to_email, reply_to, subject, message):
             Source=SENDER, Destinations=[to_email]))
 
 
-# send_raw_email("aaronorosen@gmail.com", 'aaronorose.n@gmail.com',
-#               'subject', 'message')
-
 def send_email(to_email, subject, message):
     SENDER = "Pam Report <no-reply@app.usepam.com>"
 

@@ -90,9 +90,6 @@ def record_video_screen(request):
 
 
 def save_checkin(request):
-    print("A CHECKIN HAS OCC")
-    print(request.POST)
-
     msg = request.POST.get("msg")
     lat = request.POST.get("lat")
     lng = request.POST.get("long")
@@ -106,26 +103,12 @@ def save_checkin(request):
     lat_long_url = 'https://www.google.com/maps/place/%s,%s' % (lat, lng)
     msg += "\n\n\n%s" % lat_long_url
 
-    default_email = 'mcknight12@aol.com'
-    is_stan_email = False
     profile = get_user_profile(request)
     if hasattr(profile, 'notify_email') and profile.notify_email:
-        print("WAS STAN Sending email to stan")
-        if profile.notify_email.lower().strip() == default_email:
-            is_stan_email = True
-
         email_utils.send_raw_email(
             profile.notify_email,  # send report here
             request.user.email,  # replies to goes here
             'GPS Checkin from %s' % profile.name,
-            msg)
-
-    if not is_stan_email:
-        print("Sending email to stan")
-        email_utils.send_raw_email(
-            default_email,  # send report here
-            request.user.email,  # replies to goes here
-            '(CCed) GPS Checkin from %s' % profile.name,
             msg)
 
     url = 'https://hooks.slack.com/services/'
@@ -224,7 +207,7 @@ def stream_video(request, path):
 @login_required
 def upload(request):
     if request.method == 'POST' and request.FILES['file']:
-        print(request.POST)
+        logger.info("Video upload: %s" % request.POST)
         save_checkin(request)
 
         # save file to disk
@@ -243,7 +226,6 @@ def upload(request):
         if uploaded_name[-4:] == '.mov':
             # ffmpeg!
             uploaded_file_url = convert_file(uploaded_file_url)
-            print("AAAH MOVE FILE")
 
         print(uploaded_file_url)
         # now lets create the db entry
@@ -252,8 +234,6 @@ def upload(request):
             videoUrl=uploaded_file_url, user=user
         )
 
-        is_stan_email = False
-        default_email = 'mcknight12@aol.com'
         profile = get_user_profile(request)
         msg = (
             'Click to play: https://%s' %
@@ -261,23 +241,10 @@ def upload(request):
         )
 
         if hasattr(profile, 'notify_email') and profile.notify_email:
-            print("WAS STAN Sending email to stan")
-            if profile.notify_email.lower().strip() == default_email:
-                is_stan_email = True
-
-            print(msg)
             email_utils.send_raw_email(
                 profile.notify_email,  # send report here
                 request.user.email,  # replies to goes here
                 'Video Checkin from %s' % profile.name,
-                msg
-            )
-        if not is_stan_email:
-            print("Sending email to stan")
-            email_utils.send_raw_email(
-                default_email,  # send report here
-                request.user.email,  # replies to goes here
-                '(CCed) Video Checkin from %s' % profile.name,
                 msg
             )
 
@@ -326,11 +293,43 @@ def record_video(request):
     }, status=HTTP_200_OK)
 
 
+existing_monitor_message = (
+    "Hi there, I have added you to monitor my recovery process "
+    "and help keep me accountable using https://useiam.com. "
+    "You will receieve video and gps checkins of my activity which "
+    "you can reply to via email to help encourage me.")
+
+new_monitor_message = (
+    "Hi there, I have added you to monitor my recovery process "
+    "and help keep me accountable using https://useiam.com. "
+    "You will receieve video and gps checkins of my activity which "
+    "you can reply to via email to help encourage me. "
+
+    )
+
+
 def _create_user(request):
-    print("Create user request!!!")
-    print(request.POST)
     data = request.POST.copy()
     data['username'] = request.POST.get('email')
+    # check if notify email has an account
+    monitor_user = User.objects.filter(
+        username=request.POST.get("notify_email", "")).first()
+    if monitor_user:
+        logger.info("I HAVE MONITOR USER")
+        email_utils.send_raw_email(
+            to_email=request.POST["notify_email"],
+            reply_to=request.POST['email'],
+            subject='useIAM: %s added you as a monitor'
+                    % request.POST['name'],
+            message=existing_monitor_message)
+    else:
+        email_utils.send_raw_email(
+            to_email=request.POST["notify_email"],
+            reply_to=request.POST['email'],
+            subject='useIAM: %s added you as a monitor'
+                    % request.POST['name'],
+            message=existing_monitor_message)
+
     print('after')
     print(data)
     user_form = UserForm(data)
@@ -384,12 +383,12 @@ def index(request):
                       days_sober(profile.user.date_joined))
 
     return render(request, 'dappx/index.html',
-                           {'user_form': user_form,
-                            'profile_form': profile_form,
-                            'user_taken': user_taken,
-                            'sober_days': sober_days,
-                            'name': name,
-                            'registered': registered})
+                  {'user_form': user_form,
+                   'profile_form': profile_form,
+                   'user_taken': user_taken,
+                   'sober_days': sober_days,
+                   'name': name,
+                   'registered': registered})
 
 
 def user_login(request):
