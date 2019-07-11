@@ -54,7 +54,7 @@ def video_monitor(request):
         raise Http404
 
     monitor_user = UserProfileInfo.objects.filter(
-        notify_email=video.user.email, is_monitor_user=True
+        user__email=video.user.email, is_monitor_user=True
     ).first()
 
     if video and request.user.is_superuser:
