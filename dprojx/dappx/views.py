@@ -58,7 +58,10 @@ def video_monitor(request):
         user__email=video.user.email, is_monitor_user=True
     ).first()
 
-    logger.info("monitor user for video is: %s" % monitor_user.user)
+    if monitor_user:
+        logger.info("monitor user for video is: %s" % monitor_user)
+    else:
+        logger.info("no monitor user")
 
     if video and request.user.is_superuser:
         return stream_video(request, path)
