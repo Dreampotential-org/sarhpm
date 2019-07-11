@@ -19,7 +19,7 @@ services:
             - NEW_RELIC_CONFIG_FILE=/config/newrelic/dev.ini
         depends_on:
             - dev-db
-        command: newrelic-admin run-program /usr/local/bin/gunicorn --env DJANGO_SETTINGS_MODULE=dprojx.settings dprojx.wsgi --workers 8 --bind=unix:/home/sock/dprojx-dev.sock
+        command: newrelic-admin run-program /usr/local/bin/gunicorn --env DJANGO_SETTINGS_MODULE=dprojx.settings dprojx.wsgi --workers 8 --bind=unix:/home/sock/dprojx-dev.sock --log-level=info
         entrypoint: /entrypoint.sh
         restart: always
 
