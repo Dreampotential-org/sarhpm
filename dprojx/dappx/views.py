@@ -54,6 +54,9 @@ def video_monitor(request):
         notify_email=video.user.email, is_monitor_user=True
     ).first()
 
+    if video and request.user.is_superuser:
+        return stream_video(request, path)
+
     if video and monitor_user and monitor_user.user != request.user:
         raise Http404
 
