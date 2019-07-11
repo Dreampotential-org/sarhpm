@@ -47,6 +47,7 @@ def video(request):
 
 @login_required
 def video_monitor(request):
+    logger.info("View video request from: %s" % request.user)
     path = '/media/%s/%s' % (request.GET.get("user"), request.GET.get("id"))
     video = VideoUpload.objects.filter(videoUrl=path).first()
 
@@ -56,6 +57,8 @@ def video_monitor(request):
     monitor_user = UserProfileInfo.objects.filter(
         user__email=video.user.email, is_monitor_user=True
     ).first()
+
+    logger.info("monitor user for video is: %s" % monitor_user.user)
 
     if video and request.user.is_superuser:
         return stream_video(request, path)
