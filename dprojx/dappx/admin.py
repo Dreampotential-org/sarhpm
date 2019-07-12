@@ -52,7 +52,10 @@ class CustomGpsCheckin(admin.ModelAdmin):
 
 
 class UserProfileInfoAdmin(admin.ModelAdmin):
-    list_display = ['user', 'notify_email', 'created_at', 'is_monitor_user']
+    list_display = [
+        'id', 'user', 'notify_email', 'created_at'
+    ]
+    ordering = ('-id',)
 
 
 # Register your models here.

@@ -54,8 +54,12 @@ def video_monitor(request):
     if not video:
         raise Http404
 
+    if video and request.user.is_superuser:
+        return stream_video(request, path)
+
+    video_owner = UserProfileInfo.objects.filter(user=video.user).first()
     monitor_user = UserProfileInfo.objects.filter(
-        user__email=video.user.email, is_monitor_user=True
+        user__email=video_owner.notify_email
     ).first()
 
     if monitor_user:
@@ -63,10 +67,7 @@ def video_monitor(request):
     else:
         logger.info("no monitor user")
 
-    if video and request.user.is_superuser:
-        return stream_video(request, path)
-
-    if video and monitor_user and monitor_user.user != request.user:
+    if monitor_user and monitor_user.user.email != request.user.email:
         raise Http404
 
     return stream_video(request, path)
@@ -321,8 +322,13 @@ def _create_user(request):
     data = request.POST.copy()
     data['username'] = request.POST.get('email')
     # check if notify email has an account
-    monitor_user = User.objects.filter(
-        username=request.POST.get("notify_email", "")).first()
+    notify_email = request.POST.get('notify_email', '')
+    monitor_user = None
+    if notify_email != '':
+        monitor_user = User.objects.filter(
+            username=request.POST.get("notify_email", "")
+        ).first()
+
     if monitor_user:
         logger.info("I HAVE MONITOR USER")
         email_utils.send_raw_email(
@@ -331,7 +337,7 @@ def _create_user(request):
             subject='useIAM: %s added you as a monitor'
                     % request.POST['name'],
             message=existing_monitor_message)
-    else:
+    elif notify_email != '':
         email_utils.send_raw_email(
             to_email=request.POST["notify_email"],
             reply_to=request.POST['email'],
