@@ -6,7 +6,7 @@ from botocore.exceptions import ClientError
 
 
 def send_raw_email(to_email, reply_to, subject, message):
-    SENDER = "Pam Report <no-reply@app.usepam.com>"
+    SENDER = "useIAM Report <no-reply@app.usepam.com>"
     msg = MIMEMultipart()
     msg.set_charset("utf-8")
     msg['Subject'] = subject

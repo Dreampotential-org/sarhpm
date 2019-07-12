@@ -87,13 +87,13 @@ def user_logout(request):
 
 @login_required
 def monitor(request):
-    user_ids = [
-        user.user.id for user in UserProfileInfo.objects.filter(
-            notify_email=request.user.email)
-    ]
-    videos = VideoUpload.objects.filter(user__id__in=user_ids)
-
-    return render(request, 'dappx/monitor.html', {'videos': videos})
+    # users = [
+    #    user for user in UserProfileInfo.objects.filter(
+    #        notify_email=request.user.email)
+    # ]
+    # videos = VideoUpload.objects.filter(user__id__in=user_ids)
+    # return render(request, 'dappx/monitor.html', {'users': users})
+    return render(request, 'dappx/monitor.html', {})
 
 
 def record_video_screen(request):
