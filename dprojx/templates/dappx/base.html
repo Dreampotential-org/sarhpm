@@ -48,6 +48,7 @@
    {% if user.is_authenticated %}
     <div class="slideMenu">
         <h4 class="textCenter">Days Sober: {{sober_days}}</h4>
+        <h4 class="textCenter">Your Email: {{ request.user.email }}</h4>
         <h4 class="textCenter">Notify Email: {{ notify_email }}</h4>
         <h4 class="textCenter"><a href="/logout">Logout</a></h4>
     </div>

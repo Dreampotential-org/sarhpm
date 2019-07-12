@@ -16,6 +16,7 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.http import JsonResponse
 from django.http.response import StreamingHttpResponse
 # from django.shortcuts import render
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
@@ -54,8 +55,12 @@ def video_monitor(request):
     if not video:
         raise Http404
 
+    if video and request.user.is_superuser:
+        return stream_video(request, path)
+
+    video_owner = UserProfileInfo.objects.filter(user=video.user).first()
     monitor_user = UserProfileInfo.objects.filter(
-        user__email=video.user.email, is_monitor_user=True
+        user__email=video_owner.notify_email
     ).first()
 
     if monitor_user:
@@ -63,10 +68,7 @@ def video_monitor(request):
     else:
         logger.info("no monitor user")
 
-    if video and request.user.is_superuser:
-        return stream_video(request, path)
-
-    if video and monitor_user and monitor_user.user != request.user:
+    if monitor_user and monitor_user.user.email != request.user.email:
         raise Http404
 
     return stream_video(request, path)
@@ -321,26 +323,13 @@ def _create_user(request):
     data = request.POST.copy()
     data['username'] = request.POST.get('email')
     # check if notify email has an account
-    monitor_user = User.objects.filter(
-        username=request.POST.get("notify_email", "")).first()
-    if monitor_user:
-        logger.info("I HAVE MONITOR USER")
-        email_utils.send_raw_email(
-            to_email=request.POST["notify_email"],
-            reply_to=request.POST['email'],
-            subject='useIAM: %s added you as a monitor'
-                    % request.POST['name'],
-            message=existing_monitor_message)
-    else:
-        email_utils.send_raw_email(
-            to_email=request.POST["notify_email"],
-            reply_to=request.POST['email'],
-            subject='useIAM: %s added you as a monitor'
-                    % request.POST['name'],
-            message=existing_monitor_message)
+    notify_email = request.POST.get('notify_email', '')
+    monitor_user = None
+    if notify_email != '':
+        monitor_user = User.objects.filter(
+            username=request.POST.get("notify_email", "")
+        ).first()
 
-    print('after')
-    print(data)
     user_form = UserForm(data)
     profile_form = UserProfileInfoForm(data=request.POST)
     if user_form.is_valid() and profile_form.is_valid():
@@ -360,6 +349,26 @@ def _create_user(request):
         username = request.POST.get('email')
         password = request.POST.get('password')
         user = authenticate(username=username, password=password)
+
+        if monitor_user:
+            logger.info("I HAVE MONITOR USER")
+            email_utils.send_raw_email(
+                to_email=request.POST["notify_email"],
+                reply_to=request.POST['email'],
+                subject='useIAM: %s added you as a monitor'
+                        % request.POST['name'],
+                message=existing_monitor_message)
+        elif notify_email != '':
+            url = "https://" + request.META['HTTP_HOST']
+            url += "/create_notify_user/" + profile.user_hash
+            mail_text = new_monitor_message + url
+            email_utils.send_raw_email(
+                to_email=request.POST["notify_email"],
+                reply_to=request.POST['email'],
+                subject='useIAM: %s added you as a monitor'
+                        % request.POST['name'],
+                message=mail_text)
+
         if user:
             login(request, user)
             return HttpResponseRedirect(reverse('index'))
@@ -400,6 +409,38 @@ def index(request):
                    'registered': registered})
 
 
+def create_notify_user(request, user_hash):
+    profile = get_object_or_404(UserProfileInfo, user_hash=user_hash)
+    if request.method == 'POST':
+        # username = request.POST.get('email')
+        username = profile.notify_email
+        password = request.POST.get('password')
+
+        user = User.objects.filter(username=username).first()
+        if user:
+            return HttpResponse('Email already exists')
+
+        user = User()
+        user.email = username
+        user.username = username
+        user.set_password(password)
+        user.save()
+
+        profile = UserProfileInfo()
+        profile.user = user
+        profile.save()
+
+        user = authenticate(username=username, password=password)
+        login(request, user)
+
+        return HttpResponseRedirect(reverse('monitor'))
+
+    return render(
+        request, 'dappx/create_notify_user.html',
+        {'username': profile.notify_email}
+    )
+
+
 def user_login(request):
     if request.method == 'POST':
         username = request.POST.get('email')
@@ -430,5 +471,5 @@ def user_login(request):
             print("They used username: {} and password: {}".format(
                 username, password))
             return HttpResponse("Invalid login details given")
-    else:
-        return render(request, 'dappx/login.html', {})
+
+    return render(request, 'dappx/login.html', {})
