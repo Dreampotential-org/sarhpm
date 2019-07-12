@@ -48,7 +48,7 @@ def video(request):
 
 @login_required
 def video_monitor(request):
-    logger.info("View video request from: %s" % request.user)
+    logger.error("View video request from: %s" % request.user)
     path = '/media/%s/%s' % (request.GET.get("user"), request.GET.get("id"))
     video = VideoUpload.objects.filter(videoUrl=path).first()
 
