@@ -24,6 +24,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    url(r'^api/', include('api.urls')),
     url(r'^$', views.index, name='index'),
     url(r'^log-errors/', views.post_slack_errors, name='log-errors'),
     url(r'^record/', views.record_video_screen, name='record'),
