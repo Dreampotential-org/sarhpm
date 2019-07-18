@@ -24,7 +24,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 @api_view(['POST'])
 def create_user(request):
     data = {k: v for k, v in request.data.items()}
-    user = User._default_manager.get_by_natural_key(data['email'])
+    user = User.objects.filter(username=data['email']).first()
 
     if user:
         return Response({'message': 'User already exists'})
