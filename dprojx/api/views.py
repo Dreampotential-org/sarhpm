@@ -1,9 +1,13 @@
 from django.contrib.auth.models import User
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
 
-from dappx.models import UserProfileInfo
 from api.serializers import UserSerializer, UserProfileSerializer
+from dappx.models import UserProfileInfo
+from dappx.views import _create_user
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -15,3 +19,24 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     queryset = UserProfileInfo.objects.all().order_by('-created_at')
     serializer_class = UserProfileSerializer
+
+
+@api_view(['POST'])
+def create_user(request):
+    data = {k: v for k, v in request.data.items()}
+    user = User._default_manager.get_by_natural_key(data['email'])
+
+    if user:
+        return Response({'message': 'User already exists'})
+
+    _create_user(**data)
+
+    user = User._default_manager.get_by_natural_key(data['email'])
+    Token.objects.filter(user=user).delete()
+    token = Token.objects.get_or_create(user=user)
+
+    data.pop('password')
+    data['message'] = "User created"
+    data['token'] = token[0].key
+
+    return Response(data)

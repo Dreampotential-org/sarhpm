@@ -319,19 +319,19 @@ new_monitor_message = (
     )
 
 
-def _create_user(request):
-    data = request.POST.copy()
-    data['username'] = request.POST.get('email')
-    # check if notify email has an account
-    notify_email = request.POST.get('notify_email', '')
+def _create_user(**data):
+    data['username'] = data['email']
+    request = data.get('request')
+
     monitor_user = None
-    if notify_email != '':
+    if data.get('notify_email'):
         monitor_user = User.objects.filter(
-            username=request.POST.get("notify_email", "")
+            username=data.get('notify_email')
         ).first()
 
     user_form = UserForm(data)
-    profile_form = UserProfileInfoForm(data=request.POST)
+    profile_form = UserProfileInfoForm(data)
+
     if user_form.is_valid() and profile_form.is_valid():
         user = user_form.save()
         print("UERERERE %s" % user)
@@ -339,37 +339,38 @@ def _create_user(request):
         user.save()
         profile = profile_form.save(commit=False)
         profile.user = user
-        profile.phone = request.POST.get("phone", "")
-        profile.days_sober = request.POST.get("days_sober", 0)
-        profile.name = request.POST.get("name", "")
-        profile.notify_email = request.POST.get("notify_email", "")
+        profile.phone = data.get("phone", "")
+        profile.days_sober = data.get("days_sober", 0)
+        profile.name = data.get("name", "")
+        profile.notify_email = data.get("notify_email", "")
         profile.save()
 
         # log user in!
-        username = request.POST.get('email')
-        password = request.POST.get('password')
+        username = data.get('email')
+        password = data.get('password')
         user = authenticate(username=username, password=password)
 
         if monitor_user:
             logger.info("I HAVE MONITOR USER")
             email_utils.send_raw_email(
-                to_email=request.POST["notify_email"],
-                reply_to=request.POST['email'],
+                to_email=data.get("notify_email"),
+                reply_to=data('email'),
                 subject='useIAM: %s added you as a monitor'
-                        % request.POST['name'],
+                        % data.get('name'),
                 message=existing_monitor_message)
-        elif notify_email != '':
-            url = "https://" + request.META['HTTP_HOST']
-            url += "/create_notify_user/" + profile.user_hash
-            mail_text = new_monitor_message + url
+        elif data.get('notify_email'):
+            # url = "https://" + request.META['HTTP_HOST']
+            # url += "/create_notify_user/" + profile.user_hash
+            # mail_text = new_monitor_message + url
+            mail_text = new_monitor_message
             email_utils.send_raw_email(
-                to_email=request.POST["notify_email"],
-                reply_to=request.POST['email'],
+                to_email=data.get("notify_email"),
+                reply_to=data.get('email'),
                 subject='useIAM: %s added you as a monitor'
-                        % request.POST['name'],
+                        % data.get('name'),
                 message=mail_text)
 
-        if user:
+        if user and request:
             login(request, user)
             return HttpResponseRedirect(reverse('index'))
 
@@ -382,7 +383,9 @@ def index(request):
     user_taken = False
     name = ''
     if request.method == 'POST':
-        user = _create_user(request)
+        data = {k: v for k, v in request.POST.items()}
+        data['request'] = request
+        user = _create_user(**data)
         if user == 'error':
             user_taken = True
         else:
