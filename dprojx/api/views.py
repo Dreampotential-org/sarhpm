@@ -31,7 +31,7 @@ def create_user(request):
 
     _create_user(**data)
 
-    user = User._default_manager.get_by_natural_key(data['email'])
+    user = User.objects.filter(username=data['email']).first()
     Token.objects.filter(user=user).delete()
     token = Token.objects.get_or_create(user=user)
 
