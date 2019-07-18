@@ -32,7 +32,7 @@ class CustomVideoUpload(admin.ModelAdmin):
 
 
 class CustomGpsCheckin(admin.ModelAdmin):
-    list_display = ['view_map', 'msg', 'user']
+    list_display = ['id', 'view_map', 'msg', 'user']
     list_filter = ['user']
     model = GpsCheckin
 
