@@ -29,6 +29,9 @@ def create_user(request):
             'message': 'Missing parameters. Email and password is required'
         })
 
+    if not data.get('days_sober'):
+        data['days_sober'] = '0'
+
     user = User.objects.filter(username=data['email']).first()
 
     if user:
