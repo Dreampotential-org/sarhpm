@@ -24,6 +24,11 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 @api_view(['POST'])
 def create_user(request):
     data = {k: v for k, v in request.data.items()}
+    if not data.get('email') or not data.get('password'):
+        return Response({
+            'message': 'Missing parameters. Email and password is required'
+        })
+
     user = User.objects.filter(username=data['email']).first()
 
     if user:
