@@ -27,6 +27,9 @@ class GpsCheckinViewSet(viewsets.ModelViewSet):
     queryset = GpsCheckin.objects.all().order_by('-id')
     serializer_class = GpsCheckinSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
 
 @api_view(['POST'])
 def create_user(request):

@@ -19,7 +19,9 @@ class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class GpsCheckinSerializer(serializers.HyperlinkedModelSerializer):
-    user = UserSerializer(many=False, read_only=True)
+    user = UserSerializer(
+        many=False, read_only=True
+    )
 
     class Meta:
         model = GpsCheckin
