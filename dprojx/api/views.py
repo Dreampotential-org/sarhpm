@@ -24,6 +24,15 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfileInfo.objects.all().order_by('-created_at')
     serializer_class = UserProfileSerializer
 
+    def list(self, request):
+        profile = UserProfileInfo.objects.filter(
+            id=request.user.id
+        ).first()
+        return Response({
+            'days_sober': profile.days_sober,
+            'notify_email': profile.notify_email
+        })
+
 
 class GpsCheckinViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
@@ -50,6 +59,9 @@ class VideoUploadViewSet(viewsets.ModelViewSet):
 @permission_classes([IsAuthenticated])
 def video_upload(request):
     video = request.data.get('video')
+    if not video:
+        return Response({'message': 'video is required'}, 400)
+
     video = convert_video(video, request.user)
     return Response({'videoUrl': video.videoUrl})
 
@@ -81,3 +93,24 @@ def create_user(request):
     data['token'] = token[0].key
 
     return Response(data)
+
+
+@api_view(['PUT', 'GET'])
+def profile(request):
+    profile = UserProfileInfo.objects.filter(
+        id=request.user.id
+    ).first()
+
+    if request.method == 'PUT':
+        if request.data.get('days_sober'):
+            profile.days_sober = request.data.get('days_sober')
+
+        if request.data.get('notify_email'):
+            profile.notify_email = request.data.get('notify_email')
+
+        profile.save()
+
+    return Response({
+        'days_sober': profile.days_sober,
+        'notify_email': profile.notify_email
+    }, 201)
