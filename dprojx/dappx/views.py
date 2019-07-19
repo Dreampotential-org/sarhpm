@@ -360,7 +360,7 @@ def _create_user(**data):
             logger.info("I HAVE MONITOR USER")
             email_utils.send_raw_email(
                 to_email=data.get("notify_email"),
-                reply_to=data('email'),
+                reply_to=data.get('email'),
                 subject='useIAM: %s added you as a monitor'
                         % data.get('name'),
                 message=existing_monitor_message)

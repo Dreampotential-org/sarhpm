@@ -15,7 +15,7 @@ class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = UserProfileInfo
-        fields = ['days_sober', 'notify_email', 'user']
+        fields = ['user']
 
 
 class GpsCheckinSerializer(serializers.HyperlinkedModelSerializer):
