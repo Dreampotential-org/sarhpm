@@ -1,3 +1,4 @@
+import logging
 from django.contrib.auth.models import User
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -12,6 +13,8 @@ from api.serializers import (
 from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload
 from dappx.views import _create_user
 from dappx.views import convert_video, notify_gps_checkin
+
+logger = logging.getLogger(__name__)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -49,6 +52,8 @@ class VideoUploadViewSet(viewsets.ModelViewSet):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def video_upload(request):
+    logger.error("I am here video_upload")
+    logger.error(request.FILES)
     video = request.data.get('video')
     video = convert_video(video, request.user)
     return Response({'videoUrl': video.videoUrl})
