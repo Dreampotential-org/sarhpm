@@ -63,6 +63,7 @@ class VideoUploadViewSet(viewsets.ModelViewSet):
 def video_upload(request):
     logger.error("I am here video_upload")
     logger.error(request.FILES)
+    logger.error(request.data)
     video = request.data.get('video')
     if not video:
         return Response({'message': 'video is required'}, 400)
