@@ -11,6 +11,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.http import JsonResponse
@@ -114,7 +115,7 @@ def save_checkin(request):
     lat_long_url = 'https://www.google.com/maps/place/%s,%s' % (lat, lng)
     msg += "\n\n\n%s" % lat_long_url
 
-    profile = get_user_profile(request)
+    profile = get_user_profile(request.user)
     if hasattr(profile, 'notify_email') and profile.notify_email:
         email_utils.send_raw_email(
             profile.notify_email,  # send report here
@@ -143,12 +144,12 @@ def gps_check_in(request):
         return JsonResponse({'status': 'okay'}, status=200)
 
 
-def get_user_profile(request):
-    if not hasattr(request.user, 'email'):
+def get_user_profile(user):
+    if not hasattr(user, 'email'):
         return False
 
     return UserProfileInfo.objects.filter(
-        user__username=request.user.email
+        user__username=user.email
     ).first()
 
 
@@ -214,6 +215,57 @@ def stream_video(request, path):
     return resp
 
 
+def convert_video(myfile, user):
+    fs = FileSystemStorage()
+    user_hash = hashlib.sha1(
+        user.email.encode('utf-8')
+    ).hexdigest()
+    uploaded_name = (
+        "%s/%s-%s" % (user_hash, uuid.uuid4(), myfile.name)
+    ).lower()
+
+    filename = fs.save(uploaded_name, myfile)
+    uploaded_file_url = fs.url(filename)
+    print(uploaded_name)
+    if uploaded_name[-4:] == '.mov':
+        # ffmpeg!
+        uploaded_file_url = convert_file(uploaded_file_url)
+
+    print(uploaded_file_url)
+    # now lets create the db entry
+    user = User.objects.get(id=user.id)
+    video = VideoUpload.objects.create(
+        videoUrl=uploaded_file_url, user=user
+    )
+
+    profile = get_user_profile(user)
+    msg = (
+        'Click to play: https://%s' %
+        video.video_monitor_link()
+    )
+
+    if hasattr(profile, 'notify_email') and profile.notify_email:
+        email_utils.send_raw_email(
+            profile.notify_email,  # send report here
+            user.email,  # replies to goes here
+            'Video Checkin from %s' % profile.name,
+            msg
+        )
+
+    url = 'https://hooks.slack.com/services/'
+    url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
+    domain_name = Site.objects.last().domain
+    data = (
+        str("VideoUpload: %s - https://%s%s" % (
+            user.email,
+            domain_name,
+            uploaded_file_url)
+            ))
+    body = {"text": "%s" % data, 'username': 'pam-server'}
+    requests.put(url, data=json.dumps(body))
+    return video
+
+
 @csrf_exempt
 @login_required
 def upload(request):
@@ -221,54 +273,8 @@ def upload(request):
         logger.info("Video upload: %s" % request.POST)
         save_checkin(request)
 
-        # save file to disk
         myfile = request.FILES['file']
-        fs = FileSystemStorage()
-        user_hash = hashlib.sha1(
-            request.user.email.encode('utf-8')
-        ).hexdigest()
-        uploaded_name = (
-            "%s/%s-%s" % (user_hash, uuid.uuid4(), myfile.name)
-        ).lower()
-
-        filename = fs.save(uploaded_name, myfile)
-        uploaded_file_url = fs.url(filename)
-        print(uploaded_name)
-        if uploaded_name[-4:] == '.mov':
-            # ffmpeg!
-            uploaded_file_url = convert_file(uploaded_file_url)
-
-        print(uploaded_file_url)
-        # now lets create the db entry
-        user = User.objects.get(id=request.user.id)
-        video = VideoUpload.objects.create(
-            videoUrl=uploaded_file_url, user=user
-        )
-
-        profile = get_user_profile(request)
-        msg = (
-            'Click to play: https://%s' %
-            video.video_monitor_link()
-        )
-
-        if hasattr(profile, 'notify_email') and profile.notify_email:
-            email_utils.send_raw_email(
-                profile.notify_email,  # send report here
-                request.user.email,  # replies to goes here
-                'Video Checkin from %s' % profile.name,
-                msg
-            )
-
-        url = 'https://hooks.slack.com/services/'
-        url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
-        data = (
-            str("VideoUpload: %s - https://%s%s" % (
-                request.user.email,
-                request.META['HTTP_HOST'],
-                uploaded_file_url)
-                ))
-        body = {"text": "%s" % data, 'username': 'pam-server'}
-        requests.put(url, data=json.dumps(body))
+        convert_video(myfile, request.user)
 
         return JsonResponse({'error': 'Some error'}, status=200)
 
@@ -394,7 +400,7 @@ def index(request):
     user_form = UserForm()
     profile_form = UserProfileInfoForm()
     # need to get the name XXX fix this
-    profile = get_user_profile(request)
+    profile = get_user_profile(request.user)
     sober_days = 0
     if profile:
         name = profile.name
@@ -454,7 +460,7 @@ def user_login(request):
             if user.is_active:
                 login(request, user)
                 if notify_email:
-                    profile = get_user_profile(request)
+                    profile = get_user_profile(request.user)
                     profile.notify_email = notify_email
                     profile.save()
                 # update notify_email

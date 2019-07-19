@@ -1,14 +1,17 @@
 from django.contrib.auth.models import User
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 
-from api.serializers import UserSerializer, UserProfileSerializer
-from api.serializers import GpsCheckinSerializer
-from dappx.models import UserProfileInfo, GpsCheckin
+from api.serializers import (
+    UserSerializer, UserProfileSerializer, GpsCheckinSerializer,
+    VideoUploadSerializer
+)
+from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload
 from dappx.views import _create_user
+from dappx.views import convert_video
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -29,6 +32,20 @@ class GpsCheckinViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class VideoUploadViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)
+    queryset = VideoUpload.objects.all().order_by('-id')
+    serializer_class = VideoUploadSerializer
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def video_upload(request):
+    video = request.data.get('video')
+    video = convert_video(video, request.user)
+    return Response({'videoUrl': video.videoUrl})
 
 
 @api_view(['POST'])

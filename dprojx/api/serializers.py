@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from dappx.models import UserProfileInfo, GpsCheckin
+from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -19,10 +19,16 @@ class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class GpsCheckinSerializer(serializers.HyperlinkedModelSerializer):
-    user = UserSerializer(
-        many=False, read_only=True
-    )
+    user = UserSerializer(many=False, read_only=True)
 
     class Meta:
         model = GpsCheckin
         fields = ['msg', 'lat', 'lng', 'user']
+
+
+class VideoUploadSerializer(serializers.HyperlinkedModelSerializer):
+    user = UserSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = VideoUpload
+        fields = ['id', 'user', 'videoUrl']
