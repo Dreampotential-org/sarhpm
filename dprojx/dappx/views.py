@@ -101,6 +101,27 @@ def record_video_screen(request):
     return render(request, 'dappx/record.html')
 
 
+def notify_gps_checkin(lat, lng, msg, user):
+    lat_long_url = 'https://www.google.com/maps/place/%s,%s' % (lat, lng)
+    msg += "\n\n\n%s" % lat_long_url
+
+    profile = get_user_profile(user)
+    if hasattr(profile, 'notify_email') and profile.notify_email:
+        email_utils.send_raw_email(
+            profile.notify_email,  # send report here
+            user.email,  # replies to goes here
+            'GPS Checkin from %s' % profile.name,
+            msg)
+
+    url = 'https://hooks.slack.com/services/'
+    url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
+    data = "GspCheckin: %s - %s (%s, %s)" % (user.email, msg, lat, lng)
+    # data += "\nSite: %s" % request.META['HTTP_HOST']
+
+    body = {"text": "%s" % data, 'username': 'pam-server'}
+    requests.put(url, data=json.dumps(body))
+
+
 def save_checkin(request):
     msg = request.POST.get("msg")
     lat = request.POST.get("lat")
@@ -111,25 +132,7 @@ def save_checkin(request):
 
     user = User.objects.get(id=request.user.id)
     GpsCheckin.objects.create(lat=lat, lng=lng, msg=msg, user=user)
-
-    lat_long_url = 'https://www.google.com/maps/place/%s,%s' % (lat, lng)
-    msg += "\n\n\n%s" % lat_long_url
-
-    profile = get_user_profile(request.user)
-    if hasattr(profile, 'notify_email') and profile.notify_email:
-        email_utils.send_raw_email(
-            profile.notify_email,  # send report here
-            request.user.email,  # replies to goes here
-            'GPS Checkin from %s' % profile.name,
-            msg)
-
-    url = 'https://hooks.slack.com/services/'
-    url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
-    data = "GspCheckin: %s - %s (%s, %s)" % (request.user.email, msg, lat, lng)
-    data += "\nSite: %s" % request.META['HTTP_HOST']
-
-    body = {"text": "%s" % data, 'username': 'pam-server'}
-    requests.put(url, data=json.dumps(body))
+    notify_gps_checkin(lat, lng, msg, request.user)
 
 
 @csrf_exempt

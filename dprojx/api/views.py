@@ -11,7 +11,7 @@ from api.serializers import (
 )
 from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload
 from dappx.views import _create_user
-from dappx.views import convert_video
+from dappx.views import convert_video, notify_gps_checkin
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -31,6 +31,12 @@ class GpsCheckinViewSet(viewsets.ModelViewSet):
     serializer_class = GpsCheckinSerializer
 
     def perform_create(self, serializer):
+        notify_gps_checkin(
+            self.request.data['lat'],
+            self.request.data['lng'],
+            self.request.data['msg'],
+            self.request.user
+        )
         serializer.save(user=self.request.user)
 
 
