@@ -43,6 +43,7 @@ class GpsCheckinViewSet(viewsets.ModelViewSet):
     serializer_class = GpsCheckinSerializer
 
     def perform_create(self, serializer):
+        logger.error("Creating gps event for user %s" % self.request.user)
         notify_gps_checkin(
             self.request.data['lat'],
             self.request.data['lng'],
