@@ -103,8 +103,9 @@ def create_user(request):
 
 @api_view(['PUT', 'GET'])
 def profile(request):
+
     profile = UserProfileInfo.objects.filter(
-        id=request.user.id
+        user__username=request.user.email
     ).first()
 
     if request.method == 'PUT':
