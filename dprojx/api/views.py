@@ -43,6 +43,7 @@ class GpsCheckinViewSet(viewsets.ModelViewSet):
     serializer_class = GpsCheckinSerializer
 
     def perform_create(self, serializer):
+        logger.error("Creating gps event for user %s" % self.request.user)
         notify_gps_checkin(
             self.request.data['lat'],
             self.request.data['lng'],
@@ -63,6 +64,7 @@ class VideoUploadViewSet(viewsets.ModelViewSet):
 def video_upload(request):
     logger.error("I am here video_upload")
     logger.error(request.FILES)
+    logger.error(request.data)
     video = request.data.get('video')
     if not video:
         return Response({'message': 'video is required'}, 400)
@@ -101,8 +103,9 @@ def create_user(request):
 
 @api_view(['PUT', 'GET'])
 def profile(request):
+
     profile = UserProfileInfo.objects.filter(
-        id=request.user.id
+        user__username=request.user.email
     ).first()
 
     if request.method == 'PUT':
