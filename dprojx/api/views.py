@@ -90,7 +90,6 @@ def create_user(request):
     _create_user(**data)
 
     user = User.objects.filter(username=data['email']).first()
-    Token.objects.filter(user=user).delete()
     token = Token.objects.get_or_create(user=user)
 
     data.pop('password')
