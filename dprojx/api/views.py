@@ -67,6 +67,7 @@ def video_upload(request):
     logger.error(request.data)
     video = request.data.get('video')
     if not video:
+        logger.error("no vidoe file foudn")
         return Response({'message': 'video is required'}, 400)
 
     video = convert_video(video, request.user)
