@@ -12,7 +12,9 @@ from api.serializers import (
 )
 from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload
 from dappx.views import _create_user
+from dappx import email_utils
 from dappx.views import convert_video, notify_gps_checkin
+from dappx import constants
 
 logger = logging.getLogger(__name__)
 
@@ -109,16 +111,55 @@ def profile(request):
         user__username=request.user.email
     ).first()
 
+    active_monitor = False
+
     if request.method == 'PUT':
         if request.data.get('days_sober'):
             profile.days_sober = request.data.get('days_sober')
 
         if request.data.get('notify_email'):
+
+            no_change = False
+            if profile.notify_email == request.data.get('notify_email'):
+                no_change = True
+
             profile.notify_email = request.data.get('notify_email')
+            monitor_user = User.objects.filter(
+                username=profile.notify_email
+            ).first()
+
+            if monitor_user and no_change is False:
+                email_utils.send_raw_email(
+                    to_email=request.data.get("notify_email"),
+                    reply_to=request.user.email,
+                    subject='useIAM: %s added you as a monitor'
+                            % profile.name,
+                    message=constants.existing_monitor_message)
+            elif not monitor_user and no_change is False:
+                url = "https://" + request.META['HTTP_HOST']
+                url += "/create_notify_user/" + profile.user_hash
+                mail_text = constants.new_monitor_message + url
+                email_utils.send_raw_email(
+                    to_email=request.data.get("notify_email"),
+                    reply_to=request.user.email,
+                    subject='useIAM: %s added you as a monitor'
+                            % profile.name,
+                    message=mail_text)
 
         profile.save()
 
+    else:
+        if profile.notify_email:
+            monitor_user = User.objects.filter(
+                username=profile.notify_email
+            ).first()
+            if monitor_user:
+                active_monitor = True
+
+    # Check to see to see if monitor_user is on platform
+
     return Response({
         'days_sober': profile.days_sober,
-        'notify_email': profile.notify_email
+        'notify_email': profile.notify_email,
+        'active_monitor': active_monitor,
     }, 201)

@@ -26,6 +26,7 @@ from wsgiref.util import FileWrapper
 
 from . import email_utils
 from . import video_utils
+from . import constants
 from .models import GpsCheckin
 from .models import UserProfileInfo
 from .models import VideoUpload
@@ -313,21 +314,6 @@ def record_video(request):
     }, status=HTTP_200_OK)
 
 
-existing_monitor_message = (
-    "Hi there, I have added you to monitor my recovery process "
-    "and help keep me accountable using https://useiam.com. "
-    "You will receieve video and gps checkins of my activity which "
-    "you can reply to via email to help encourage me.")
-
-new_monitor_message = (
-    "Hi there, I have added you to monitor my recovery process "
-    "and help keep me accountable using https://useiam.com. "
-    "You will receieve video and gps checkins of my activity which "
-    "you can reply to via email to help encourage me. "
-
-    )
-
-
 def _create_user(**data):
     data['username'] = data['email']
     request = data.get('request')
@@ -366,12 +352,11 @@ def _create_user(**data):
                 reply_to=data.get('email'),
                 subject='useIAM: %s added you as a monitor'
                         % data.get('name'),
-                message=existing_monitor_message)
+                message=constants.existing_monitor_message)
         elif data.get('notify_email'):
-            # url = "https://" + request.META['HTTP_HOST']
-            # url += "/create_notify_user/" + profile.user_hash
-            # mail_text = new_monitor_message + url
-            mail_text = new_monitor_message
+            url = "https://" + request.META['HTTP_HOST']
+            url += "/create_notify_user/" + profile.user_hash
+            mail_text = constants.new_monitor_message + url
             email_utils.send_raw_email(
                 to_email=data.get("notify_email"),
                 reply_to=data.get('email'),
