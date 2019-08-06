@@ -10,7 +10,7 @@ from api.serializers import (
     UserSerializer, UserProfileSerializer, GpsCheckinSerializer,
     VideoUploadSerializer
 )
-from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload
+from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload, UserMonitor
 from dappx.views import _create_user
 from dappx import email_utils
 from dappx.views import convert_video, notify_gps_checkin
@@ -105,11 +105,54 @@ def create_user(request):
 
 
 @api_view(['PUT', 'GET'])
+@permission_classes([IsAuthenticated])
+def add_monitor(request):
+    user = User.objects.filter(username=request.user.email).first()
+    notify_email = request.data.get('notify_email')
+
+    # check if notify_email is already set for user
+    have = UserMonitor.objects.filter(user=user,
+                                      notify_email=notify_email).first()
+    if have:
+        return Response({
+            'msg': '%s is already a monitor user for you',
+        }, 201)
+
+
+    user_monitor = UserMonitor()
+    user_monitor.user = user
+    user_monitor.notify_email = notify_email
+    user_monitor.save()
+
+    return Response({
+        'response': 'okay',
+    }, 201)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def remove_monitor(request):
+    user = User.objects.filter(username=request.user.email).first()
+    notify_email = request.data.get('notify_email')
+    monitors = UserMonitor.objects.filter(user=user,
+                                          notify_email=notify_email).all()
+    if monitors:
+        UserMonitor.objects.filter(user=user,
+                                   notify_email=notify_email).delete()
+
+    return Response({
+        'status': 'okay',
+    }, 201)
+
+
+@api_view(['PUT', 'GET'])
 def profile(request):
 
     profile = UserProfileInfo.objects.filter(
         user__username=request.user.email
     ).first()
+
+    monitors = []
 
     active_monitor = False
 
@@ -155,11 +198,14 @@ def profile(request):
             ).first()
             if monitor_user:
                 active_monitor = True
-
+        user = User.objects.filter(username=request.user.email).first()
+        users = UserMonitor.objects.filter(user=user).all()
+        monitors = [u.notify_email for u in users]
     # Check to see to see if monitor_user is on platform
 
     return Response({
         'days_sober': profile.days_sober,
         'notify_email': profile.notify_email,
         'active_monitor': active_monitor,
+        'monitors': monitors,
     }, 201)

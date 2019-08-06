@@ -4,6 +4,7 @@ from dappx.models import UserProfileInfo
 from dappx.models import GpsCheckin
 from dappx.models import User
 from dappx.models import VideoUpload
+from dappx.models import UserMonitor
 
 from django.utils.html import format_html
 
@@ -58,7 +59,15 @@ class UserProfileInfoAdmin(admin.ModelAdmin):
     ordering = ('-id',)
 
 
+class CustomUserMonitor(admin.ModelAdmin):
+    list_display = [
+        'id', 'user', 'notify_email',
+    ]
+    ordering = ('-id',)
+
+
 # Register your models here.
 admin.site.register(UserProfileInfo, UserProfileInfoAdmin)
 admin.site.register(GpsCheckin, CustomGpsCheckin)
 admin.site.register(VideoUpload, CustomVideoUpload)
+admin.site.register(UserMonitor, CustomUserMonitor)

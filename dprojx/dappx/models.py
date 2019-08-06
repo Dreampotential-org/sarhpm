@@ -58,3 +58,8 @@ class UserProfileInfo(models.Model):
                 self.user.email.encode('utf-8')
             ).hexdigest()
         super(UserProfileInfo, self).save(*args, **kwargs)
+
+
+class UserMonitor(models.Model):
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
+    notify_email = models.EmailField(max_length=512, blank=True, null=True)

@@ -18,4 +18,7 @@ urlpatterns = [
     path('create-user/', views.create_user, name='create_user'),
     path('video-upload/', views.video_upload, name='video_upload'),
     path('profile/', views.profile, name='profile'),
+    path('add-monitor/', views.add_monitor, name='add_monitor'),
+    path('remove-monitor/', views.remove_monitor, name='remove_monitor'),
+    # path('list-events/', views.list_events, name='list_events'),
 ]
