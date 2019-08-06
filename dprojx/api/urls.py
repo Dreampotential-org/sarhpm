@@ -10,7 +10,7 @@ router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'user-profiles', views.UserProfileViewSet)
 router.register(r'gps-checkin', views.GpsCheckinViewSet)
-# router.register(r'video', views.VideoUploadViewSet)
+router.register(r'video', views.VideoUploadViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -20,5 +20,6 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('add-monitor/', views.add_monitor, name='add_monitor'),
     path('remove-monitor/', views.remove_monitor, name='remove_monitor'),
+
     # path('list-events/', views.list_events, name='list_events'),
 ]

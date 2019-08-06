@@ -13,7 +13,8 @@ from api.serializers import (
 from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload, UserMonitor
 from dappx.views import _create_user
 from dappx import email_utils
-from dappx.views import convert_video, notify_gps_checkin
+from dappx.views import convert_and_save_video
+from dappx.notify_utils import notify_gps_checkin
 from dappx import constants
 
 logger = logging.getLogger(__name__)
@@ -50,7 +51,7 @@ class GpsCheckinViewSet(viewsets.ModelViewSet):
             self.request.data['lat'],
             self.request.data['lng'],
             self.request.data['msg'],
-            self.request.user
+            self.request
         )
         serializer.save(user=self.request.user)
 
@@ -72,7 +73,7 @@ def video_upload(request):
         logger.error("no vidoe file foudn")
         return Response({'message': 'video is required'}, 400)
 
-    video = convert_video(video, request.user)
+    video = convert_and_save_video(video, request)
     return Response({'videoUrl': video.videoUrl})
 
 
