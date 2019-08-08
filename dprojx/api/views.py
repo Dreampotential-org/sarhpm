@@ -1,4 +1,3 @@
-import logging
 from django.contrib.auth.models import User
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -14,10 +13,11 @@ from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload, UserMonitor
 from dappx.views import _create_user
 from dappx import email_utils
 from dappx.views import convert_and_save_video
-from dappx.notify_utils import notify_gps_checkin
+from dappx.notify_utils import notify_gps_checkin, notify_monitor
 from dappx import constants
+from common import config
 
-logger = logging.getLogger(__name__)
+logger = config.get_logger()
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -119,11 +119,12 @@ def add_monitor(request):
             'msg': '%s is already a monitor user for you',
         }, 201)
 
-
     user_monitor = UserMonitor()
     user_monitor.user = user
     user_monitor.notify_email = notify_email
     user_monitor.save()
+
+    notify_monitor(request, notify_email)
 
     return Response({
         'response': 'okay',
@@ -149,6 +150,7 @@ def remove_monitor(request):
 @api_view(['PUT', 'GET'])
 def profile(request):
 
+    logger.info("HERE")
     profile = UserProfileInfo.objects.filter(
         user__username=request.user.email
     ).first()

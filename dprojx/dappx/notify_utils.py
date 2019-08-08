@@ -7,7 +7,11 @@ import json
 from .models import UserMonitor
 from .models import UserProfileInfo
 from . import email_utils
+from . import constants
+from common import config
 
+
+logger = config.get_logger()
 
 def get_user_monitors(request):
     user = User.objects.filter(username=request.user.email).first()
@@ -75,3 +79,32 @@ def notify_gps_checkin(lat, lng, msg, request):
 
     body = {"text": "%s" % data, 'username': 'pam-server'}
     requests.put(url, data=json.dumps(body))
+
+def invite_monitor(request, notify_email):
+    logger.info("invite source: %s" % request.data.get("source"))
+    signup_link = (
+        "\n\nhttps://%s/signup.html?email=%s"
+        % (request.data.get("source"), request.data.get('notify_email')))
+    profile = get_user_profile(request.user)
+    email_utils.send_raw_email(
+        to_email=request.data.get("notify_email"),
+        reply_to=request.user.username,
+        subject='useIAM: %s added you as a monitor'
+                % profile.name,
+        message=constants.existing_monitor_message + signup_link)
+
+
+def notify_monitor(request, notify_email):
+    # check to see if notify_email has account
+
+    logger.info("user: %s added notify_email: %s" %
+                 (request.user.username, notify_email))
+    monitor_user = User.objects.filter(
+        username='notify_email'
+    ).first()
+
+    if monitor_user:
+        logger.info("monitor user already exists")
+    else:
+        logger.info("monitor user does not exist")
+        invite_monitor(request, notify_email)
