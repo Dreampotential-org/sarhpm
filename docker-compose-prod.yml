@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+    db:
+        restart: always
+        image: postgres
+        volumes:
+            - ../postgres-data-prod:/var/lib/postgresql/data
+        environment:
+            POSTGRES_DB: db
+    project:
+        build: .
+        volumes:
+            - ./dprojx:/home/web/pam
+            - ./sock:/home/sock
+        ports:
+            - 8822:8822
+        depends_on:
+            - db
+        command: newrelic-admin run-program /usr/local/bin/gunicorn --env DJANGO_SETTINGS_MODULE=dprojx.settings dprojx.wsgi --workers 8 --bind=0.0.0.0:8822
+        entrypoint: /entrypoint.sh
+        restart: always
+
+    web-server:
+        image: nginx
+        volumes:
+            - ./config/nginx/site-enabled/prod.conf:/etc/nginx/conf.d/default.conf
+            - ./dprojx/static:/var/data/dprojx/static
+        ports:
+            - 8844:80
+        restart: always
