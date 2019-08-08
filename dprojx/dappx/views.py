@@ -30,12 +30,13 @@ from . import constants
 from .models import GpsCheckin
 from .models import UserProfileInfo
 from .models import VideoUpload
+from .models import UserMonitor
 from dappx.forms import UserForm, UserProfileInfoForm
 from utils import superuser_only
 from utils import custom_render as render
+from common import config
 
-
-logger = logging.getLogger(__name__)
+logger = config.get_logger()
 
 
 def register(request):
@@ -61,6 +62,13 @@ def video_monitor(request):
         return stream_video(request, path)
 
     video_owner = UserProfileInfo.objects.filter(user=video.user).first()
+
+    # get monitors of user
+    user_monitors = UserMonitor.objects.filter(user=video.user).all()
+    user_monitor_emails = [u.notify_email for u in user_monitors]
+    logging.info("User %s monitors are %s"
+                 % (video.user.email, user_monitor_emails))
+
     monitor_user = UserProfileInfo.objects.filter(
         user__email=video_owner.notify_email
     ).first()

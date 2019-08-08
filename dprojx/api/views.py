@@ -12,10 +12,12 @@ from api.serializers import (
 from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload, UserMonitor
 from dappx.views import _create_user
 from dappx import email_utils
-from dappx.views import convert_and_save_video
+from dappx.views import convert_and_save_video, stream_video
 from dappx.notify_utils import notify_gps_checkin, notify_monitor
 from dappx import constants
 from common import config
+
+from django.http import Http404
 
 logger = config.get_logger()
 
@@ -145,6 +147,33 @@ def remove_monitor(request):
     return Response({
         'status': 'okay',
     }, 201)
+
+
+@api_view(['GET'])
+def review_video(request):
+    token = Token.objects.get(key=request.GET.get("token"))
+    logger.info("requesting video as user: %s" % token.user.email)
+    path = '/media/%s/%s' % (request.GET.get("user"), request.GET.get("id"))
+    video = VideoUpload.objects.filter(videoUrl=path).first()
+
+    if not video:
+        raise Http404
+
+    if video and token.user.is_superuser:
+        return stream_video(request, path)
+
+    # get monitors of user
+    user_monitors = UserMonitor.objects.filter(user=video.user).all()
+    user_monitor_emails = [u.notify_email for u in user_monitors]
+    logger.info("User %s monitors are %s"
+                % (video.user.email, user_monitor_emails))
+
+    if token.user.email in user_monitor_emails:
+        logger.info("User %s is a monitor for %s"
+                    % (token.user.email, video.user.email))
+        return stream_video(request, path)
+
+    raise Http404
 
 
 @api_view(['PUT', 'GET'])

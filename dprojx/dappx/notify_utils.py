@@ -13,6 +13,7 @@ from common import config
 
 logger = config.get_logger()
 
+
 def get_user_monitors(request):
     user = User.objects.filter(username=request.user.email).first()
     users = UserMonitor.objects.filter(user=user).all()
@@ -75,36 +76,40 @@ def notify_gps_checkin(lat, lng, msg, request):
     url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
     data = "GspCheckin: %s - %s (%s, %s)" % (request.user.email,
                                              msg, lat, lng)
-    # data += "\nSite: %s" % request.META['HTTP_HOST']
-
     body = {"text": "%s" % data, 'username': 'pam-server'}
     requests.put(url, data=json.dumps(body))
 
-def invite_monitor(request, notify_email):
+
+def notify_monitor_email(request, notify_email, monitor_user):
+
     logger.info("invite source: %s" % request.data.get("source"))
     signup_link = (
         "\n\nhttps://%s/signup.html?email=%s"
         % (request.data.get("source"), request.data.get('notify_email')))
     profile = get_user_profile(request.user)
+
+    if monitor_user:
+        logger.info("monitor user already exists")
+        message = constants.existing_monitor_message
+    else:
+        logger.info("monitor user does not exist")
+        message = constants.existing_monitor_message + signup_link
+
     email_utils.send_raw_email(
         to_email=request.data.get("notify_email"),
         reply_to=request.user.username,
         subject='useIAM: %s added you as a monitor'
                 % profile.name,
-        message=constants.existing_monitor_message + signup_link)
+        message=message)
 
 
 def notify_monitor(request, notify_email):
     # check to see if notify_email has account
 
     logger.info("user: %s added notify_email: %s" %
-                 (request.user.username, notify_email))
+                (request.user.username, notify_email))
     monitor_user = User.objects.filter(
         username='notify_email'
     ).first()
 
-    if monitor_user:
-        logger.info("monitor user already exists")
-    else:
-        logger.info("monitor user does not exist")
-        invite_monitor(request, notify_email)
+    notify_monitor_email(request, notify_email, monitor_user)

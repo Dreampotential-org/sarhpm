@@ -20,6 +20,6 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('add-monitor/', views.add_monitor, name='add_monitor'),
     path('remove-monitor/', views.remove_monitor, name='remove_monitor'),
-
+    path('review-video/', views.review_video, name='review_video'),
     # path('list-events/', views.list_events, name='list_events'),
 ]
