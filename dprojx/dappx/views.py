@@ -220,7 +220,8 @@ def convert_and_save_video(myfile, request):
     # now lets create the db entry
     user = User.objects.get(id=user.id)
     video = VideoUpload.objects.create(
-        videoUrl=uploaded_file_url, user=user
+        videoUrl=uploaded_file_url, user=user,
+        source=request.data.get("source")
     )
 
     notify_utils.notify_monitors_video(request, {

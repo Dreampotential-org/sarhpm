@@ -17,9 +17,16 @@ class VideoUpload(models.Model):
     videoUrl = models.CharField(max_length=500)
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    source = models.CharField(max_length=500, default="")
 
     def __str__(self):
         return self.videoUrl
+
+    def video_source_link(self):
+        url = self.videoUrl.split('/')
+        video_id = url[-1]
+        user_id = url[2]
+        return '%s/review-video.html?id=%s&user=%s' % (self.source, video_id, user_id)
 
     def video_link(self):
         domain_name = Site.objects.last().domain

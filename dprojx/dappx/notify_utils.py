@@ -32,10 +32,17 @@ def get_user_profile(user):
 def notify_monitors_video(request, event):
     notify_users = get_user_monitors(request)
     if event['event_type'] == "video":
-        msg = (
-            'Click to play: https://%s' %
-            event['video_model'].video_monitor_link()
-        )
+
+        if event['video_model'].source:
+            msg = (
+                'Click to play: https://%s' %
+                event['video_model'].video_source_link()
+            )
+        else:
+            msg = (
+                'Click to play: https://%s' %
+                event['video_model'].video_monitor_link()
+            )
 
         profile = get_user_profile(request.user)
         for notify_user in notify_users:
