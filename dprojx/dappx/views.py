@@ -248,7 +248,6 @@ def upload(request):
 # @csrf_exempt
 @login_required
 def record_video(request):
-    print(request.user)
     files = request.data.get("file")
     userId = request.data.get('userId')
     fs = FileSystemStorage()
@@ -300,6 +299,7 @@ def _create_user(**data):
         profile.days_sober = data.get("days_sober", 0)
         profile.name = data.get("name", "")
         profile.notify_email = data.get("notify_email", "")
+        profile.source = data.get("source", "")
         profile.save()
 
         # log user in!
