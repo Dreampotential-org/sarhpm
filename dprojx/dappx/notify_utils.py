@@ -117,7 +117,7 @@ def notify_monitor(request, notify_email):
     logger.info("user: %s added notify_email: %s" %
                 (request.user.username, notify_email))
     monitor_user = User.objects.filter(
-        username='notify_email'
+        username=notify_email
     ).first()
 
     notify_monitor_email(request, notify_email, monitor_user)
