@@ -12,6 +12,7 @@ services:
         build: .
         volumes:
             - ./dprojx:/home/web/pam
+            - /opt/var/media-prod-api:/home/web/pam/media
             - ./sock:/home/sock
         ports:
             - 8822:8822
