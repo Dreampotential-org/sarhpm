@@ -45,6 +45,7 @@ def notify_monitors_video(request, event):
             )
 
         profile = get_user_profile(request.user)
+        logger.info("Sendering notify email to: %s" % notify_users)
         for notify_user in notify_users:
             email_utils.send_raw_email(
                 notify_user,  # send report here
