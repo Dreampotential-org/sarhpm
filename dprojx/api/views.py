@@ -1,3 +1,4 @@
+import time
 from django.contrib.auth.models import User
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -174,6 +175,34 @@ def review_video(request):
         return stream_video(request, path)
 
     raise Http404
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_activity(request):
+    user = User.objects.filter(username=request.user.email).first()
+    video_events = VideoUpload.objects.filter(user=user).all()
+    gps_events = GpsCheckin.objects.filter(user=user).all()
+    events = []
+
+    for event in gps_events:
+        t = event.created_at
+        events.append({
+            'type': 'gps',
+            'msg': event.msg,
+            'created_at': time.mktime(t.timetuple())})
+
+    for event in video_events:
+        t = event.created_at
+        events.append({
+            'type': 'video',
+            'url': event.video_ref_link(),
+            'created_at': time.mktime(t.timetuple())})
+
+    return Response({
+        'events': events
+    })
+
 
 
 @api_view(['PUT', 'GET'])

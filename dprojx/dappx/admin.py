@@ -10,7 +10,7 @@ from django.utils.html import format_html
 
 
 class CustomVideoUpload(admin.ModelAdmin):
-    list_display = ['id', 'user', 'display_link', 'uploaded_at']
+    list_display = ['id', 'user', 'display_link', 'created_at']
 
     def display_link(self, obj):
         user_hash = obj.videoUrl.split("/media/")[1].split("/")[0]
@@ -33,7 +33,7 @@ class CustomVideoUpload(admin.ModelAdmin):
 
 
 class CustomGpsCheckin(admin.ModelAdmin):
-    list_display = ['id', 'msg', 'user']
+    list_display = ['id', 'msg', 'user', 'created_at']
     list_filter = ['user']
     model = GpsCheckin
 

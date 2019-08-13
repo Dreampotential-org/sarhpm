@@ -21,5 +21,6 @@ urlpatterns = [
     path('add-monitor/', views.add_monitor, name='add_monitor'),
     path('remove-monitor/', views.remove_monitor, name='remove_monitor'),
     path('review-video/', views.review_video, name='review_video'),
+    path('get-activity/', views.get_activity, name='get_activity'),
     # path('list-events/', views.list_events, name='list_events'),
 ]
