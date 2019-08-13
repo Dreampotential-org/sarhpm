@@ -14,3 +14,4 @@ sudo docker exec -t deploy-prod_db_1 pg_dumpall -c -U postgres > $BACKUP_DIR/med
 sudo tar -cvf $BACKUP_DIR.tar $BACKUP_DIR
 
 aws s3 cp $BACKUP_DIR.tar s3://backups-useiam
+rm -fr $BACKUP_DIR
