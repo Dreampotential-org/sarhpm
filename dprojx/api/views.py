@@ -174,6 +174,11 @@ def review_video(request):
                     % (token.user.email, video.user.email))
         return stream_video(request, path)
 
+    elif token.user.email == video.user.email:
+        logger.info("User is viewing their own video: %s:%s"
+                    % (token.user.email, video.user.email))
+        return stream_video(request, path)
+
     raise Http404
 
 
@@ -202,7 +207,6 @@ def get_activity(request):
     return Response({
         'events': events
     })
-
 
 
 @api_view(['PUT', 'GET'])
