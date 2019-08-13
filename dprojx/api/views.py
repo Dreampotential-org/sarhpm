@@ -205,7 +205,8 @@ def get_activity(request):
             'created_at': time.mktime(t.timetuple())})
 
     return Response({
-        'events': events
+        'events': sorted(events,
+                         key=lambda i: i['created_at'], reverse=True)
     })
 
 
