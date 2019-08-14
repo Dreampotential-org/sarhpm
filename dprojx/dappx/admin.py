@@ -5,6 +5,7 @@ from dappx.models import GpsCheckin
 from dappx.models import User
 from dappx.models import VideoUpload
 from dappx.models import UserMonitor
+from dappx.models import MonitorFeedback
 
 from django.utils.html import format_html
 
@@ -66,8 +67,16 @@ class CustomUserMonitor(admin.ModelAdmin):
     ordering = ('-id',)
 
 
+class CustomMonitorFeedback(admin.ModelAdmin):
+    list_display = [
+        'user', 'message',
+    ]
+    ordering = ('-id',)
+
+
 # Register your models here.
 admin.site.register(UserProfileInfo, UserProfileInfoAdmin)
 admin.site.register(GpsCheckin, CustomGpsCheckin)
 admin.site.register(VideoUpload, CustomVideoUpload)
 admin.site.register(UserMonitor, CustomUserMonitor)
+admin.site.register(MonitorFeedback, CustomMonitorFeedback)

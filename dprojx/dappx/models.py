@@ -5,6 +5,11 @@ from django.db import models
 import hashlib
 
 
+class MonitorFeedback(models.Model):
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
+    message = models.TextField(default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+
 class GpsCheckin(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
     msg = models.CharField(max_length=2000, default='')
@@ -18,6 +23,7 @@ class VideoUpload(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     source = models.CharField(max_length=500, default="")
+    monitor_feedback = models.ManyToManyField(MonitorFeedback)
 
     def __str__(self):
         return self.videoUrl
@@ -26,8 +32,8 @@ class VideoUpload(models.Model):
         url = self.videoUrl.split('/')
         video_id = url[-1]
         user_id = url[2]
-        return '%s/review-video.html?id=%s&user=%s' % (self.source, video_id, user_id)
-
+        return '%s/review-video.html?id=%s&user=%s' % (self.source,
+                                                       video_id, user_id)
 
     def video_ref_link(self):
         url = self.videoUrl.split('/')

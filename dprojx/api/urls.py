@@ -22,5 +22,7 @@ urlpatterns = [
     path('remove-monitor/', views.remove_monitor, name='remove_monitor'),
     path('review-video/', views.review_video, name='review_video'),
     path('get-activity/', views.get_activity, name='get_activity'),
+    path('send-feedback/', views.send_feedback, name='send_feedback'),
+    path('get-video-info/', views.get_video_info, name='get_video_info'),
     # path('list-events/', views.list_events, name='list_events'),
 ]

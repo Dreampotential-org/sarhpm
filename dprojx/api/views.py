@@ -11,6 +11,7 @@ from api.serializers import (
     VideoUploadSerializer
 )
 from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload, UserMonitor
+from dappx.models import MonitorFeedback
 from dappx.views import _create_user
 from dappx import email_utils
 from dappx.views import convert_and_save_video, stream_video
@@ -148,6 +149,77 @@ def remove_monitor(request):
     return Response({
         'status': 'okay',
     }, 201)
+
+
+@api_view(['GET'])
+def get_video_info(request):
+    token = Token.objects.get(key=request.GET.get("token"))
+    logger.info("requesting video as user: %s" % token.user.email)
+    path = '/media/%s/%s' % (request.GET.get("user"), request.GET.get("id"))
+    video = VideoUpload.objects.filter(videoUrl=path).first()
+
+    if not video:
+        return Response({
+            'status': 'error',
+        }, 201)
+
+    profile = UserProfileInfo.objects.filter(
+        user__username=video.user.email
+    ).first()
+
+    feedbacks = video.monitor_feedback.all()
+    video_feedback = [
+        {'user': feedback.user.email, 'message': feedback.message,
+         'created_at': time.mktime(feedback.created_at.timetuple())}
+        for feedback in feedbacks]
+
+    # get monitors of user
+    user_monitors = UserMonitor.objects.filter(user=video.user).all()
+    user_monitor_emails = [u.notify_email for u in user_monitors]
+    logger.info("User %s monitors are %s"
+                % (video.user.email, user_monitor_emails))
+
+    if token.user.email == video.user.email:
+        return Response({
+            'feedback': video_feedback,
+            'owner_name': profile.name,
+            'created_at': time.mktime(video.created_at.timetuple()),
+            'video_owner': True,
+        }, 201)
+
+    elif token.user.email in user_monitor_emails:
+        return Response({
+            'feedback': video_feedback,
+            'owner_name': profile.name,
+            'created_at': time.mktime(video.created_at.timetuple()),
+            'video_owner': False,
+        }, 201)
+
+    return Response({
+        'status': 'error',
+    }, 201)
+
+
+@api_view(['POST'])
+def send_feedback(request):
+    token = Token.objects.get(key=request.GET.get("token"))
+    user = User.objects.filter(username=token.user.email).first()
+
+    # lookup video
+    path = '/media/%s/%s' % (request.GET.get("user"), request.GET.get("id"))
+    video = VideoUpload.objects.filter(videoUrl=path).first()
+    if not video:
+        raise Http404
+
+    logger.info("sending feedback as user: %s msg: %s"
+                % (token.user.email, request.data.get("message")))
+
+    monitor_feedback = MonitorFeedback.objects.create(
+        user=user, message=request.data.get("message"))
+
+    video.monitor_feedback.add(monitor_feedback)
+
+    return Response({'status': 'okay'})
 
 
 @api_view(['GET'])
