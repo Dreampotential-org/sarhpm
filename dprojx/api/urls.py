@@ -3,6 +3,7 @@ from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
 
 from api import views
+from api import views_admin
 
 app_name = 'api'
 
@@ -24,5 +25,9 @@ urlpatterns = [
     path('get-activity/', views.get_activity, name='get_activity'),
     path('send-feedback/', views.send_feedback, name='send_feedback'),
     path('get-video-info/', views.get_video_info, name='get_video_info'),
+
+    path('list-patients/', views_admin.list_patients, name='list_patients'),
+    path('list-patient-events/', views_admin.list_patient_events,
+         name='list_patient_events'),
     # path('list-events/', views.list_events, name='list_events'),
 ]
