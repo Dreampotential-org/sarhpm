@@ -29,6 +29,15 @@ def get_user_profile(user):
     ).first()
 
 
+def notify_feedback(message, subject, send_to_email, send_from_email):
+    email_utils.send_raw_email(
+        send_to_email,  # send report here
+        send_from_email,  # replies to goes here
+        subject,
+        message
+    )
+
+
 def notify_monitors_video(request, event):
     notify_users = get_user_monitors(request)
     if event['event_type'] == "video":

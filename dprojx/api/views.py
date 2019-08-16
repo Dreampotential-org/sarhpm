@@ -16,6 +16,7 @@ from dappx.views import _create_user
 from dappx import email_utils
 from dappx.views import convert_and_save_video, stream_video
 from dappx.notify_utils import notify_gps_checkin, notify_monitor
+from dappx.notify_utils import notify_feedback
 from dappx import constants
 from common import config
 
@@ -219,6 +220,16 @@ def send_feedback(request):
 
     video.monitor_feedback.add(monitor_feedback)
 
+    # email user who created the video the feedback
+
+    profile = UserProfileInfo.objects.filter(
+        user__username=token.user.email
+    ).first()
+
+    subject = "%s replied to your video submission" % profile.name
+    notify_feedback(request.data.get("message"),
+                    subject, video.user.email, token.user.email)
+
     return Response({'status': 'okay'})
 
 
@@ -266,6 +277,8 @@ def get_activity(request):
         t = event.created_at
         events.append({
             'type': 'gps',
+            'lat': event.lat,
+            'lng': event.lng,
             'msg': event.msg,
             'created_at': time.mktime(t.timetuple())})
 

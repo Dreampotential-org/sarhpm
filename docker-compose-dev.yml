@@ -1,25 +1,33 @@
 version: '3'
 
 services:
-    dev-db:
+    db:
         restart: always
         image: postgres
         volumes:
-            - /opt/var/postgres-data-dev:/var/lib/postgresql/data
+            - ../postgres-data-prod:/var/lib/postgresql/data
         environment:
             POSTGRES_DB: db
     project:
         build: .
         volumes:
             - ./dprojx:/home/web/pam
-            - /opt/var/sock:/home/sock
-            - /opt/var/media-dev:/home/web/pam/media
-            - ./config/newrelic/dev.ini:/config/newrelic/dev.ini
-        environment:
-            - NEW_RELIC_CONFIG_FILE=/config/newrelic/dev.ini
+            - /opt/var/media-prod-api:/home/web/pam/media
+            - ./sock:/home/sock
+        ports:
+            - 8822:8822
         depends_on:
-            - dev-db
-        command: newrelic-admin run-program /usr/local/bin/gunicorn --env DJANGO_SETTINGS_MODULE=dprojx.settings dprojx.wsgi --workers 8 --bind=unix:/home/sock/dprojx-dev.sock --log-level=info
+            - db
+        # command: newrelic-admin run-program /usr/local/bin/gunicorn --env DJANGO_SETTINGS_MODULE=dprojx.settings dprojx.wsgi --workers 8 --bind=0.0.0.0:8822
+        command: python3 manage.py runserver 0.0.0.0:8822
         entrypoint: /entrypoint.sh
         restart: always
 
+    web-server:
+        image: nginx
+        volumes:
+            - ./config/nginx/site-enabled/prod.conf:/etc/nginx/conf.d/default.conf
+            - ./dprojx/static:/var/data/dprojx/static
+        ports:
+            - 8844:80
+        restart: always
