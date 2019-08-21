@@ -39,4 +39,4 @@ urlpatterns = [
     path('create_notify_user/<str:user_hash>/', views.create_notify_user),
     url(r'^monitor/$', views.monitor, name='monitor'),
     url('^', include('django.contrib.auth.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]# + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
