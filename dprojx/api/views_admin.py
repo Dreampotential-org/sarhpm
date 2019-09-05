@@ -97,6 +97,8 @@ def list_patient_events(request):
                 'url': event.video_api_link(),
                 'created_at': time.mktime(t.timetuple())})
 
+    events = sorted(events, key=lambda i: i['created_at'], reverse=True)
+
     paginator = PageNumberPagination()
     paginator.page_size = 10
 
