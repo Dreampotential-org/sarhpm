@@ -2,6 +2,7 @@ import time
 
 from django.contrib.auth.models import User
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -10,6 +11,7 @@ from dappx.models import GpsCheckin, VideoUpload
 from common import config
 
 logger = config.get_logger()
+
 
 def user_profile_dict(user_profile):
     return {
@@ -36,6 +38,7 @@ def list_patients(request):
     return Response({
         'patients': patients_info
     }, 201)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -94,7 +97,11 @@ def list_patient_events(request):
                 'url': event.video_api_link(),
                 'created_at': time.mktime(t.timetuple())})
 
-    return Response({
-        'events': sorted(events,
-                         key=lambda i: i['created_at'], reverse=True)
-    })
+    paginator = PageNumberPagination()
+    paginator.page_size = 10
+
+    page = paginator.paginate_queryset(events, request)
+    if page is not None:
+        return paginator.get_paginated_response(page)
+
+    return Response(events)
