@@ -75,6 +75,8 @@ class UserProfileInfo(models.Model):
     days_sober = models.PositiveIntegerField(default=0)
     user_hash = models.CharField(max_length=256, blank=True, null=True)
     source = models.CharField(max_length=500, default="")
+    stripe_subscription_id = models.CharField(max_length=256,
+                                              blank=True, null=True)
 
     def __str__(self):
         return self.user.username

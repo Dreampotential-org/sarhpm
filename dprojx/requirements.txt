@@ -11,3 +11,4 @@ psycopg2-binary
 gunicorn
 newrelic
 django-cors-headers
+stripe

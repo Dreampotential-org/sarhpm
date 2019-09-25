@@ -297,8 +297,7 @@ def get_activity(request):
 
 @api_view(['PUT', 'GET'])
 def profile(request):
-
-    logger.info("HERE")
+    logger.info("get profile info %s" % request.user.email)
     profile = UserProfileInfo.objects.filter(
         user__username=request.user.email
     ).first()
@@ -359,4 +358,5 @@ def profile(request):
         'notify_email': profile.notify_email,
         'active_monitor': active_monitor,
         'monitors': monitors,
+        'stripe_subscription_id': profile.stripe_subscription_id,
     }, 201)

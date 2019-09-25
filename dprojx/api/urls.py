@@ -4,6 +4,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 from api import views
 from api import views_admin
+from api import views_stripe
 
 app_name = 'api'
 
@@ -17,6 +18,8 @@ urlpatterns = [
     path('', include(router.urls)),
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
     path('create-user/', views.create_user, name='create_user'),
+    path('pay/', views_stripe.pay, name='pay'),
+    path('cancel-plan/', views_stripe.cancel_plan, name='cancel_plan'),
     path('video-upload/', views.video_upload, name='video_upload'),
     path('profile/', views.profile, name='profile'),
     path('add-monitor/', views.add_monitor, name='add_monitor'),
