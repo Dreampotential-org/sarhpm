@@ -48,15 +48,22 @@ def list_patient_events(request):
     filter_type = request.GET.get("filter_type")
     patient = request.GET.get("email")
     users = []
+    profiles_map = {}
 
     # get all patients
     if not patient:
         patients = UserMonitor.objects.filter(
             notify_email=request.user.email).all()
+
         for patient in patients:
+            profile = UserProfileInfo.objects.filter(user=patient.user).first()
+            profiles_map[patient.user.email] = profile
             users.append(patient.user)
+
     else:
         user = User.objects.filter(username=patient).first()
+        profile = UserProfileInfo.objects.filter(user=user).first()
+        profiles_map[user.email] = profile
         allowed = UserMonitor.objects.filter(
             notify_email=request.user.email, user=user).first()
 
@@ -85,6 +92,7 @@ def list_patient_events(request):
                 'lat': event.lat,
                 'lng': event.lng,
                 'msg': event.msg,
+                'name': profiles_map[event.user.email].name,
                 'email': event.user.email,
                 'created_at': time.mktime(t.timetuple())})
 
@@ -94,6 +102,7 @@ def list_patient_events(request):
             events.append({
                 'type': 'video',
                 'email': event.user.email,
+                'name': profiles_map[event.user.email].name,
                 'url': event.video_api_link(),
                 'created_at': time.mktime(t.timetuple())})
 
