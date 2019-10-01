@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from dappx.models import UserMonitor, UserProfileInfo
 from dappx.models import GpsCheckin, VideoUpload
 from common import config
+import urllib.parse
 
 logger = config.get_logger()
 
@@ -46,7 +47,7 @@ def list_patient_events(request):
     # find users who have set this user as a monitor
 
     filter_type = request.GET.get("filter_type")
-    patient = request.GET.get("email")
+    patient = urllib.parse.unquote(request.GET.get("email"))
     users = []
     profiles_map = {}
 
