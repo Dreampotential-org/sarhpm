@@ -162,6 +162,17 @@ def convert_file(uploaded_file_url):
     return outfile
 
 
+def compress_file(uploaded_file_url):
+    outfile = "%s_resized.mp4" % uploaded_file_url.rsplit(".", 1)[0]
+    command = (
+        'ffmpeg -i ./%s -strict -2 -vcodec libx265 -crf 24 ./%s' % (
+            uploaded_file_url, outfile)
+    )
+    print(command)
+    os.system(command)
+    return outfile
+
+
 def stream_video(request, path):
     path = settings.BASE_DIR + path
     range_header = request.META.get('HTTP_RANGE', '').strip()
@@ -208,6 +219,8 @@ def convert_and_save_video(myfile, request):
     if uploaded_name[-4:] == '.mov':
         # ffmpeg!
         uploaded_file_url = convert_file(uploaded_file_url)
+    else:
+        uploaded_file_url = compress_file(uploaded_file_url)
 
     logger.info("Uploaded video file: %s" % uploaded_file_url)
 
