@@ -165,8 +165,7 @@ def convert_file(uploaded_file_url):
 def compress_file(uploaded_file_url):
     outfile = "%s_resized.mp4" % uploaded_file_url.rsplit(".", 1)[0]
     command = (
-        'ffmpeg -i ./%s -strict -2 -vcodec libx265 -crf 24 ./%s' % (
-            uploaded_file_url, outfile)
+        'avconv -i ./%s -strict -2 ./%s' % (uploaded_file_url, outfile)
     )
     print(command)
     os.system(command)
