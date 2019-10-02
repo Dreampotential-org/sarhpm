@@ -218,8 +218,7 @@ def convert_and_save_video(myfile, request):
     if uploaded_name[-4:] == '.mov':
         # ffmpeg!
         uploaded_file_url = convert_file(uploaded_file_url)
-    else:
-        uploaded_file_url = compress_file(uploaded_file_url)
+    # XXX resize video for android need to implement async processing
 
     logger.info("Uploaded video file: %s" % uploaded_file_url)
 
