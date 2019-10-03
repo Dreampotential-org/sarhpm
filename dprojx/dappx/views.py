@@ -281,13 +281,14 @@ def record_video(request):
 
 
 def _create_user(**data):
+    data['email'] = data['email'].lower()
     data['username'] = data['email']
     request = data.get('request')
 
     monitor_user = None
     if data.get('notify_email'):
         monitor_user = User.objects.filter(
-            username=data.get('notify_email')
+            username=data.get('notify_email').lower()
         ).first()
 
     user_form = UserForm(data)

@@ -93,6 +93,7 @@ def create_user(request):
     if not data.get('days_sober'):
         data['days_sober'] = '0'
 
+    data['email'] = data['email'].lower()
     user = User.objects.filter(username=data['email']).first()
 
     if user:
@@ -114,7 +115,7 @@ def create_user(request):
 @permission_classes([IsAuthenticated])
 def add_monitor(request):
     user = User.objects.filter(username=request.user.email).first()
-    notify_email = request.data.get('notify_email')
+    notify_email = request.data.get('notify_email').lower()
 
     # check if notify_email is already set for user
     have = UserMonitor.objects.filter(user=user,
