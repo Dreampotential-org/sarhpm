@@ -18,6 +18,7 @@ from dappx.views import convert_and_save_video, stream_video
 from dappx.notify_utils import notify_gps_checkin, notify_monitor
 from dappx.notify_utils import notify_feedback
 from dappx import constants
+from dappx import utils
 from common import config
 
 from django.http import Http404
@@ -40,7 +41,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             id=request.user.id
         ).first()
         return Response({
-            'days_sober': profile.days_sober,
+            'days_sober': utils.calc_days_sober(profile),
             'sober_date': profile.sober_date,
             'notify_email': profile.notify_email
         })
@@ -358,7 +359,7 @@ def profile(request):
     # Check to see to see if monitor_user is on platform
 
     return Response({
-        'days_sober': profile.days_sober,
+        'days_sober': utils.calc_days_sober(profile),
         'sober_date': profile.sober_date,
         'notify_email': profile.notify_email,
         'active_monitor': active_monitor,
