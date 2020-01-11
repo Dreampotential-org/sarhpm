@@ -7,3 +7,4 @@ dprojx/dprojx/__pycache__/
 .DS_Store
 *.pyc
 denvx
+venv

@@ -10,6 +10,7 @@ class MonitorFeedback(models.Model):
     message = models.TextField(default="")
     created_at = models.DateTimeField(auto_now_add=True)
 
+
 class GpsCheckin(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
     msg = models.CharField(max_length=2000, default='')
@@ -73,6 +74,7 @@ class UserProfileInfo(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     notify_email = models.EmailField(max_length=512, blank=True, null=True)
     days_sober = models.PositiveIntegerField(default=0)
+    sober_date = models.CharField(max_length=256, blank=True, null=True)
     user_hash = models.CharField(max_length=256, blank=True, null=True)
     source = models.CharField(max_length=500, default="")
     stripe_subscription_id = models.CharField(max_length=256,

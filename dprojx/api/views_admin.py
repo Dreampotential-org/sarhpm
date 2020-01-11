@@ -19,6 +19,7 @@ def user_profile_dict(user_profile):
         'name': user_profile.name,
         'email': user_profile.user.email,
         'days_sober': user_profile.days_sober,
+        'sober_date': user_profile.sober_date,
         'created_at': time.mktime(user_profile.created_at.timetuple())
     }
 

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -xe
 
 export AWS_ACCESS_KEY_ID=AKIAU7EQAGZOF7PQ2HER
 export AWS_SECRET_ACCESS_KEY=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

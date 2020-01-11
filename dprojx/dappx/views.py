@@ -303,6 +303,7 @@ def _create_user(**data):
         profile.user = user
         profile.phone = data.get("phone", "")
         profile.days_sober = data.get("days_sober", 0)
+        profile.sober_date = data.get("sober_date", 0)
         profile.name = data.get("name", "")
         profile.notify_email = data.get("notify_email", "")
         profile.source = data.get("source", "")

@@ -3,7 +3,7 @@ version: '3'
 services:
     db:
         restart: always
-        image: postgres
+        image: postgres:11
         volumes:
             - /opt/var/postgres-data-prod-useiam:/var/lib/postgresql/data
         environment:

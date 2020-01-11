@@ -41,6 +41,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         ).first()
         return Response({
             'days_sober': profile.days_sober,
+            'sober_date': profile.sober_date,
             'notify_email': profile.notify_email
         })
 
@@ -310,6 +311,8 @@ def profile(request):
     if request.method == 'PUT':
         if request.data.get('days_sober'):
             profile.days_sober = request.data.get('days_sober')
+        if request.data.get('sober_date'):
+            profile.sober_date = request.data.get('sober_date')
 
         if request.data.get('notify_email'):
 
@@ -356,6 +359,7 @@ def profile(request):
 
     return Response({
         'days_sober': profile.days_sober,
+        'sober_date': profile.sober_date,
         'notify_email': profile.notify_email,
         'active_monitor': active_monitor,
         'monitors': monitors,
