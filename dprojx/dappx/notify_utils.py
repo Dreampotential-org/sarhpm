@@ -83,6 +83,7 @@ def notify_gps_checkin(lat, lng, msg, request):
     profile = get_user_profile(request.user)
     notify_users = get_user_monitors(request)
     for notify_user in notify_users:
+        logger.info("sending email to %s" % notify_user)
         email_utils.send_raw_email(
             notify_user,  # send report here
             request.user.email,  # replies to goes here
