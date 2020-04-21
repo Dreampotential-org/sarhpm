@@ -44,12 +44,12 @@ def notify_monitors_video(request, event):
 
         if event['video_model'].source:
             msg = (
-                'Click to play: https://%s' %
+                "<a href='https://%s'>Click to play</a>" %
                 event['video_model'].video_source_link()
             )
         else:
             msg = (
-                'Click to play: https://%s' %
+                "<a href='https://%s'>Click to play</a>" %
                 event['video_model'].video_monitor_link()
             )
 

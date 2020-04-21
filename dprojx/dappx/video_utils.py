@@ -62,7 +62,7 @@ def convert_video(myfile, request):
 
     profile = get_user_profile(user)
     msg = (
-        'Click to play: https://%s' %
+        "<a href='https://%s'>Click to play</a>" %
         video.video_monitor_link()
     )
 

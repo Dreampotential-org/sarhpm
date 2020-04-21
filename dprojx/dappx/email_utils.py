@@ -1,20 +1,45 @@
+import re
 from email.mime.text import MIMEText
 import boto3
 
 from email.mime.multipart import MIMEMultipart
 from botocore.exceptions import ClientError
 
+BODY_HTML = """\
+<html>
+<head></head>
+<body>%s</body>
+</html>
+"""
 
-def send_raw_email(to_email, reply_to, subject, message):
-    SENDER = "useIAM Report <no-reply@app.usepam.com>"
-    msg = MIMEMultipart()
+
+def send_raw_email(to_email, reply_to, subject,
+                   message_text, message_html=None):
+
+    message_html = BODY_HTML % message_text
+    message_text = message_html
+    BODY_TEXT = re.sub('<[^<]+?>', '', message_html)
+
+    SENDER = "New useIAM <no-reply@app.usepam.com>"
+    msg = MIMEMultipart('mixed')
     msg.set_charset("utf-8")
     msg['Subject'] = subject
     msg['From'] = SENDER
     msg['To'] = to_email
     msg['Reply-to'] = reply_to
 
-    msg.attach(MIMEText(message))
+    CHARSET = "utf-8"
+    textpart = MIMEText(BODY_TEXT.encode(CHARSET), 'plain', CHARSET)
+    htmlpart = MIMEText(message_html.encode(CHARSET), 'html', CHARSET)
+
+    # Create a multipart/alternative child container.
+    msg_body = MIMEMultipart('alternative')
+    msg_body.attach(textpart)
+    msg_body.attach(htmlpart)
+
+    # Attach the multipart/alternative child container to the multipart/mixed
+    # parent container.
+    msg.attach(msg_body)
 
     # attachmensts
     # XXX remove hard coded client
