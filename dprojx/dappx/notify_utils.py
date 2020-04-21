@@ -122,7 +122,7 @@ def notify_monitor_email(request, notify_email, monitor_user):
         reply_to=request.user.username,
         subject='useIAM: %s added you as a monitor'
                 % profile.name,
-        message=message)
+        message_text=message)
 
 
 def notify_monitor(request, notify_email):

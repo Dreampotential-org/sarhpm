@@ -321,7 +321,7 @@ def _create_user(**data):
                 reply_to=data.get('email'),
                 subject='useIAM: %s added you as a monitor'
                         % data.get('name'),
-                message=constants.existing_monitor_message)
+                message_text=constants.existing_monitor_message)
         elif data.get('notify_email'):
             url = "https://" + request.META['HTTP_HOST']
             url += "/create_notify_user/" + profile.user_hash
@@ -331,7 +331,7 @@ def _create_user(**data):
                 reply_to=data.get('email'),
                 subject='useIAM: %s added you as a monitor'
                         % data.get('name'),
-                message=mail_text)
+                message_text=mail_text)
 
         if user and request:
             login(request, user)
