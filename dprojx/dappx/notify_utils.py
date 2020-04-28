@@ -40,40 +40,62 @@ def notify_feedback(message, subject, send_to_email, send_from_email):
 
 def notify_monitors_video(request, event):
     notify_users = get_user_monitors(request)
-    if event['event_type'] == "video":
+    profile = get_user_profile(request.user)
 
-        if event['video_model'].source:
-            msg = (
-                "<a href='https://%s'>Click to play</a>" %
-                event['video_model'].video_source_link()
-            )
+    if event['video_model'].source:
+        msg = (
+            "<p>I AM video from %s - "
+            "<a href='https://%s'>Click to play</a></p>" %
+            (profile.name, event['video_model'].video_source_link())
+        )
+    else:
+        msg = (
+            "<p>I AM video from %s - "
+            "<a href='https://%s'>Click to play</a></p>" %
+            (profile.name, event['video_model'].video_monitor_link())
+        )
+
+    logger.info("Sendering notify email to: %s" % notify_users)
+    domain_name = Site.objects.last().domain
+
+    for notify_user in notify_users:
+
+        # Check if user is on platform
+        if not UserProfileInfo.objects.filter(
+            user__username=notify_user,
+        ).count():
+            send_msg = (
+                "<p>You must created an account "
+                "<a href='https://%s/signup.html?email=%s'>here</a> "
+                "to view first.<p>" % (domain_name, notify_user)) + msg
         else:
-            msg = (
-                "<a href='https://%s'>Click to play</a>" %
-                event['video_model'].video_monitor_link()
-            )
+            logger.info("ON PLATFORM: %s" % notify_user)
+            send_msg = msg
 
-        profile = get_user_profile(request.user)
-        logger.info("Sendering notify email to: %s" % notify_users)
-        for notify_user in notify_users:
-            email_utils.send_raw_email(
-                notify_user,  # send report here
-                request.user.email,  # replies to goes here
-                'Video Checkin from %s' % profile.name,
-                msg
-            )
 
-        url = 'https://hooks.slack.com/services/'
-        url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
-        domain_name = Site.objects.last().domain
-        data = (
-            str("VideoUpload: %s - https://%s%s" % (
-                request.user.email,
-                domain_name,
-                event['uploaded_file_url'])
-                ))
-        body = {"text": "%s" % data, 'username': 'pam-server'}
-        requests.put(url, data=json.dumps(body))
+        footer = (
+            "<p><a href='https://medium.com/@useIAM/tips-on-being-an-iam-monitor-953086e01e2d'>Tips on Being an IAM Monitor</a></p><a href='https://useiam.com'>Try I AM</a>"
+        )
+
+        email_utils.send_raw_email(
+            notify_user,  # send report here
+            request.user.email,  # replies to goes here
+            'Video Checkin from %s' % profile.name,
+            send_msg + footer
+        )
+
+    logger.info(msg)
+
+    url = 'https://hooks.slack.com/services/'
+    url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
+    data = (
+        str("VideoUpload: %s - https://%s%s" % (
+            request.user.email,
+            domain_name,
+            event['uploaded_file_url'])
+            ))
+    body = {"text": "%s" % data, 'username': 'pam-server'}
+    requests.put(url, data=json.dumps(body))
 
 
 def notify_gps_checkin(lat, lng, msg, request):
