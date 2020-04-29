@@ -294,7 +294,7 @@ def get_activity(request):
 
     return Response({
         'events': sorted(events,
-                         key=lambda i: i['created_at'], reverse=True)
+                         key=lambda i: i['created_at'], reverse=True)[0:20]
     })
 
 
