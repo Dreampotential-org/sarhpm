@@ -67,14 +67,13 @@ def notify_monitors_video(request, event):
             send_msg = (
                 "<p>You must created an account "
                 "<a href='https://%s/signup.html?email=%s'>here</a> "
-                "to view first.<p>" % (domain_name, notify_user)) + msg
+                "to view first.<p>" % ('m.useiam.com', notify_user)) + msg
         else:
             logger.info("ON PLATFORM: %s" % notify_user)
             send_msg = msg
 
-
         footer = (
-            "<p><a href='https://medium.com/@useIAM/tips-on-being-an-iam-monitor-953086e01e2d'>Tips on Being an IAM Monitor</a></p><a href='https://useiam.com'>Try I AM</a>"
+            "<p><a href='https://medium.com/@useIAM/tips-on-being-an-iam-monitor-953086e01e2d'>Tips on Being an IAM Monitor</a></p><a href='https://m.useiam.com'>Try I AM</a>"
         )
 
         email_utils.send_raw_email(
