@@ -32,5 +32,8 @@ urlpatterns = [
     path('list-patients/', views_admin.list_patients, name='list_patients'),
     path('list-patient-events/', views_admin.list_patient_events,
          name='list_patient_events'),
+    path('list-patient-events-v2/', views_admin.list_patient_events_v2,
+         name='list_patient_events_v2'),
+
     # path('list-events/', views.list_events, name='list_events'),
 ]

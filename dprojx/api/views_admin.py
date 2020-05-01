@@ -118,3 +118,77 @@ def list_patient_events(request):
         return paginator.get_paginated_response(page)
 
     return Response(events)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_patient_events_v2(request):
+    # find users who have set this user as a monitor
+
+    filter_type = request.GET.get("filter_type")
+    patient = urllib.parse.unquote(request.GET.get("email"))
+    users = []
+    profiles_map = {}
+
+    # get all patients
+    if not patient:
+        patients = UserMonitor.objects.filter(
+            notify_email=request.user.email).all()
+
+        for patient in patients:
+            profile = UserProfileInfo.objects.filter(user=patient.user).first()
+            profiles_map[patient.user.email] = profile
+            users.append(patient.user)
+
+    else:
+        user = User.objects.filter(username=patient).first()
+        profile = UserProfileInfo.objects.filter(user=user).first()
+        profiles_map[user.email] = profile
+        allowed = UserMonitor.objects.filter(
+            notify_email=request.user.email, user=user).first()
+
+        if not allowed:
+            return Response({
+                'status': "%s not viewable by %s" % (patient,
+                                                     request.user.email)
+            })
+
+        users.append(user)
+
+    print("len %s" % len(users))
+    video_events = []
+    gps_events = []
+    for user in users:
+        video_events += VideoUpload.objects.filter(user=user).all()
+        gps_events += GpsCheckin.objects.filter(user=user).all()
+
+    events = []
+    if filter_type == 'gps' or not filter_type:
+        for event in gps_events:
+            t = event.created_at
+            events.append({
+                'id': event.id,
+                'type': 'gps',
+                'lat': event.lat,
+                'lng': event.lng,
+                'msg': event.msg,
+                'name': profiles_map[event.user.email].name,
+                'email': event.user.email,
+                'created_at': time.mktime(t.timetuple())})
+
+    if filter_type == 'video' or not filter_type:
+        for event in video_events:
+            t = event.created_at
+            events.append({
+                'type': 'video',
+                'email': event.user.email,
+                'name': profiles_map[event.user.email].name,
+                'url': event.video_api_link(),
+                'created_at': time.mktime(t.timetuple())})
+
+    events = sorted(events, key=lambda i: i['created_at'], reverse=True)
+
+    return Response({
+        'events': sorted(events,
+                         key=lambda i: i['created_at'], reverse=True)[0:20]
+    })
