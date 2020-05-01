@@ -42,18 +42,11 @@ def notify_monitors_video(request, event):
     notify_users = get_user_monitors(request)
     profile = get_user_profile(request.user)
 
-    if event['video_model'].source:
-        msg = (
-            "<p>I AM video from %s - "
-            "<a href='https://%s'>Click to play</a></p>" %
-            (profile.name, event['video_model'].video_source_link())
-        )
-    else:
-        msg = (
-            "<p>I AM video from %s - "
-            "<a href='https://%s'>Click to play</a></p>" %
-            (profile.name, event['video_model'].video_monitor_link())
-        )
+    msg = (
+        "<p>I AM video from %s - "
+        "<a href='https://%s'>Click to play</a></p>" %
+        (profile.name, event['video_model'].video_source_link())
+    )
 
     logger.info("Sendering notify email to: %s" % notify_users)
     domain_name = Site.objects.last().domain
