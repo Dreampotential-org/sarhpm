@@ -185,6 +185,7 @@ def get_video_info(request):
 
     if token.user.email == video.user.email:
         return Response({
+            'owner_email': video.user.email,
             'feedback': video_feedback,
             'owner_name': profile.name,
             'created_at': time.mktime(video.created_at.timetuple()),
@@ -193,6 +194,7 @@ def get_video_info(request):
 
     elif token.user.email in user_monitor_emails:
         return Response({
+            'owner_email': video.user.email,
             'feedback': video_feedback,
             'owner_name': profile.name,
             'created_at': time.mktime(video.created_at.timetuple()),
