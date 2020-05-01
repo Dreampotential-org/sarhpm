@@ -44,8 +44,8 @@ def notify_monitors_video(request, event):
 
     msg = (
         "<p>I AM video from %s - "
-        "<a href='https://%s'>Click to play</a></p>" %
-        ('https://m.useiam.com', event['video_model'].video_source_link())
+        "<a href='https://m.useiam.com%s'>Click to play</a></p>" %
+        (profile.name, event['video_model'].video_source_link())
     )
 
     logger.info("Sendering notify email to: %s" % notify_users)

@@ -33,8 +33,7 @@ class VideoUpload(models.Model):
         url = self.videoUrl.split('/')
         video_id = url[-1]
         user_id = url[2]
-        return '%s/review-video.html?id=%s&user=%s' % (self.source,
-                                                       video_id, user_id)
+        return '/review-video.html?id=%s&user=%s' % (video_id, user_id)
 
     def video_api_link(self):
         url = self.videoUrl.split('/')
