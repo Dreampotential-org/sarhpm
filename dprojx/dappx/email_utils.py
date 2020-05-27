@@ -20,7 +20,7 @@ def send_raw_email(to_email, reply_to, subject,
     message_text = message_html
     BODY_TEXT = re.sub('<[^<]+?>', '', message_html)
 
-    SENDER = "New useIAM <no-reply@app.usepam.com>"
+    SENDER = "useIAM Journal <no-reply@app.usepam.com>"
     msg = MIMEMultipart('mixed')
     msg.set_charset("utf-8")
     msg['Subject'] = subject
@@ -47,10 +47,13 @@ def send_raw_email(to_email, reply_to, subject,
         'ses', aws_access_key_id='AKIAIHFAW4CMLKGZJWQQ',
         aws_secret_access_key='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',
         region_name='us-east-1')
-    print(
-        client.send_raw_email(
-            RawMessage={'Data': msg.as_string()},
-            Source=SENDER, Destinations=[to_email]))
+    try:
+        print(
+            client.send_raw_email(
+                RawMessage={'Data': msg.as_string()},
+                Source=SENDER, Destinations=[to_email]))
+    except Exception as e:
+        print("ERROR here!@!!! %s" % e)
 
 
 def send_email(to_email, subject, message):
@@ -63,7 +66,7 @@ def send_email(to_email, subject, message):
     # Specify a configuration set. If you do not want to use a configuration
     # set, comment the following variable, and the
     # ConfigurationSetName=CONFIGURATION_SET argument below.
-    #CONFIGURATION_SET = "ConfigSet"
+    # CONFIGURATION_SET = "ConfigSet"
 
     # If necessary, replace us-west-2 with the AWS Region you're using for Amazon SES.
     AWS_REGION = "us-east-1"
