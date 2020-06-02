@@ -7,7 +7,7 @@ from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password']
+        # fields = ['id', 'username', 'email', 'password']
         exclude = ('password',)
 
 
