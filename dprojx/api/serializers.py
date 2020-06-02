@@ -8,6 +8,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'password']
+        exclude = ('password',)
 
 
 class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
