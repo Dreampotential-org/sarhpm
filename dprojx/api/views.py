@@ -30,6 +30,8 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
 
+    http_method_names = ['post']
+
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
