@@ -108,6 +108,13 @@ def notify_gps_checkin(lat, lng, msg, request):
             'GPS Checkin from %s' % profile.name,
             msg)
 
+    # auto email the user a copy
+    email_utils.send_raw_email(
+        request.user.email,  # send report here
+        request.user.email,  # replies to goes here
+        'GPS useIAM Checkin',
+        msg)
+
     url = 'https://hooks.slack.com/services/'
     url += 'TF6H12JQY/BFJHJFSN5/Zeodnz8HPIR4La9fq5J46dKF'
     data = "GspCheckin: %s - %s (%s, %s)" % (request.user.email,
