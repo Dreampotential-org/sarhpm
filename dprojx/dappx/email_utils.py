@@ -20,7 +20,7 @@ def send_raw_email(to_email, reply_to, subject,
     message_text = message_html
     BODY_TEXT = re.sub('<[^<]+?>', '', message_html)
 
-    SENDER = "useIAM Journal <no-reply@app.usepam.com>"
+    SENDER = "useIAM Journal <no-reply@useiam.com>"
     msg = MIMEMultipart('mixed')
     msg.set_charset("utf-8")
     msg['Subject'] = subject
