@@ -158,9 +158,24 @@ def remove_monitor(request):
 @api_view(['GET'])
 def get_video_info(request):
     token = Token.objects.get(key=request.GET.get("token"))
+
     logger.info("requesting video as user: %s" % token.user.email)
-    path = '/media/%s/%s' % (request.GET.get("user"), request.GET.get("id"))
-    video = VideoUpload.objects.filter(videoUrl=path).first()
+    resp_body = {}
+
+    try:
+        int(request.GET.get("id"))
+        # if we get here this is gps-checkin
+        # test
+        video = GpsCheckin.objects.filter(
+            id=int(request.GET.get("id"))).first()
+        resp_body['type'] = 'gps'
+        resp_body['lat'] = video.lat
+        resp_body['lng'] = video.lng
+        resp_body['msg'] = video.msg
+    except ValueError:
+        resp_body['type'] = 'video'
+        path = '/media/%s/%s' % (request.GET.get("user"), request.GET.get("id"))
+        video = VideoUpload.objects.filter(videoUrl=path).first()
 
     if not video:
         return Response({
@@ -183,23 +198,19 @@ def get_video_info(request):
     logger.info("User %s monitors are %s"
                 % (video.user.email, user_monitor_emails))
 
+    resp_body.update({
+        'owner_email': video.user.email,
+        'feedback': video_feedback,
+        'owner_name': profile.name,
+        'created_at': time.mktime(video.created_at.timetuple()),
+    })
     if token.user.email == video.user.email:
-        return Response({
-            'owner_email': video.user.email,
-            'feedback': video_feedback,
-            'owner_name': profile.name,
-            'created_at': time.mktime(video.created_at.timetuple()),
-            'video_owner': True,
-        }, 201)
+        resp_body['video_owner'] = True
+        return Response(resp_body, 201)
 
     elif token.user.email in user_monitor_emails:
-        return Response({
-            'owner_email': video.user.email,
-            'feedback': video_feedback,
-            'owner_name': profile.name,
-            'created_at': time.mktime(video.created_at.timetuple()),
-            'video_owner': False,
-        }, 201)
+        resp_body['video_owner'] = False
+        return Response(resp_body, 201)
 
     return Response({
         'status': 'error',
@@ -211,11 +222,20 @@ def send_feedback(request):
     token = Token.objects.get(key=request.GET.get("token"))
     user = User.objects.filter(username=token.user.email).first()
 
-    # lookup video
-    path = '/media/%s/%s' % (request.GET.get("user"), request.GET.get("id"))
-    video = VideoUpload.objects.filter(videoUrl=path).first()
+    try:
+        int(request.GET.get("id"))
+        # if we get here this is gps-checkin
+        # test
+        video = GpsCheckin.objects.filter(
+            id=int(request.GET.get("id"))).first()
+    except ValueError:
+        path = '/media/%s/%s' % (request.GET.get("user"), request.GET.get("id"))
+        video = VideoUpload.objects.filter(videoUrl=path).first()
+
     if not video:
         raise Http404
+
+    # XXX todo add fitlering below to check monitor access to video objs
 
     logger.info("sending feedback as user: %s msg: %s"
                 % (token.user.email, request.data.get("message")))

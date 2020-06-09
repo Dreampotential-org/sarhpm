@@ -17,6 +17,7 @@ class GpsCheckin(models.Model):
     lat = models.CharField(max_length=500, default='')
     lng = models.CharField(max_length=500, default='')
     created_at = models.DateTimeField(auto_now_add=True)
+    monitor_feedback = models.ManyToManyField(MonitorFeedback)
 
 
 class VideoUpload(models.Model):

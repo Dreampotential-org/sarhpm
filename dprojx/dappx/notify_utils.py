@@ -100,6 +100,15 @@ def notify_gps_checkin(gps_checkin, request):
     msg += "\n\n\n%s" % lat_long_url
 
     profile = get_user_profile(request.user)
+
+    gps_link = '/review-video.html?id=%s&user=%s' % (
+        gps_checkin.id, gps_checkin.user)
+    msg = (
+        "<p>I AM GPS Checkin from %s - "
+        "<a href='https://m.useiam.com%s'>View Checkin</a></p>" %
+        (profile.name, gps_link)
+    )
+
     notify_users = get_user_monitors(request)
     for notify_user in notify_users:
         if not notify_user:
