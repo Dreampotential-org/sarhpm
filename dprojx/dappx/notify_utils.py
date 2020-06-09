@@ -90,7 +90,12 @@ def notify_monitors_video(request, event):
     requests.put(url, data=json.dumps(body))
 
 
-def notify_gps_checkin(lat, lng, msg, request):
+def notify_gps_checkin(gps_checkin, request):
+
+    lat = gps_checkin.lat
+    lng = gps_checkin.lng
+    msg = gps_checkin.msg
+
     lat_long_url = 'https://www.google.com/maps/place/%s,%s' % (lat, lng)
     msg += "\n\n\n%s" % lat_long_url
 

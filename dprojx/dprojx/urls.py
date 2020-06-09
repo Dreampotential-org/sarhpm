@@ -31,7 +31,6 @@ urlpatterns = [
     url(r'^video/', views.video, name='video'),
     url(r'^video-monitor/', views.video_monitor, name='video-monitor'),
     url(r'^upload/', views.upload, name='upload'),
-    url(r'^gps-checkin/', views.gps_check_in, name='gps-checkin'),
     url(r'^special/', views.special, name='special'),
     url(r'^dappx/', include('dappx.urls')),
     url(r'^logout/$', views.user_logout, name='logout'),

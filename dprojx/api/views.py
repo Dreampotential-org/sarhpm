@@ -56,13 +56,11 @@ class GpsCheckinViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         logger.error("Creating gps event for user %s" % self.request.user)
+        gps_checkin = serializer.save(user=self.request.user)
         notify_gps_checkin(
-            self.request.data['lat'],
-            self.request.data['lng'],
-            self.request.data['msg'],
-            self.request
+            gps_checkin, self.request
         )
-        serializer.save(user=self.request.user)
+        print("Created...")
 
 
 class VideoUploadViewSet(viewsets.ModelViewSet):

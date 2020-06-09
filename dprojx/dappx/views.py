@@ -27,7 +27,6 @@ from . import email_utils
 from . import notify_utils
 from . import video_utils
 from . import constants
-from .models import GpsCheckin
 from .models import UserProfileInfo
 from .models import VideoUpload
 from .models import UserMonitor
@@ -102,31 +101,6 @@ def monitor(request):
 
 def record_video_screen(request):
     return render(request, 'dappx/record.html')
-
-
-def save_and_notify_gps(request):
-    msg = request.data.get("msg")
-    lat = request.data.get("lat")
-    lng = request.data.get("long")
-
-    if not all([msg, lat, lng]):
-        raise TypeError
-        return False
-
-    user = User.objects.get(id=request.user.id)
-    GpsCheckin.objects.create(lat=lat, lng=lng, msg=msg, user=user)
-    notify_utils.notify_gps_checkin(lat, lng, msg, request)
-
-
-@csrf_exempt
-@login_required
-def gps_check_in(request):
-    if request.method == 'GET':
-        return render(request, 'dappx/gps-event.html')
-
-    if request.method == 'POST':
-        save_and_notify_gps(request)
-        return JsonResponse({'status': 'okay'}, status=200)
 
 
 def days_sober(date_joined):
