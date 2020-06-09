@@ -102,6 +102,7 @@ def list_patient_events(request):
         for event in video_events:
             t = event.created_at
             events.append({
+                'id': event.id,
                 'type': 'video',
                 'email': event.user.email,
                 'name': profiles_map[event.user.email].name,
@@ -180,6 +181,7 @@ def list_patient_events_v2(request):
         for event in video_events:
             t = event.created_at
             events.append({
+                'id': event.video_id(),
                 'type': 'video',
                 'email': event.user.email,
                 'name': profiles_map[event.user.email].name,
