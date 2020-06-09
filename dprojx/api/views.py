@@ -155,6 +155,7 @@ def remove_monitor(request):
     }, 201)
 
 
+# XXX rename to get_event_info
 @api_view(['GET'])
 def get_video_info(request):
     token = Token.objects.get(key=request.GET.get("token"))
