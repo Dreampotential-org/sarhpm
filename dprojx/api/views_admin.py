@@ -24,6 +24,39 @@ def user_profile_dict(user_profile):
     }
 
 
+def get_user_events(user):
+    video_events = VideoUpload.objects.filter(user=user).all()
+    gps_events = GpsCheckin.objects.filter(user=user).all()
+
+    events = []
+    for event in gps_events:
+        t = event.created_at
+        events.append({
+            'id': event.id,
+            'type': 'gps',
+            'lat': event.lat,
+            'lng': event.lng,
+            'msg': event.msg,
+            'created_at': time.mktime(t.timetuple())})
+
+    for event in video_events:
+        t = event.created_at
+        events.append({
+            'id': event.video_id(),
+            'type': 'video',
+            'url': event.video_api_link(),
+            'created_at': time.mktime(t.timetuple())})
+
+    events = sorted(events, key=lambda i: i['created_at'], reverse=True)
+
+    result = user_profile_dict(
+        UserProfileInfo.objects.filter(user=user).first()
+    )
+    result['events'] = events
+
+    return result
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def list_patients(request):
@@ -32,8 +65,7 @@ def list_patients(request):
         notify_email=request.user.email).all()
 
     patients_info = [
-        user_profile_dict(
-            UserProfileInfo.objects.filter(user=patient.user).first())
+        get_user_events(patient.user)
         for patient in patients
     ]
 
@@ -137,7 +169,8 @@ def list_patient_events_v2(request):
             notify_email=request.user.email).all()
 
         for patient in patients:
-            profile = UserProfileInfo.objects.filter(user=patient.user).first()
+            profile = UserProfileInfo.objects.filter(
+                user=patient.user).first()
             profiles_map[patient.user.email] = profile
             users.append(patient.user)
 
