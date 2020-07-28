@@ -37,6 +37,7 @@ def get_user_events(user):
             'lat': event.lat,
             'lng': event.lng,
             'msg': event.msg,
+            'monitor_feedbacks': event.monitor_feedback,
             'created_at': time.mktime(t.timetuple())})
 
     for event in video_events:
@@ -45,6 +46,7 @@ def get_user_events(user):
             'id': event.video_id(),
             'type': 'video',
             'url': event.video_api_link(),
+            'monitor_feedbacks': event.monitor_feedback,
             'created_at': time.mktime(t.timetuple())})
 
     events = sorted(events, key=lambda i: i['created_at'], reverse=True)
