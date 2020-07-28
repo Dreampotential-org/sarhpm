@@ -24,6 +24,15 @@ def user_profile_dict(user_profile):
     }
 
 
+def monitor_feedback_dict(feedback):
+    return {
+        'name': feedback.user.name,
+        'email': feedback.user.email,
+        'message': feedback.message,
+        'created_at': time.mktime(feedback.created_at.timetuple())
+    }
+
+
 def get_user_events(user):
     video_events = VideoUpload.objects.filter(user=user).all()
     gps_events = GpsCheckin.objects.filter(user=user).all()
@@ -37,7 +46,8 @@ def get_user_events(user):
             'lat': event.lat,
             'lng': event.lng,
             'msg': event.msg,
-            'monitor_feedbacks': event.monitor_feedback,
+            # 'monitor_feedbacks': [monitor_feedback_dict(f)
+            #                     for f in event.monitor_feedback],
             'created_at': time.mktime(t.timetuple())})
 
     for event in video_events:
@@ -46,7 +56,8 @@ def get_user_events(user):
             'id': event.video_id(),
             'type': 'video',
             'url': event.video_api_link(),
-            'monitor_feedbacks': event.monitor_feedback,
+            # 'monitor_feedbacks': [monitor_feedback_dict(f)
+            #                     for f in event.monitor_feedback],
             'created_at': time.mktime(t.timetuple())})
 
     events = sorted(events, key=lambda i: i['created_at'], reverse=True)
