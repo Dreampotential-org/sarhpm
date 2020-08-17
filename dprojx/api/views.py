@@ -175,8 +175,10 @@ def get_video_info(request):
         resp_body['msg'] = video.msg
     except ValueError:
         resp_body['type'] = 'video'
-        path = '/media/%s/%s' % (request.GET.get("user"), request.GET.get("id"))
+        path = '/media/%s/%s' % (request.GET.get("user"),
+                                 request.GET.get("id"))
         video = VideoUpload.objects.filter(videoUrl=path).first()
+        resp_body['url'] = video.video_ref_link()
 
     if not video:
         return Response({
