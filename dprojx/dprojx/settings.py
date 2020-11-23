@@ -70,7 +70,7 @@ ROOT_URLCONF = 'dprojx.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [TEMPLATE_DIR,],
+        'DIRS': [TEMPLATE_DIR, ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -92,9 +92,11 @@ WSGI_APPLICATION = 'dprojx.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'db',
+        'NAME': 'postgres',
         'USER': 'postgres',
-        'HOST': 'db'
+        'PORT': '5432',
+        'HOST': 'useiam-v2.cb7bl0nt7fvo.us-east-2.rds.amazonaws.com',
+        'PASSWORD': 'Mjg1ZmUxZjEwOTQ1MDMyZmIzYjQ3OWRl',
     }
 }
 
@@ -147,8 +149,13 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 
+# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# AWS_STORAGE_BUCKET_NAME = 'useiamstorage'
+# AWS_S3_REGION_NAME = 'us-west-2'
+# AWS_ACCESS_KEY_ID = 'AKIAU7EQAGZOEBB6KESL'
+# AWS_SECRET_ACCESS_KEY = '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'
+
 try:
     from settings_local import *
 except ImportError:
     pass
-
