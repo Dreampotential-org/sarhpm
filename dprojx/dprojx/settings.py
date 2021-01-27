@@ -92,11 +92,11 @@ WSGI_APPLICATION = 'dprojx.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
+        'NAME': 'db',
         'USER': 'postgres',
         'PORT': '5432',
-        'HOST': 'useiam-v2.cb7bl0nt7fvo.us-east-2.rds.amazonaws.com',
-        'PASSWORD': 'Mjg1ZmUxZjEwOTQ1MDMyZmIzYjQ3OWRl',
+        'HOST': 'useiam-v3.cb7bl0nt7fvo.us-east-2.rds.amazonaws.com',
+        'PASSWORD': 'MzFmZDI0NTUyNGIwOWNmNzcyOWEwYTQ1',
     }
 }
 
