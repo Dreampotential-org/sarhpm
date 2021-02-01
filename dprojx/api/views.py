@@ -335,10 +335,13 @@ def profile(request):
     active_monitor = False
 
     if request.method == 'PUT':
+        if request.data.get('paying'):
+            paying = request.data.get("paying")
+            if paying == 'true':
+                profile.paying = True
+                profile.iap_blurb = request.data.get("iap_blurb")
         if request.data.get('days_sober'):
             profile.days_sober = request.data.get('days_sober')
-        if request.data.get('sober_date'):
-            profile.sober_date = request.data.get('sober_date')
 
         if request.data.get('notify_email'):
 
@@ -389,5 +392,7 @@ def profile(request):
         'notify_email': profile.notify_email,
         'active_monitor': active_monitor,
         'monitors': monitors,
+        'paying': profile.paying,
+        'iap_blurb': profile.iap_blurb,
         'stripe_subscription_id': profile.stripe_subscription_id,
     }, 201)
