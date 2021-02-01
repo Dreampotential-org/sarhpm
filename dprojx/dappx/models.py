@@ -83,6 +83,8 @@ class UserProfileInfo(models.Model):
     source = models.CharField(max_length=500, default="")
     stripe_subscription_id = models.CharField(max_length=256,
                                               blank=True, null=True)
+    paying = models.BooleanField(default=False)
+    iap_apple_blurb = models.TextField(default="")
 
     def __str__(self):
         return self.user.username

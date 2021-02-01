@@ -44,7 +44,8 @@ def register(request):
 
 @superuser_only
 def video(request):
-    path = '/media/%s/%s' % (request.GET.get("user"), request.GET.get("id"))
+    path = '/media/%s/%s' % (request.GET.get("user"),
+                             request.GET.get("id"))
     return stream_video(request, path)
 
 
