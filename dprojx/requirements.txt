@@ -10,5 +10,7 @@ Pillow
 psycopg2-binary
 gunicorn
 newrelic
+django-allauth
+django-rest-auth
 django-cors-headers
 stripe

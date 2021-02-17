@@ -1,6 +1,7 @@
 import time
 from django.contrib.auth.models import User
-from rest_framework import viewsets
+from django.contrib.auth.forms import PasswordResetForm
+from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -22,6 +23,7 @@ from dappx import utils
 from common import config
 
 from django.http import Http404
+from django.conf import settings
 
 logger = config.get_logger()
 
@@ -396,3 +398,40 @@ def profile(request):
         'iap_blurb': profile.iap_blurb,
         'stripe_subscription_id': profile.stripe_subscription_id,
     }, 201)
+
+
+@api_view(['POST'])
+def forgot_password(request):
+    email = request.data.get('email')
+    if not email:
+        return Response(
+            'Email is required', status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # agent = AgentWeb.objects.filter(user__email=email).first()
+    # if not agent:
+    #     return Response(
+    #         'Email is invalid', status=status.HTTP_400_BAD_REQUEST
+    #     )
+    form = PasswordResetForm(data={'email': email})
+    # first_name = ''
+    # if (agent.agent_profile_connector and
+    #         agent.agent_profile_connector.full_name):
+    #     profile_connector = agent.agent_profile_connector
+    #     first_name = profile_connector.full_name.split()[0]
+
+    if form.is_valid():
+        form.save(
+            request=request,
+            html_email_template_name='registration/password_reset_email.html',
+            extra_email_context={
+                'agent_name': 'Hassan',
+                'reset_url': settings.WEBSITE_URL+'reset-password.html'
+            }
+        )
+    else:
+        return Response(
+            'Email is invalid', status=status.HTTP_400_BAD_REQUEST
+        )
+
+    return Response({'status': True})

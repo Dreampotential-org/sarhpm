@@ -22,6 +22,8 @@ urlpatterns = [
     path('cancel-plan/', views_stripe.cancel_plan, name='cancel_plan'),
     path('video-upload/', views.video_upload, name='video_upload'),
     path('profile/', views.profile, name='profile'),
+    path('forgot-password/', views.forgot_password, name='forgot_password'),
+
     path('add-monitor/', views.add_monitor, name='add_monitor'),
     path('remove-monitor/', views.remove_monitor, name='remove_monitor'),
     path('review-video/', views.review_video, name='review_video'),

@@ -21,10 +21,16 @@ from dappx import views
 from django.conf import settings
 from django.conf.urls.static import static
 
+from allauth.account.views import confirm_email as allauthemailconfirmation
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^api/', include('api.urls')),
+    url(r'^rest-auth/', include('rest_auth.urls')),
+    url(r'^rest-auth/registration/account-confirm-email/(?P<key>[-:\w]+)/$',
+        allauthemailconfirmation, name="account_confirm_email"),
+    url(r'^rest-auth/registration/', include('rest_auth.registration.urls')),
     url(r'^$', views.index, name='index'),
     url(r'^log-errors/', views.post_slack_errors, name='log-errors'),
     url(r'^record/', views.record_video_screen, name='record'),
