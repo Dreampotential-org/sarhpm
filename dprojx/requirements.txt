@@ -1,10 +1,10 @@
+Django==2.2.13
 django-phonenumber-field
 phonenumbers
 django-ses
 djangorestframework
 boto3
 requests
-Django
 django-crispy-forms
 Pillow
 psycopg2-binary
