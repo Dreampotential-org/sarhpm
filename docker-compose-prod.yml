@@ -1,14 +1,6 @@
 version: '3'
 
 services:
-    db:
-        restart: always
-        image: postgres:11
-        volumes:
-            - ../postgres-data-prod:/var/lib/postgresql/data
-        environment:
-            POSTGRES_DB: db
-            POSTGRES_HOST_AUTH_METHOD: trust
     project:
         build: .
         volumes:
@@ -17,8 +9,6 @@ services:
             - ./sock:/home/sock
         ports:
             - 8822:8822
-        depends_on:
-            - db
         command: newrelic-admin run-program /usr/local/bin/gunicorn --env DJANGO_SETTINGS_MODULE=dprojx.settings dprojx.wsgi --workers 8 --timeout 999 --bind=0.0.0.0:8822
         # command: python3 manage.py runserver 0.0.0.0:8822
         entrypoint: /entrypoint.sh
