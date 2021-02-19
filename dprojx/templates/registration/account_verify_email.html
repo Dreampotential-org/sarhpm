@@ -1,0 +1,24 @@
+{% load i18n %}{% autoescape on %}
+<html>
+  <head>
+  </head>
+<body>
+Hello {{ user.username }},
+<br><br>
+
+You're receiving this email because you have to verify the email at m.useiam.com
+<br><br>
+
+Click here to verify your acount <a href="{{url}}">HERE</a>
+<br><br>
+
+Sincerely,
+<br><br>
+UseIam team
+
+<br><br>
+
+</body>
+</html>
+
+{% endautoescape %}

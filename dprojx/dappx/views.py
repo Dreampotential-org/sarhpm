@@ -35,6 +35,21 @@ from utils import superuser_only
 from utils import custom_render as render
 from common import config
 
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.template.loader import render_to_string
+from .tokens import account_activation_token
+from django.core.mail import EmailMessage
+
+
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.template.loader import render_to_string
+from .tokens import account_activation_token
+from django.contrib.auth.models import User
+from django.core.mail import EmailMessage
+
+
 logger = config.get_logger()
 
 
@@ -273,6 +288,7 @@ def _create_user(**data):
         user = user_form.save()
         print("UERERERE %s" % user)
         user.set_password(user.password)
+        user.is_active = False
         user.save()
         profile = profile_form.save(commit=False)
         profile.user = user
@@ -283,6 +299,21 @@ def _create_user(**data):
         profile.notify_email = data.get("notify_email", "")
         profile.source = data.get("source", "")
         profile.save()
+
+        #send email to to verify account
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = account_activation_token.make_token(user)
+        url = settings.WEBSITE_URL + 'verify-email.html?u='+uid+'&t='+token
+        message = render_to_string('registration/account_verify_email.html', {
+            'user': user,
+            'url': url,
+        })
+
+        email_utils.send_raw_email(
+            to_email='triconbox@gmail.com',
+            reply_to='triconbox@gmail.com',
+            subject='Activate your useiam account.',
+            message_text=message)
 
         # log user in!
         username = data.get('email')

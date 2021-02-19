@@ -25,6 +25,12 @@ from common import config
 from django.http import Http404
 from django.conf import settings
 
+from django.http import HttpResponse
+from django.contrib.auth import login, authenticate
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from dappx.tokens import account_activation_token
+
 logger = config.get_logger()
 
 
@@ -408,17 +414,7 @@ def forgot_password(request):
             'Email is required', status=status.HTTP_400_BAD_REQUEST
         )
 
-    # agent = AgentWeb.objects.filter(user__email=email).first()
-    # if not agent:
-    #     return Response(
-    #         'Email is invalid', status=status.HTTP_400_BAD_REQUEST
-    #     )
     form = PasswordResetForm(data={'email': email})
-    # first_name = ''
-    # if (agent.agent_profile_connector and
-    #         agent.agent_profile_connector.full_name):
-    #     profile_connector = agent.agent_profile_connector
-    #     first_name = profile_connector.full_name.split()[0]
 
     if form.is_valid():
         form.save(
@@ -435,3 +431,20 @@ def forgot_password(request):
         )
 
     return Response({'status': True})
+
+
+@api_view(['GET'])
+def activate(request, uidb64, token):
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.save()
+        login(request, user)
+        # return redirect('home')
+        return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
+    else:
+        return HttpResponse('Activation link is invalid!')
