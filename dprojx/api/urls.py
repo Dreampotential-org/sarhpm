@@ -1,5 +1,4 @@
 from django.urls import include, path
-from django.conf.urls import url
 from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
 
@@ -19,7 +18,6 @@ urlpatterns = [
     path('', include(router.urls)),
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
     path('create-user/', views.create_user, name='create_user'),
-
     path('pay/', views_stripe.pay, name='pay'),
     path('cancel-plan/', views_stripe.cancel_plan, name='cancel_plan'),
     path('video-upload/', views.video_upload, name='video_upload'),
@@ -38,8 +36,6 @@ urlpatterns = [
          name='list_patient_events'),
     path('list-patient-events-v2/', views_admin.list_patient_events_v2,
          name='list_patient_events_v2'),
-    url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
-        views.activate, name='activate'),
 
     # path('list-events/', views.list_events, name='list_events'),
 ]
