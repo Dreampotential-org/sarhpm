@@ -93,3 +93,17 @@ def cancel_plan(request):
         return JsonResponse({
             'status': 'OKAY'
         })
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def cancel_plan_braintree(request):
+    logger.info("Cancelling user on paid plan: %s" % request.user.email)
+    profile = UserProfileInfo.objects.filter(
+        user__username=request.user.email
+    ).first()
+    profile.paying = False
+    profile.iap_blurb = ''
+    profile.save()
+    return JsonResponse({
+            'status': 'OKAY'
+        })

@@ -20,6 +20,7 @@ urlpatterns = [
     path('create-user/', views.create_user, name='create_user'),
     path('pay/', views_stripe.pay, name='pay'),
     path('cancel-plan/', views_stripe.cancel_plan, name='cancel_plan'),
+    path('cancel-plan-braintree/', views_stripe.cancel_plan_braintree, name='cancel_plan_braintree'),
     path('video-upload/', views.video_upload, name='video_upload'),
     path('profile/', views.profile, name='profile'),
     path('forgot-password/', views.forgot_password, name='forgot_password'),
