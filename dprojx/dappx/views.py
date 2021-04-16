@@ -259,7 +259,7 @@ def _create_user(**data):
     data['email'] = data['email'].lower()
     data['username'] = data['email']
     request = data.get('request')
-
+    print("############################")
     monitor_user = None
     if data.get('notify_email'):
         monitor_user = User.objects.filter(

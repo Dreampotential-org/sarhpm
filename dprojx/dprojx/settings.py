@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'dappx',
     'api',
+    'magic_link',
 ]
 
 # CORS_ORIGIN_WHITELIST = ['v2-local.postmunk.me']
@@ -151,3 +152,11 @@ try:
     from settings_local import *
 except ImportError:
     pass
+
+
+MAGIC_LINK = {
+    "DEFAULT_EXPIRY": 300,
+    "DEFAULT_REDIRECT": "/",
+    "AUTHENTICATION_BACKEND": "django.contrib.auth.backends.ModelBackend",
+    "SESSION_EXPIRY": 7 * 24 * 60 * 60
+}
