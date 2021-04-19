@@ -73,14 +73,14 @@ class VideoUpload(models.Model):
 
 class UserProfileInfo(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=17, blank=True)
-    name = models.CharField(max_length=17, blank=True)
+    phone = models.CharField(max_length=17, blank=True , null=True)
+    name = models.CharField(max_length=17, blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     notify_email = models.EmailField(max_length=512, blank=True, null=True)
-    days_sober = models.PositiveIntegerField(default=0)
+    days_sober = models.PositiveIntegerField(default=0, null=True)
     sober_date = models.CharField(max_length=256, blank=True, null=True)
     user_hash = models.CharField(max_length=256, blank=True, null=True)
-    source = models.CharField(max_length=500, default="")
+    source = models.CharField(max_length=500, default="",null=True)
     stripe_subscription_id = models.CharField(max_length=256,
                                               blank=True, null=True)
     paying = models.BooleanField(default=False)

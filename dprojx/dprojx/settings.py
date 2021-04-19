@@ -104,6 +104,7 @@ DATABASES = {
     }
 }
 
+website_url = 'https://localhost:80000/?token='
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators

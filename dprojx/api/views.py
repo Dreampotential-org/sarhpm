@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
+from dprojx.dprojx.settings import website_url
 
 from api.serializers import (
     UserSerializer, UserProfileSerializer, GpsCheckinSerializer,
@@ -446,6 +447,25 @@ def forgot_password(request):
 @api_view(['POST'])
 def send_magic_link(request):
     email = request.data['email']
+    name = email.strip().split('@')
+    print(name[0], "@@@@@@@@@@")
+    user = User.objects.filter(username=email).first()
+    if not user:
+        password = User.objects.make_random_password()
+        print("password" , password)
+        data = {
+            'username': email,
+            'email':email,
+            'notify_email': email,
+            'password': password,
+            'name': name[0],
+            'phone':'',
+            'days_sober':0,
+            'sober_date':0,
+            'source':None
+        }
+        _create_user(**data)
+        print("create user successfully")
     print("####################")
     print(email)
     if email is None:
@@ -458,13 +478,13 @@ def send_magic_link(request):
     user = get_object_or_404(User, email=email)
     link = MagicLink.objects.create(user=user)
     if link:
-        login_url = str('https://localhost:80000/?t=' + str(link.token))
+        login_url = str(website_url + str(link.token))
         email_utils.send_email(
-            #to_email=settings.DEFAULT_FROM_EMAIL,
+            # to_email=settings.DEFAULT_FROM_EMAIL,
             to_email=email,
             subject='useIAM: %s added you as a monitor'
                     % email,
-            message="please click on this link %s for login "%login_url
+            message="please click on this link %s for login " % login_url
         )
         print(login_url)
         data = {
@@ -504,7 +524,7 @@ def auth_magic_link(request):
     data = {
         'status': True,
         'auth_token': token.key,
-        'user': serialized.data
+        #'user': serialized.data
     }
 
     return Response(data, status=status.HTTP_201_CREATED)
