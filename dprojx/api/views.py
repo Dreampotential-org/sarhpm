@@ -465,8 +465,6 @@ def send_magic_link(request):
             'source':None
         }
         _create_user(**data)
-        print("create user successfully")
-    print("####################")
     print(email)
     if email is None:
         data = {
