@@ -37,6 +37,8 @@ urlpatterns = [
          name='list_patient_events'),
     path('list-patient-events-v2/', views_admin.list_patient_events_v2,
          name='list_patient_events_v2'),
+    path(r'send-magic-link/', views.send_magic_link),
+    path(r'auth-magic-link/', views.auth_magic_link),
 
     # path('list-events/', views.list_events, name='list_events'),
 ]

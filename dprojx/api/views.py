@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
+from dprojx.settings import website_url
 
 from api.serializers import (
     UserSerializer, UserProfileSerializer, GpsCheckinSerializer,
@@ -22,10 +23,16 @@ from dappx import constants
 from dappx import utils
 from common import config
 
+from magic_link.models import MagicLink
+from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
+
 from django.http import Http404
 from django.conf import settings
 
 logger = config.get_logger()
+
+user = get_user_model()
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -426,7 +433,7 @@ def forgot_password(request):
             html_email_template_name='registration/password_reset_email.html',
             extra_email_context={
                 'agent_name': 'Hassan',
-                'reset_url': settings.WEBSITE_URL+'reset-password.html'
+                'reset_url': settings.WEBSITE_URL + 'reset-password.html'
             }
         )
     else:
@@ -435,3 +442,87 @@ def forgot_password(request):
         )
 
     return Response({'status': True})
+
+
+@api_view(['POST'])
+def send_magic_link(request):
+    email = request.data['email']
+    name = email.strip().split('@')
+    print(name[0], "@@@@@@@@@@")
+    user = User.objects.filter(username=email).first()
+    if not user:
+        password = User.objects.make_random_password()
+        print("password" , password)
+        data = {
+            'username': email,
+            'email':email,
+            'notify_email': email,
+            'password': password,
+            'name': name[0],
+            'phone':'',
+            'days_sober':0,
+            'sober_date':0,
+            'source':None
+        }
+        _create_user(**data)
+    print(email)
+    if email is None:
+        data = {
+            'status': False,
+            'error': 'Email is required'
+        }
+        return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+    user = get_object_or_404(User, email=email)
+    link = MagicLink.objects.create(user=user)
+    if link:
+        login_url = str(website_url + str(link.token))
+        email_utils.send_email(
+            # to_email=settings.DEFAULT_FROM_EMAIL,
+            to_email=email,
+            subject='useIAM: %s added you as a monitor'
+                    % email,
+            message="please click on this link %s for login " % login_url
+        )
+        print(login_url)
+        data = {
+            'status': True,
+            'token': link.token
+        }
+    else:
+        data = {
+            'status': False,
+        }
+
+    return Response(data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+def auth_magic_link(request):
+    token = request.data['token']
+    if token is None:
+        data = {
+            'status': False,
+            'error': 'Token is required'
+        }
+        return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+    link = get_object_or_404(MagicLink, token=token)
+    link.validate()
+    link.authorize(request.user)
+    print("#############")
+    print(link.user.id)
+    user = User.objects.get(id=link.user.id)
+    serialized = UserSerializer(user)
+    # link.login(request)
+    link.disable()
+
+    token, _ = Token.objects.get_or_create(user=link.user)
+
+    data = {
+        'status': True,
+        'auth_token': token.key,
+        #'user': serialized.data
+    }
+
+    return Response(data, status=status.HTTP_201_CREATED)

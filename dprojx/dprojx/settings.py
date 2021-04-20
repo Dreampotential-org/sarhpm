@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'dappx',
     'api',
+    'magic_link',
 ]
 
 # CORS_ORIGIN_WHITELIST = ['v2-local.postmunk.me']
@@ -103,6 +104,7 @@ DATABASES = {
     }
 }
 
+website_url = 'https://localhost:80000/?token='
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -151,3 +153,11 @@ try:
     from settings_local import *
 except ImportError:
     pass
+
+
+MAGIC_LINK = {
+    "DEFAULT_EXPIRY": 300,
+    "DEFAULT_REDIRECT": "/",
+    "AUTHENTICATION_BACKEND": "django.contrib.auth.backends.ModelBackend",
+    "SESSION_EXPIRY": 7 * 24 * 60 * 60
+}

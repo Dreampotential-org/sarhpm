@@ -258,8 +258,8 @@ def record_video(request):
 def _create_user(**data):
     data['email'] = data['email'].lower()
     data['username'] = data['email']
+    print("######Get####",data.get("notify_email", ""))
     request = data.get('request')
-
     monitor_user = None
     if data.get('notify_email'):
         monitor_user = User.objects.filter(
@@ -269,7 +269,10 @@ def _create_user(**data):
     user_form = UserForm(data)
     profile_form = UserProfileInfoForm(data)
 
+    print("user form ",user_form)
+
     if user_form.is_valid() and profile_form.is_valid():
+        print("Enter in this form")
         user = user_form.save()
         print("UERERERE %s" % user)
         user.set_password(user.password)
@@ -350,6 +353,8 @@ def index(request):
 
 def create_notify_user(request, user_hash):
     profile = get_object_or_404(UserProfileInfo, user_hash=user_hash)
+
+    print("#######Notiy create user########")
     if request.method == 'POST':
         # username = request.POST.get('email')
         username = profile.notify_email
