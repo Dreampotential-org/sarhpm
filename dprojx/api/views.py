@@ -6,7 +6,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
-from dprojx.settings import website_url
 
 from api.serializers import (
     UserSerializer, UserProfileSerializer, GpsCheckinSerializer,
@@ -448,7 +447,6 @@ def forgot_password(request):
 def send_magic_link(request):
     email = request.data['email']
     name = email.strip().split('@')
-    print(name[0], "@@@@@@@@@@")
     user = User.objects.filter(username=email).first()
     if not user:
         password = User.objects.make_random_password()
@@ -465,7 +463,6 @@ def send_magic_link(request):
             'source':None
         }
         _create_user(**data)
-    print(email)
     if email is None:
         data = {
             'status': False,
@@ -476,15 +473,12 @@ def send_magic_link(request):
     user = get_object_or_404(User, email=email)
     link = MagicLink.objects.create(user=user)
     if link:
-        login_url = str(website_url + str(link.token))
+        login_url = settings.WEBSITE_URL+ '?token=' + str(link.token)
         email_utils.send_email(
-            # to_email=settings.DEFAULT_FROM_EMAIL,
             to_email=email,
-            subject='useIAM: %s added you as a monitor'
-                    % email,
+            subject='useIAM: Magic Link to Login',
             message="please click on this link %s for login " % login_url
         )
-        print(login_url)
         data = {
             'status': True,
             'token': link.token
