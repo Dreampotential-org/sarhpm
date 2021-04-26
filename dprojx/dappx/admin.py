@@ -6,6 +6,7 @@ from dappx.models import User
 from dappx.models import VideoUpload
 from dappx.models import UserMonitor
 from dappx.models import MonitorFeedback
+from dappx.models import SubscriptionEvent
 
 from django.utils.html import format_html
 
@@ -74,9 +75,17 @@ class CustomMonitorFeedback(admin.ModelAdmin):
     ordering = ('-id',)
 
 
+class CustomSubscriptionEvent(admin.ModelAdmin):
+    list_display = [
+        'created_at', 'user', 'paying', 'subscription_id',
+    ]
+    ordering = ('-id',)
+
+
 # Register your models here.
 admin.site.register(UserProfileInfo, UserProfileInfoAdmin)
 admin.site.register(GpsCheckin, CustomGpsCheckin)
 admin.site.register(VideoUpload, CustomVideoUpload)
 admin.site.register(UserMonitor, CustomUserMonitor)
 admin.site.register(MonitorFeedback, CustomMonitorFeedback)
+admin.site.register(SubscriptionEvent, CustomSubscriptionEvent)

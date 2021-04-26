@@ -97,6 +97,13 @@ class UserProfileInfo(models.Model):
         super(UserProfileInfo, self).save(*args, **kwargs)
 
 
+class SubscriptionEvent(models.Model):
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+    subscription_id = models.TextField(default="")
+    paying = models.BooleanField(default=False)
+
+
 class UserMonitor(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
     notify_email = models.EmailField(max_length=512, blank=True, null=True)

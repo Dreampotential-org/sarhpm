@@ -11,7 +11,8 @@ from api.serializers import (
     UserSerializer, UserProfileSerializer, GpsCheckinSerializer,
     VideoUploadSerializer
 )
-from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload, UserMonitor
+from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload
+from dappx.models import UserMonitor, SubscriptionEvent
 from dappx.models import MonitorFeedback
 from dappx.views import _create_user
 from dappx import email_utils
@@ -240,7 +241,8 @@ def send_feedback(request):
         video = GpsCheckin.objects.filter(
             id=int(request.GET.get("id"))).first()
     except ValueError:
-        path = '/media/%s/%s' % (request.GET.get("user"), request.GET.get("id"))
+        path = '/media/%s/%s' % (request.GET.get("user"),
+                                 request.GET.get("id"))
         video = VideoUpload.objects.filter(videoUrl=path).first()
 
     if not video:
@@ -348,6 +350,13 @@ def profile(request):
             if paying == 'true':
                 profile.paying = True
                 profile.iap_blurb = request.data.get("iap_blurb")
+
+            # keep track of subscription events
+            user = User.objects.filter(username=request.user.email).first()
+            SubscriptionEvent(
+                user=user, subscription_id=request.data.get("iap_blurb"),
+                paying=request.data.get("paying")).save()
+
         if request.data.get('days_sober'):
             profile.days_sober = request.data.get('days_sober')
 
