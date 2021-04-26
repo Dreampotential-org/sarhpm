@@ -335,7 +335,8 @@ def get_activity(request):
 
 @api_view(['PUT', 'GET'])
 def profile(request):
-    logger.info("get profile info %s" % request.user.email)
+    logger.info("get profile info %s %s"
+                % (request.data.get("paying"), request.user.email))
     profile = UserProfileInfo.objects.filter(
         user__username=request.user.email
     ).first()
