@@ -355,7 +355,7 @@ def profile(request):
             user = User.objects.filter(username=request.user.email).first()
             SubscriptionEvent(
                 user=user, subscription_id=request.data.get("iap_blurb"),
-                paying=request.data.get("paying")).save()
+                paying=bool(request.data.get("paying"))).save()
 
         if request.data.get('days_sober'):
             profile.days_sober = request.data.get('days_sober')
