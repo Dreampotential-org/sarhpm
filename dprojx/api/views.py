@@ -353,15 +353,15 @@ def profile(request):
                 profile.paying = True
             else:
                 profile.paying = False
+
             user = User.objects.filter(username=request.user.email).first()
             logger.info("Creating subscription event: %s %s %s" %
-                         (bool(request.data.get("paying")),
-                          user, request.data.get("iap_blurb")))
+                        (profile.paying, user,
+                         request.data.get("iap_blurb")))
             # keep track of subscription events
-            logger.info("")
             SubscriptionEvent(
                 user=user, subscription_id=request.data.get("iap_blurb"),
-                paying=bool(request.data.get("paying"))).save()
+                paying=profile.paying).save()
 
         if request.data.get('days_sober'):
             profile.days_sober = request.data.get('days_sober')
