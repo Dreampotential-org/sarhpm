@@ -348,12 +348,17 @@ def profile(request):
     if request.method == 'PUT':
         if str(request.data.get("paying")).lower() in ['true', 'false']:
             paying = request.data.get("paying").lower()
+            profile.iap_blurb = request.data.get("iap_blurb")
             if paying == 'true':
                 profile.paying = True
-                profile.iap_blurb = request.data.get("iap_blurb")
-
-            # keep track of subscription events
+            else:
+                profile.paying = False
             user = User.objects.filter(username=request.user.email).first()
+            logger.info("Creating subscription event: %s %s %s" %
+                         (bool(request.data.get("paying")),
+                          user, request.data.get("iap_blurb")))
+            # keep track of subscription events
+            logger.info("")
             SubscriptionEvent(
                 user=user, subscription_id=request.data.get("iap_blurb"),
                 paying=bool(request.data.get("paying"))).save()
@@ -463,14 +468,14 @@ def send_magic_link(request):
         print("password", password)
         data = {
             'username': email,
-            'email':email,
+            'email': email,
             'notify_email': email,
             'password': password,
             'name': name[0],
             'phone':'',
-            'days_sober':0,
-            'sober_date':0,
-            'source':None
+            'days_sober': 0,
+            'sober_date': 0,
+            'source': None
         }
         _create_user(**data)
     if email is None:
