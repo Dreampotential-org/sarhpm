@@ -346,8 +346,8 @@ def profile(request):
     active_monitor = False
 
     if request.method == 'PUT':
-        if request.data.get("paying") in ['true', 'false']:
-            paying = request.data.get("paying")
+        if str(request.data.get("paying")).lower() in ['true', 'false']:
+            paying = request.data.get("paying").lower()
             if paying == 'true':
                 profile.paying = True
                 profile.iap_blurb = request.data.get("iap_blurb")
