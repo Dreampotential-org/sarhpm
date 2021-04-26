@@ -345,7 +345,7 @@ def profile(request):
     active_monitor = False
 
     if request.method == 'PUT':
-        if 'paying' in request.data:
+        if request.data.get("paying") in ['true', 'false']:
             paying = request.data.get("paying")
             if paying == 'true':
                 profile.paying = True
@@ -459,7 +459,7 @@ def send_magic_link(request):
     user = User.objects.filter(username=email).first()
     if not user:
         password = User.objects.make_random_password()
-        print("password" , password)
+        print("password", password)
         data = {
             'username': email,
             'email':email,
