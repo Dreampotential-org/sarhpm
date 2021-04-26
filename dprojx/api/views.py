@@ -345,7 +345,7 @@ def profile(request):
     active_monitor = False
 
     if request.method == 'PUT':
-        if request.data.get('paying'):
+        if 'paying' in request.data:
             paying = request.data.get("paying")
             if paying == 'true':
                 profile.paying = True
