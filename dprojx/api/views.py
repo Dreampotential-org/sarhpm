@@ -415,7 +415,8 @@ def profile(request):
         'notify_email': profile.notify_email,
         'active_monitor': active_monitor,
         'monitors': monitors,
-        'paying': profile.paying,
+        #'paying': profile.paying,
+        'paying': True,
         'iap_blurb': profile.iap_blurb,
         'stripe_subscription_id': profile.stripe_subscription_id,
     }, 201)
