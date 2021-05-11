@@ -447,7 +447,7 @@ def forgot_password(request):
             request=request,
             html_email_template_name='registration/password_reset_email.html',
             extra_email_context={
-                'agent_name': 'Hassan',
+                'agent_name': '',
                 'reset_url': settings.WEBSITE_URL + 'reset-password.html'
             }
         )
