@@ -462,6 +462,7 @@ def forgot_password(request):
 @api_view(['POST'])
 def send_magic_link(request):
     email = request.data['email']
+    mode = request.data['mode']
     name = email.strip().split('@')
     user = User.objects.filter(username=email).first()
     if not user:
@@ -489,16 +490,28 @@ def send_magic_link(request):
     user = get_object_or_404(User, email=email)
     link = MagicLink.objects.create(user=user)
     if link:
-        login_url = settings.WEBSITE_URL+ '?token=' + str(link.token)
-        email_utils.send_email(
-            to_email=email,
-            subject='useIAM: Magic Link to Login',
-            message="please click on this link %s for login " % login_url
-        )
-        data = {
-            'status': True,
-            'token': link.token
-        }
+        if mode=='web':
+            login_url = settings.WEBSITE_URL+ '?token=' + str(link.token)
+            email_utils.send_email(
+                to_email=email,
+                subject='useIAM: Magic Link to Login',
+                message="please click on this link %s for login " % login_url
+            )
+            data = {
+                'status': True,
+                'token': link.token
+            }
+        else:
+            login_url = "useiam://?token=" + str(link.token)
+            email_utils.send_email(
+                to_email=email,
+                subject='useIAM: Magic Link to Login',
+                message="please click on this link %s for login " % login_url
+            )
+            data = {
+                'status': True,
+                'token': link.token
+            }
     else:
         data = {
             'status': False,
