@@ -14,6 +14,7 @@ from api.serializers import (
 from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload
 from dappx.models import UserMonitor, SubscriptionEvent
 from dappx.models import MonitorFeedback
+from dappx.models import Organization
 from dappx.views import _create_user
 from dappx import email_utils
 from dappx.views import convert_and_save_video, stream_video
@@ -272,6 +273,33 @@ def send_feedback(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_organizations(request):
+    orgs = Organization.objects.all()
+    resp = []
+    for org in orgs:
+        resp.append({'id': org.id,
+                     'logo': org.logo,
+                     'name': org.name})
+    return Response(resp)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def set_org(request):
+    print("HERE")
+    profile = UserProfileInfo.objects.filter(
+        user__username=request.user.email
+    ).first()
+
+    org = Organization.objects.get(id=request.data.get("org_id"))
+    profile.user_org = org
+    profile.save()
+
+    return Response({'status': 'okay'})
+
+
+@api_view(['GET'])
 def review_video(request):
     token = Token.objects.get(key=request.GET.get("token"))
     logger.info("requesting video as user: %s" % token.user.email)
@@ -415,7 +443,7 @@ def profile(request):
         'notify_email': profile.notify_email,
         'active_monitor': active_monitor,
         'monitors': monitors,
-        #'paying': profile.paying,
+        # 'paying': profile.paying,
         'paying': True,
         'iap_blurb': profile.iap_blurb,
         'stripe_subscription_id': profile.stripe_subscription_id,
@@ -474,7 +502,7 @@ def send_magic_link(request):
             'notify_email': email,
             'password': password,
             'name': name[0],
-            'phone':'',
+            'phone': '',
             'days_sober': 0,
             'sober_date': 0,
             'source': None

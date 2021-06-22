@@ -86,14 +86,15 @@ class UserMonitor(models.Model):
 class Organization(models.Model):
     name = models.CharField(max_length=256, blank=True, null=True)
     logo = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
-class OrganizationMember(models.Model):
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
+# class OrganizationMember(models.Model):
+#     user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
 
 
-class OrganizationMemberMonitor(models.Model):
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
+# class OrganizationMemberMonitor(models.Model):
+#    user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
 
 
 class UserProfileInfo(models.Model):
@@ -110,8 +111,9 @@ class UserProfileInfo(models.Model):
                                               blank=True, null=True)
     paying = models.BooleanField(default=False)
     iap_blurb = models.TextField(default="")
-    org = models.ForeignKey(to=Organization,
-                            on_delete=models.CASCADE, default="")
+    user_org = models.ForeignKey(to=Organization,
+                                 on_delete=models.CASCADE,
+                                 blank=True, null=True)
 
     def __str__(self):
         return self.user.username
