@@ -89,12 +89,13 @@ class Organization(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-# class OrganizationMember(models.Model):
-#     user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
+class OrganizationMember(models.Model):
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
+    admin = models.BooleanField(default=False, db_index=True)
 
 
-# class OrganizationMemberMonitor(models.Model):
-#    user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
+class OrganizationMemberMonitor(models.Model):
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
 
 
 class UserProfileInfo(models.Model):

@@ -8,7 +8,7 @@ from dappx.models import UserMonitor
 from dappx.models import MonitorFeedback
 from dappx.models import SubscriptionEvent
 from dappx.models import Organization
-# from dappx.models import OrganizationMember
+from dappx.models import OrganizationMember
 # from dappx.models import OrganizationMemberMonitor
 
 from django.utils.html import format_html
@@ -92,11 +92,11 @@ class CustomOrganization(admin.ModelAdmin):
     ordering = ('-id',)
 
 
-#class CustomOrganizationMember(admin.ModelAdmin):
-#    list_display = [
-#        'user',
-#    ]
-#    ordering = ('-id',)
+class CustomOrganizationMember(admin.ModelAdmin):
+    list_display = [
+        'user',
+    ]
+    ordering = ('-id',)
 
 
 # class CustomOrganizationMemberMonitor(admin.ModelAdmin):
@@ -114,5 +114,5 @@ admin.site.register(UserMonitor, CustomUserMonitor)
 admin.site.register(MonitorFeedback, CustomMonitorFeedback)
 admin.site.register(SubscriptionEvent, CustomSubscriptionEvent)
 admin.site.register(Organization, CustomOrganization)
-# admin.site.register(OrganizationMember, CustomOrganizationMember)
+admin.site.register(OrganizationMember, CustomOrganizationMember)
 # admin.site.register(OrganizationMemberMonitor, CustomOrganizationMemberMonitor)
