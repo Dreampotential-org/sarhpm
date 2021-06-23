@@ -149,10 +149,8 @@ def add_organization_member(request):
 
         return Response({'message': 'User already exists'})
 
-    token = Token.objects.get_or_create(user=user)
     data.pop('password')
     data['message'] = "User created"
-    data['token'] = token[0].key
 
     return Response(data)
 
