@@ -136,6 +136,10 @@ def add_organization_member(request):
     data['email'] = data['email'].lower()
     user = User.objects.filter(username=data['email']).first()
 
+    if not user:
+        _create_user(**data)
+
+    user = User.objects.filter(username=data['email']).first()
     if user:
         org_member = OrganizationMember.objects.filter(user=user).first()
         if not org_member:
@@ -145,10 +149,7 @@ def add_organization_member(request):
 
         return Response({'message': 'User already exists'})
 
-    _create_user(**data)
-    user = User.objects.filter(username=data['email']).first()
     token = Token.objects.get_or_create(user=user)
-
     data.pop('password')
     data['message'] = "User created"
     data['token'] = token[0].key
