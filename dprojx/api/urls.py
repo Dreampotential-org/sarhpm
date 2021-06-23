@@ -18,6 +18,8 @@ urlpatterns = [
     path('', include(router.urls)),
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
     path('create-user/', views.create_user, name='create_user'),
+    path('add_organization_member/',
+          views.add_organization_member, name='add_organization_member'),
     path('pay/', views_stripe.pay, name='pay'),
     path('cancel-plan/', views_stripe.cancel_plan, name='cancel_plan'),
     path('cancel-plan-braintree/', views_stripe.cancel_plan_braintree, name='cancel_plan_braintree'),

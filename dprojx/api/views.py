@@ -13,6 +13,7 @@ from api.serializers import (
 )
 from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload
 from dappx.models import UserMonitor, SubscriptionEvent
+from dappx.models import OrganizationMember
 from dappx.models import MonitorFeedback
 from dappx.models import Organization
 from dappx.views import _create_user
@@ -113,6 +114,38 @@ def create_user(request):
 
     _create_user(**data)
 
+    user = User.objects.filter(username=data['email']).first()
+    token = Token.objects.get_or_create(user=user)
+
+    data.pop('password')
+    data['message'] = "User created"
+    data['token'] = token[0].key
+
+    return Response(data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_organization_member(request):
+    data = {k: v for k, v in request.data.items()}
+    if not data.get('email') or not data.get('password'):
+        return Response({
+            'message': 'Missing parameters. Email and password is required'
+        })
+
+    data['email'] = data['email'].lower()
+    user = User.objects.filter(username=data['email']).first()
+
+    if user:
+        org_member = OrganizationMember.objects.filter(user=user).first()
+        if not org_member:
+            org_member = OrganizationMember()
+            org_member.user = user
+            org_member.save()
+
+        return Response({'message': 'User already exists'})
+
+    _create_user(**data)
     user = User.objects.filter(username=data['email']).first()
     token = Token.objects.get_or_create(user=user)
 
@@ -518,8 +551,8 @@ def send_magic_link(request):
     user = get_object_or_404(User, email=email)
     link = MagicLink.objects.create(user=user)
     if link:
-        if mode=='web':
-            login_url = settings.WEBSITE_URL+ '?token=' + str(link.token)
+        if mode == 'web':
+            login_url = settings.WEBSITE_URL + '?token=' + str(link.token)
             email_utils.send_email(
                 to_email=email,
                 subject='useIAM: Magic Link to Login',
@@ -573,7 +606,7 @@ def auth_magic_link(request):
     data = {
         'status': True,
         'auth_token': token.key,
-        #'user': serialized.data
+        # 'user': serialized.data
     }
 
     return Response(data, status=status.HTTP_201_CREATED)
