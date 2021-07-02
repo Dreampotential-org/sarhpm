@@ -18,24 +18,40 @@ urlpatterns = [
     path('', include(router.urls)),
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
     path('create-user/', views.create_user, name='create_user'),
-    path('add_organization_member/',
-          views.add_organization_member, name='add_organization_member'),
+
+
+
     path('pay/', views_stripe.pay, name='pay'),
     path('cancel-plan/', views_stripe.cancel_plan, name='cancel_plan'),
     path('cancel-plan-braintree/', views_stripe.cancel_plan_braintree, name='cancel_plan_braintree'),
     path('video-upload/', views.video_upload, name='video_upload'),
     path('profile/', views.profile, name='profile'),
     path('forgot-password/', views.forgot_password, name='forgot_password'),
-
-    path('add-monitor/', views.add_monitor, name='add_monitor'),
-    path('remove-monitor/', views.remove_monitor, name='remove_monitor'),
+    path('add_monitor/', views.add_monitor, name='add_monitor'),
+    #path('remove-monitor/', views.remove_monitor, name='remove_monitor'),
     path('review-video/', views.review_video, name='review_video'),
     path('get-activity/', views.get_activity, name='get_activity'),
     path('send-feedback/', views.send_feedback, name='send_feedback'),
     path('get-video-info/', views.get_video_info, name='get_video_info'),
     path('list_organizations/', views.list_organizations, name='list_organizations'),
     path('set-org/', views.set_org, name='set_org'),
-    path('list-patients/', views_admin.list_patients, name='list_patients'),
+
+    path('get_organization_member/',
+          views.get_organization_member, name='get_organization_member'),
+    path('add_organization_member/',
+          views.add_organization_member, name='add_organization_member'),
+    path('remove_organization_member/<int:id>',views.remove_organization_member, name='remove_organization_member'),
+    path('search_organization_member/<str:name>',
+         views.search_organization_member, name='search_organization_member'),
+    path('edit_organization_member/',
+         views.edit_organization_member, name='edit_organization_member'),
+
+
+    path('edit_monitor_member/',
+         views.edit_monitor_member, name='edit_monitor_member'),
+
+    path('list-patients/', views_admin.UserMonitorView.as_view(), name='list_patients'),
+    path('list-patients/<int:id>', views_admin.UserMonitorViewDetails.as_view(), name='list_patients'),
     path('list-patient-events/', views_admin.list_patient_events,
          name='list_patient_events'),
     path('list-patient-events-v2/', views_admin.list_patient_events_v2,
