@@ -5,11 +5,16 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework import response
 
 from dappx.models import UserMonitor, UserProfileInfo
+from api.serializers import (UserMonitorSerializer)
 from dappx.models import GpsCheckin, VideoUpload
 from common import config
 import urllib.parse
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import generics, status, pagination
 
 logger = config.get_logger()
 
@@ -33,6 +38,7 @@ def monitor_feedback_dict(feedback):
     }
 
 
+'''
 def get_user_events(user):
     video_events = VideoUpload.objects.filter(user=user).all()
     gps_events = GpsCheckin.objects.filter(user=user).all()
@@ -76,15 +82,53 @@ def list_patients(request):
     # find users who have set this user as a monitor
     patients = UserMonitor.objects.filter(
         notify_email=request.user.email).all()
-
-    patients_info = [
-        get_user_events(patient.user)
-        for patient in patients
-    ]
+    for patient in patients:
+        patients_info = [
+            get_user_events(patient.user)
+            for patient in patients
+        ]
 
     return Response({
         'patients': patients_info
     }, 201)
+'''
+
+
+class UserMonitorView(generics.GenericAPIView):
+    queryset = UserMonitor.objects.all()
+    serializer_class = UserMonitorSerializer
+
+    @swagger_auto_schema(manual_parameters=[
+
+        openapi.Parameter('name', openapi.IN_QUERY, description="Search by name",
+                          type=openapi.TYPE_STRING,
+                          required=False, default=None),
+
+    ])
+    def get(self, request, *args, **kwargs):
+        name = self.request.GET.get("name")
+        if name:
+            user_monitor = UserMonitor.objects.filter(user__first_name__icontains=name).all()
+        else:
+            user_monitor = UserMonitor.objects.all()
+
+        #user_monitor = user_monitor.exclude("password")
+
+        paginated_response = self.paginate_queryset(user_monitor)
+        serialized = self.get_serializer(paginated_response, many=True)
+        return self.get_paginated_response(serialized.data)
+
+
+class UserMonitorViewDetails(generics.GenericAPIView):
+    queryset = UserMonitor.objects.all()
+    serializer_class = UserMonitorSerializer
+
+    def delete(self, request, *args, **kwargs):
+        if kwargs.get('id'):
+            user_monitor = UserMonitor.objects.get(id=kwargs.get('id'))
+            user_monitor.delete()
+            return response.Response("Data Deleted",status=status.HTTP_202_ACCEPTED)
+        return response.Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(['GET'])
