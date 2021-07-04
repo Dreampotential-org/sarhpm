@@ -99,7 +99,7 @@ class OrganizationMemberMonitor(models.Model):
 
 
 class UserProfileInfo(models.Model):
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=17, blank=True, null=True)
     name = models.CharField(max_length=17, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -119,9 +119,9 @@ class UserProfileInfo(models.Model):
     def __str__(self):
         return self.user.username
 
-    '''def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):
         if not self.id:
             self.user_hash = hashlib.sha1(
                 self.user.email.encode('utf-8')
             ).hexdigest()
-        super(UserProfileInfo, self).save(*args, **kwargs)'''
+        super(UserProfileInfo, self).save(*args, **kwargs)

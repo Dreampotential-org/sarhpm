@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'dappx',
     'api',
     'magic_link',
-    'drf_yasg',
 ]
 
 # CORS_ORIGIN_WHITELIST = ['v2-local.postmunk.me']
@@ -162,4 +161,3 @@ MAGIC_LINK = {
     "AUTHENTICATION_BACKEND": "django.contrib.auth.backends.ModelBackend",
     "SESSION_EXPIRY": 7 * 24 * 60 * 60
 }
-

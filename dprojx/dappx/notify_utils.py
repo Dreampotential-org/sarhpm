@@ -155,7 +155,8 @@ def notify_monitor_email(request, notify_email, monitor_user):
     email_utils.send_raw_email(
         to_email=request.data.get("notify_email"),
         reply_to=request.user.username,
-        subject='useIAM: %s added you as a monitor',
+        subject='useIAM: %s added you as a monitor'
+                % profile.name,
         message_text=message)
 
 

@@ -1,9 +1,7 @@
 import time
-from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordResetForm
 from rest_framework import viewsets, status
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -11,7 +9,7 @@ from rest_framework.authtoken.models import Token
 
 from api.serializers import (
     UserSerializer, UserProfileSerializer, GpsCheckinSerializer,
-    VideoUploadSerializer, OrganizationMemberSerializer
+    VideoUploadSerializer
 )
 from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload
 from dappx.models import UserMonitor, SubscriptionEvent
@@ -26,7 +24,7 @@ from dappx.notify_utils import notify_feedback
 from dappx import constants
 from dappx import utils
 from common import config
-from rest_framework import response
+
 from magic_link.models import MagicLink
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
@@ -109,7 +107,7 @@ def create_user(request):
         data['days_sober'] = '0'
 
     data['email'] = data['email'].lower()
-    user = User.objects.filter(email=data['email']).first()
+    user = User.objects.filter(username=data['email']).first()
 
     if user:
         return Response({'message': 'User already exists'})
@@ -126,40 +124,10 @@ def create_user(request):
     return Response(data)
 
 
-@api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-def get_organization_member(request):
-    orgs = OrganizationMember.objects.all()
-    resp = []
-    for org in orgs:
-        user = User.objects.filter(id=org.user_id).first()
-        resp.append({'id': org.id,
-                     'user_id': org.user_id,
-                     'Admin ': org.admin,
-                     'Email': user.email,
-                     'Name': user.first_name})
-
-    results = sorted(resp, key=lambda i: i['id'], reverse=True)
-    paginator = PageNumberPagination()
-    paginator.page_size = 10
-    page = paginator.paginate_queryset(results, request)
-    if page is not None:
-        return paginator.get_paginated_response(page)
-    return Response(results)
-
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_organization_member(request):
     data = {k: v for k, v in request.data.items()}
-
-    print(data)
-    if data['is_superuser'] == 'true':
-        value = True
-    else:
-        value = False
-
-    data.pop("is_superuser")
     if not data.get('email') or not data.get('password'):
         return Response({
             'message': 'Missing parameters. Email and password is required'
@@ -167,20 +135,19 @@ def add_organization_member(request):
 
     data['email'] = data['email'].lower()
     user = User.objects.filter(username=data['email']).first()
+
     if not user:
         _create_user(**data)
 
     user = User.objects.filter(username=data['email']).first()
     if user:
-        User.objects.filter(email=data['email']).update(is_staff=value, first_name=data['first_name'])
         org_member = OrganizationMember.objects.filter(user=user).first()
         if not org_member:
             org_member = OrganizationMember()
             org_member.user = user
-            org_member.admin = value
             org_member.save()
-        else:
-            return Response({'message': 'User is already a organization member'})
+
+        return Response({'message': 'User already exists'})
 
     data.pop('password')
     data['message'] = "User created"
@@ -188,203 +155,33 @@ def add_organization_member(request):
     return Response(data)
 
 
-@api_view(['PUT'])
+@api_view(['PUT', 'GET'])
 @permission_classes([IsAuthenticated])
-def edit_organization_member(request):
-    data = {k: v for k, v in request.data.items()}
-
-    print(data)
-    if data['is_superuser'] == 'true':
-        value = True
-    else:
-        value = False
-
-    data.pop("is_superuser")
-    if not data.get('email') or not data.get('password'):
-        return Response({
-            'message': 'Missing parameters. Email and password is required'
-        })
-
-    data['email'] = data['email'].lower()
-    try:
-        user = User.objects.filter(id=data['id']).first()
-
-        if user:
-            User.objects.filter(id=user.id).update(email=data['email'],
-                                                   username=data['email'],
-                                                   first_name=data['first_name'],
-                                                   is_staff=value,
-                                                   password=make_password(data['password']))
-
-        org_member = OrganizationMember.objects.filter(user=user).first()
-        if not org_member:
-            org_member = OrganizationMember()
-            org_member.user = user
-            org_member.admin = value
-            org_member.save()
-            return Response({'status': 'Member Added'}, 200)
-        if org_member:
-            OrganizationMember.objects.filter(user=user).update(admin=value)
-            return Response({'status': 'Member Updated'}, 200)
-    except:
-        return Response({'status': 'Not Found '}, 404)
-
-
-@api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
-def remove_organization_member(request, id):
-    user = User.objects.filter(id=id).first()
-    if user:
-        org_member = OrganizationMember.objects.filter(user_id=user.id).first()
-        if org_member:
-            org_member.delete()
-            return Response({'status': 'Deleted'}, 200)
-        else:
-            return Response({'status': 'Not  Found'}, 204)
-    else:
-        return Response({'status': 'Not  Found'}, 204)
-
-
-'''@api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-def search_organization_member(request):
-    org_member = OrganizationMember.objects.all()
-    resp = []
-    for org in org_member:
-        user = User.objects.filter(id=org.user_id).first()
-        resp.append({'id': org.id,
-                     'user_id': org.user_id,
-                     'Admin ': org.admin,
-                     'Email': user.email,
-                     'Name': user.first_name})
-
-    results = sorted(resp, key=lambda i: i['id'], reverse=True)
-    paginator = PageNumberPagination()
-    paginator.page_size = 10
-    page = paginator.paginate_queryset(results, request)
-    if page is not None:
-        return paginator.get_paginated_response(page)
-    return Response(results)
-'''
-
-
-@api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-def search_organization_member(request, name):
-    # name = request.data.get('name').lower()
-    print("name : ", name)
-    if name != 'all':
-        org_member = OrganizationMember.objects.filter(user__first_name__icontains=name).all()
-        resp = []
-        for org in org_member:
-            user = User.objects.filter(id=org.user_id).first()
-            resp.append({'id': org.id,
-                         'user_id': org.user_id,
-                         'Admin ': org.admin,
-                         'Email': user.email,
-                         'Name': user.first_name})
-
-        results = sorted(resp, key=lambda i: i['id'], reverse=True)
-        paginator = PageNumberPagination()
-        paginator.page_size = 10
-        page = paginator.paginate_queryset(results, request)
-        if page is not None:
-            return paginator.get_paginated_response(page)
-        return Response(results)
-    else:
-        org_member = OrganizationMember.objects.all()
-        resp = []
-        for org in org_member:
-            user = User.objects.filter(id=org.user_id).first()
-            resp.append({'id': org.id,
-                         'user_id': org.user_id,
-                         'Admin ': org.admin,
-                         'Email': user.email,
-                         'Name': user.first_name})
-
-        results = sorted(resp, key=lambda i: i['id'], reverse=True)
-        paginator = PageNumberPagination()
-        paginator.page_size = 10
-        page = paginator.paginate_queryset(results, request)
-        if page is not None:
-            return paginator.get_paginated_response(page)
-        return Response(results)
-
-
-@api_view(['PUT', 'POST'])
-# @permission_classes([IsAuthenticated])
 def add_monitor(request):
-    data = {k: v for k, v in request.data.items()}
-    print(data)
-    if not data.get('email') or not data.get('password') or not data.get('first_name'):
-        return Response({
-            'message': 'Missing parameters. Email and password is required'
-        })
-    data['email'] = data['email'].lower()
-    user = User.objects.filter(username=data['email']).first()
-    # user = User.objects.filter(username=request.user.email).first()
-    if not user:
-        _create_user(**data)
+    user = User.objects.filter(username=request.user.email).first()
+    notify_email = request.data.get('notify_email').lower()
 
-    user = User.objects.filter(username=data['email']).first()
-    if user:
-        user_monitor = UserMonitor.objects.filter(user=user).first()
-        if not user_monitor:
-            user_monitor = UserMonitor()
-            user_monitor.user = user
-            user_monitor.notify_email = data['email']
-            user_monitor.save()
-            notify_monitor(request, data['email'])
-            return Response({
-                'msg': '%s is added as a patient and notified',
-            }, 201)
-        else:
-            return Response({
-                'msg': '%s is already a monitor user for you',
-            }, 201)
-
-    '''notify_email = request.data.get('notify_email').lower()
-
-    check if notify_email is already set for user
+    # check if notify_email is already set for user
     have = UserMonitor.objects.filter(user=user,
                                       notify_email=notify_email).first()
     if have:
         return Response({
             'msg': '%s is already a monitor user for you',
-        }, 201)'''
+        }, 201)
+
+    user_monitor = UserMonitor()
+    user_monitor.user = user
+    user_monitor.notify_email = notify_email
+    user_monitor.save()
+
+    notify_monitor(request, notify_email)
+
+    return Response({
+        'response': 'okay',
+    }, 201)
 
 
 @api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def edit_monitor_member(request):
-    data = {k: v for k, v in request.data.items()}
-
-    print(data)
-    if not data.get('email') or not data.get('first_name'):
-        return Response({
-            'message': 'Missing parameters. Email and name is required'
-        })
-
-    data['email'] = data['email'].lower()
-    try:
-        try:
-            user = User.objects.filter(id=data['id']).update(email=data['email'],
-                                                             username=data['email'],
-                                                             first_name=data['first_name'])
-        except:
-            pass
-        try:
-            u = UserMonitor.objects.filter(user_id=user.id).first()
-            UserMonitor.objects.filter(id=u.id).update(notify_email=data['email'])
-        except:
-            pass
-
-        return response.Response(status=status.HTTP_200_OK)
-    except:
-        return response.Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-'''@api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def remove_monitor(request):
     user = User.objects.filter(username=request.user.email).first()
@@ -398,7 +195,6 @@ def remove_monitor(request):
     return Response({
         'status': 'okay',
     }, 201)
-'''
 
 
 # XXX rename to get_event_info
@@ -410,10 +206,7 @@ def get_video_info(request):
     resp_body = {}
 
     try:
-        try:
-            int(request.GET.get("id"))
-        except:
-            pass
+        int(request.GET.get("id"))
         # if we get here this is gps-checkin
         # test
         video = GpsCheckin.objects.filter(
@@ -427,10 +220,7 @@ def get_video_info(request):
         path = '/media/%s/%s' % (request.GET.get("user"),
                                  request.GET.get("id"))
         video = VideoUpload.objects.filter(videoUrl=path).first()
-        try:
-            resp_body['url'] = video.video_ref_link()
-        except:
-            pass
+        resp_body['url'] = video.video_ref_link()
 
     if not video:
         return Response({

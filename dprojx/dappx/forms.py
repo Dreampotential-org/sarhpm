@@ -13,10 +13,11 @@ class UserForm(forms.ModelForm):
 
     class Meta():
         model = User
-        fields = ('username', 'email', 'password', 'first_name')
+        fields = ('username', 'email', 'password',)
 
 
 class UserProfileInfoForm(forms.ModelForm):
+
     class Meta():
         model = UserProfileInfo
         notify_email = forms.EmailField(label='Notify Email')
