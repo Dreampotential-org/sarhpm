@@ -268,7 +268,7 @@ def _create_user(**data):
     print("data", data)
     user_form = UserForm(data)
     profile_data = {}
-    profile_data['name'] = data['first_name']
+    profile_data['name'] = data['name']
     profile_data['notify_email'] = data['email']
     profile_data['days_sober'] = '0'
     profile_form = UserProfileInfoForm(profile_data)
