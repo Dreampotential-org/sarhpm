@@ -7,7 +7,7 @@ boto3
 requests
 django-crispy-forms
 Pillow
-psycopg2-binary>=2.8
+psycopg2-binary==2.8.6
 gunicorn
 newrelic
 django-allauth
