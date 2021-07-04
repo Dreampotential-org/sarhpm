@@ -284,10 +284,6 @@ def _create_user(**data):
         profile.phone = data.get("phone", "")
         profile.days_sober = data.get("days_sober", 0)
         profile.sober_date = data.get("sober_date", 0)
-        if data['first_name']:
-            profile.name = data['first_name']
-        else:
-            profile.name = data.get("name", "")
         profile.notify_email = data.get("notify_email", "")
         profile.source = data.get("source", "")
         profile.save()
