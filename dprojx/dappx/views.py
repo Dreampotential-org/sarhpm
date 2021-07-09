@@ -258,17 +258,17 @@ def record_video(request):
 def _create_user(**data):
     data['email'] = data['email'].lower()
     data['username'] = data['email']
-    print("######Get####",data.get("notify_email", ""))
+    print("######Get####", data.get("notify_email", ""))
     request = data.get('request')
     monitor_user = None
     if data.get('notify_email'):
         monitor_user = User.objects.filter(
             username=data.get('notify_email').lower()
         ).first()
-
+    print("data", data)
     user_form = UserForm(data)
     profile_data = {}
-    profile_data['name'] = data['name']
+    profile_data['name'] = data['first_name']
     profile_data['notify_email'] = data['email']
     profile_data['days_sober'] = '0'
     profile_form = UserProfileInfoForm(profile_data)
@@ -279,12 +279,15 @@ def _create_user(**data):
         print("UERERERE %s" % user)
         user.set_password(user.password)
         user.save()
-        profile = profile_form.save(commit=False)
-        profile.user = user
+        profile = profile_form.save()
+        profile.user_id = user.id
         profile.phone = data.get("phone", "")
         profile.days_sober = data.get("days_sober", 0)
         profile.sober_date = data.get("sober_date", 0)
-        profile.name = data.get("name", "")
+        if data['first_name']:
+            profile.name = data['first_name']
+        else:
+            profile.name = data.get("name", "")
         profile.notify_email = data.get("notify_email", "")
         profile.source = data.get("source", "")
         profile.save()
@@ -319,6 +322,7 @@ def _create_user(**data):
 
     elif (user_form.errors):
         return 'error'
+
 
 
 def index(request):
