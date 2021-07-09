@@ -5,24 +5,24 @@ from rest_framework.authtoken.views import obtain_auth_token
 from api import views
 from api import views_admin
 from api import views_stripe
+from api import views_orgs
 
 app_name = 'api'
 
 router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
-router.register(r'user-profiles', views.UserProfileViewSet)
-router.register(r'gps-checkin', views.GpsCheckinViewSet)
-router.register(r'video', views.VideoUploadViewSet)
+# router.register(r'users', views.UserViewSet)
+# router.register(r'user-profiles', views.UserProfileViewSet)
+# router.register(r'gps-checkin', views.GpsCheckinViewSet)
+# router.register(r'video', views.VideoUploadViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
     path('create-user/', views.create_user, name='create_user'),
-    path('add_organization_member/',
-          views.add_organization_member, name='add_organization_member'),
     path('pay/', views_stripe.pay, name='pay'),
     path('cancel-plan/', views_stripe.cancel_plan, name='cancel_plan'),
-    path('cancel-plan-braintree/', views_stripe.cancel_plan_braintree, name='cancel_plan_braintree'),
+    path('cancel-plan-braintree/', views_stripe.cancel_plan_braintree,
+          name='cancel_plan_braintree'),
     path('video-upload/', views.video_upload, name='video_upload'),
     path('profile/', views.profile, name='profile'),
     path('forgot-password/', views.forgot_password, name='forgot_password'),
@@ -42,6 +42,13 @@ urlpatterns = [
          name='list_patient_events_v2'),
     path(r'send-magic-link/', views.send_magic_link),
     path(r'auth-magic-link/', views.auth_magic_link),
+
+    path('get_organization_member/',
+          views_orgs.get_organization_member, name='get_organization_member'),
+    path('add_organization_member/',
+          views_orgs.add_organization_member, name='add_organization_member'),
+
+
 
     # path('list-events/', views.list_events, name='list_events'),
 ]
