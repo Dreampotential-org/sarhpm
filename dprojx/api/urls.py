@@ -42,6 +42,15 @@ urlpatterns = [
          name='list_patient_events_v2'),
     path(r'send-magic-link/', views.send_magic_link),
     path(r'auth-magic-link/', views.auth_magic_link),
+    #new api
+    path('get_organization_member/',
+          views.get_organization_member, name='get_organization_member'),
+
+    path('remove_organization_member/<int:id>',views.remove_organization_member, name='remove_organization_member'),
+    path('search_organization_member/<str:name>',
+         views.search_organization_member, name='search_organization_member'),
+    path('edit_organization_member/',
+         views.edit_organization_member, name='edit_organization_member'),
 
     # path('list-events/', views.list_events, name='list_events'),
 ]
