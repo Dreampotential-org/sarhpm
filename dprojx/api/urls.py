@@ -18,12 +18,16 @@ urlpatterns = [
     path('', include(router.urls)),
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
     path('create-user/', views.create_user, name='create_user'),
+    path('add_organization_member/',
+          views.add_organization_member, name='add_organization_member'),
     path('pay/', views_stripe.pay, name='pay'),
     path('cancel-plan/', views_stripe.cancel_plan, name='cancel_plan'),
     path('cancel-plan-braintree/', views_stripe.cancel_plan_braintree, name='cancel_plan_braintree'),
     path('video-upload/', views.video_upload, name='video_upload'),
     path('profile/', views.profile, name='profile'),
     path('forgot-password/', views.forgot_password, name='forgot_password'),
+
+    path('add-monitor/', views.add_monitor, name='add_monitor'),
     path('remove-monitor/', views.remove_monitor, name='remove_monitor'),
     path('review-video/', views.review_video, name='review_video'),
     path('get-activity/', views.get_activity, name='get_activity'),
@@ -39,22 +43,14 @@ urlpatterns = [
     path(r'send-magic-link/', views.send_magic_link),
     path(r'auth-magic-link/', views.auth_magic_link),
     #new api
-    path('add_organization_member/',
-          views.add_organization_member, name='add_organization_member'),
     path('get_organization_member/',
           views.get_organization_member, name='get_organization_member'),
+
     path('remove_organization_member/<int:id>',views.remove_organization_member, name='remove_organization_member'),
     path('search_organization_member/<str:name>',
          views.search_organization_member, name='search_organization_member'),
     path('edit_organization_member/',
          views.edit_organization_member, name='edit_organization_member'),
-
-    path('add-monitor/', views.add_monitor, name='add_monitor'),
-    path('edit_monitor_member/',
-         views.edit_monitor_member, name='edit_monitor_member'),
-
-    path('list-patients-v3/', views_admin.UserMonitorView.as_view(), name='list_patients'),
-    path('list-patients-v3/<int:id>', views_admin.UserMonitorViewDetails.as_view(), name='list_patients'),
 
     # path('list-events/', views.list_events, name='list_events'),
 ]

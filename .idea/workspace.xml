@@ -6,8 +6,8 @@
       <change beforePath="$PROJECT_DIR$/dprojx/api/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/dprojx/api/serializers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dprojx/api/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/dprojx/api/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dprojx/api/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/dprojx/api/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dprojx/api/views_admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/dprojx/api/views_admin.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dprojx/dappx/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/dprojx/dappx/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dprojx/dappx/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/dprojx/dappx/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
