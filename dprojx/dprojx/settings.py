@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'dappx',
     'api',
     'magic_link',
+    'drf_yasg',
 ]
 
 # CORS_ORIGIN_WHITELIST = ['v2-local.postmunk.me']

@@ -305,7 +305,7 @@ def send_feedback(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+#@permission_classes([IsAuthenticated])
 def list_organizations(request):
     orgs = Organization.objects.all()
     resp = []
