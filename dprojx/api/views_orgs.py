@@ -69,3 +69,15 @@ def get_organization_member(request):
     return Response(results)
 
 
+# XXX api list clients in org
+# UserProfileInfo.user_org
+
+# XXX api map client to OrganizationMemberMonitor(s)
+# API for adding
+# API for Removing
+
+
+# XXX API for creating Organization
+# XXX api for setting logo image file
+
+# mapping apis to page here - https://m.useiam.com/organization.html
