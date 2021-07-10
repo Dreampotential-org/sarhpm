@@ -10,10 +10,10 @@ from api import views_orgs
 app_name = 'api'
 
 router = routers.DefaultRouter()
-# router.register(r'users', views.UserViewSet)
-# router.register(r'user-profiles', views.UserProfileViewSet)
-# router.register(r'gps-checkin', views.GpsCheckinViewSet)
-# router.register(r'video', views.VideoUploadViewSet)
+router.register(r'users', views.UserViewSet)
+router.register(r'user-profiles', views.UserProfileViewSet)
+router.register(r'gps-checkin', views.GpsCheckinViewSet)
+router.register(r'video', views.VideoUploadViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
