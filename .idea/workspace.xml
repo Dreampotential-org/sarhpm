@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a4912a40-a651-4530-ae4a-21b4de2a4515" name="Default Changelist" comment="a">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dprojx/api/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/dprojx/api/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dprojx/api/view_org.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dprojx/api/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/dprojx/api/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dprojx/api/views_orgs.py" beforeDir="false" afterPath="$PROJECT_DIR$/dprojx/api/views_orgs.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,5 +74,16 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="a" />
     <option name="LAST_COMMIT_MESSAGE" value="a" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/dprojx/api/urls.py</url>
+          <line>45</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
