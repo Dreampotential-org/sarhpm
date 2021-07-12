@@ -22,7 +22,7 @@ urlpatterns = [
     path('pay/', views_stripe.pay, name='pay'),
     path('cancel-plan/', views_stripe.cancel_plan, name='cancel_plan'),
     path('cancel-plan-braintree/', views_stripe.cancel_plan_braintree,
-          name='cancel_plan_braintree'),
+         name='cancel_plan_braintree'),
     path('video-upload/', views.video_upload, name='video_upload'),
     path('profile/', views.profile, name='profile'),
     path('forgot-password/', views.forgot_password, name='forgot_password'),
@@ -43,12 +43,19 @@ urlpatterns = [
     path(r'send-magic-link/', views.send_magic_link),
     path(r'auth-magic-link/', views.auth_magic_link),
 
-    path('get_organization_member/',
-          views_orgs.get_organization_member, name='get_organization_member'),
     path('add_organization_member/',
-          views_orgs.add_organization_member, name='add_organization_member'),
+         views.add_organization_member, name='add_organization_member'),
 
+    path(r'add_member/', views_orgs.add_member),
+    path('get_member/', views_orgs.get_member, name='get_member'),
+    path('remove_member/<int:id>', views_orgs.remove_member, name='remove_member'),
+    path('search_member/<str:name>', views_orgs.search_member, name='search_member'),
+    path('edit_member/', views_orgs.edit_member, name='edit_member'),
 
+    path(r'add_patient/', views_orgs.add_patient, name='add_patient'),
+    path('edit_patient/', views_orgs.edit_patient, name='edit_patient'),
+    path('list-patients-v3/', views_orgs.UserMonitorView.as_view(), name='list_patients'),
+    path('list-patients-v3/<int:id>', views_orgs.UserMonitorViewDetails.as_view(), name='list_patients'),
 
     # path('list-events/', views.list_events, name='list_events'),
 ]

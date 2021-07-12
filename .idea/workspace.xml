@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="132ad5ae-9929-4247-9aaa-5df8bd0f8a6c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/dprojx/api/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/dprojx/api/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dprojx/dprojx/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/dprojx/dprojx/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dprojx/dprojx/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/dprojx/dprojx/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dprojx/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/dprojx/requirements.txt" afterDir="false" />
+    <list default="true" id="a4912a40-a651-4530-ae4a-21b4de2a4515" name="Default Changelist" comment="a">
+      <change beforePath="$PROJECT_DIR$/dprojx/api/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/dprojx/api/urls.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,6 +37,14 @@
       <option name="presentableId" value="Default" />
       <updated>1625814462548</updated>
     </task>
+    <task id="LOCAL-00001" summary="a">
+      <created>1626083759260</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1626083759260</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -65,5 +70,20 @@
       </map>
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="a" />
+    <option name="LAST_COMMIT_MESSAGE" value="a" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/dprojx/api/urls.py</url>
+          <line>45</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
