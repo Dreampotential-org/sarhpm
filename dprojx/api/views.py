@@ -155,6 +155,7 @@ def add_organization_member(request):
     return Response(data)
 
 
+
 @api_view(['PUT', 'GET'])
 @permission_classes([IsAuthenticated])
 def add_monitor(request):
@@ -470,7 +471,6 @@ def profile(request):
         users = UserMonitor.objects.filter(user=user).all()
         monitors = [u.notify_email for u in users]
     # Check to see to see if monitor_user is on platform
-
 
     print(profile.user_org)
     if profile.user_org:
