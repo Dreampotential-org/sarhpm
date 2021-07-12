@@ -305,7 +305,6 @@ def send_feedback(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def list_organizations(request):
     orgs = Organization.objects.all()
     resp = []
@@ -319,13 +318,16 @@ def list_organizations(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def set_org(request):
-    print("HERE")
     profile = UserProfileInfo.objects.filter(
         user__username=request.user.email
     ).first()
 
-    org = Organization.objects.get(id=request.data.get("org_id"))
-    profile.user_org = org
+    # lets the user clear org
+    if (request.data.get("org_id") == 'NaN'):
+        profile.user_org = None
+    else:
+        org = Organization.objects.get(id=request.data.get("org_id"))
+        profile.user_org = org
     profile.save()
 
     return Response({'status': 'okay'})
@@ -469,7 +471,19 @@ def profile(request):
         monitors = [u.notify_email for u in users]
     # Check to see to see if monitor_user is on platform
 
+
+    print(profile.user_org)
+    if profile.user_org:
+        org = {
+            'name': profile.user_org.name,
+            'logo': profile.user_org.logo,
+        }
+    else:
+        org = {
+        }
+
     return Response({
+        'user_org': org,
         'days_sober': utils.calc_days_sober(profile),
         'sober_date': profile.sober_date,
         'notify_email': profile.notify_email,

@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="132ad5ae-9929-4247-9aaa-5df8bd0f8a6c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dprojx/api/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/dprojx/api/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dprojx/dprojx/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/dprojx/dprojx/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dprojx/dprojx/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/dprojx/dprojx/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dprojx/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/dprojx/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -12,7 +15,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="numan" />
+        <entry key="$PROJECT_DIR$" value="prod_api" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
