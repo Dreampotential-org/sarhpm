@@ -12,6 +12,7 @@ from api.serializers import (
     UserSerializer, UserProfileSerializer, GpsCheckinSerializer,
     VideoUploadSerializer
 )
+from rest_framework import response, status
 from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload
 from dappx.models import UserMonitor, SubscriptionEvent
 from dappx.models import OrganizationMember
@@ -45,14 +46,18 @@ def add_member(request):
     name = request.data['name']
     password = request.data['password']
     admin = request.data['admin']
-    organization = request.data['organization']
+    try:
+        organization = request.data['organization']
+    except:
+        organization = None
+
     '''email = 'unitednuman@hotmail.com'
     name = 'numan'
     password = 'pass@123'
     admin = 'true'
     organization = 2'''
     email = email.lower()
-    if email is None or name is None or password is None or admin is None or organization is None:
+    if email is None or name is None or password is None or admin is None:
         data = {
             'status': False,
             'error': 'Missing parameters'
@@ -84,7 +89,7 @@ def add_member(request):
             org_member = OrganizationMember()
             org_member.user = user
             org_member.admin = value
-            org_member.organization = organization
+            org_member.organization_id = organization
             org_member.save()
         else:
             return Response({'message': 'User is already a organization member'})
@@ -137,6 +142,7 @@ def edit_member(request):
         user = User.objects.filter(id=data['id']).first()
         if user:
             if not data.get('password'):
+
                 User.objects.filter(id=user.id).update(email=data['email'],
                                                        username=data['email'],
                                                        first_name=data['first_name'],
