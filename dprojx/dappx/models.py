@@ -92,7 +92,7 @@ class Organization(models.Model):
 class OrganizationMember(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
     admin = models.BooleanField(default=False, db_index=True)
-    organization = models.ForeignKey(to=Organization,on_delete=models.CASCADE, default="")
+    organization = models.ForeignKey(to=Organization, on_delete=models.CASCADE, null=True, blank=True)
 
 
 class OrganizationMemberMonitor(models.Model):

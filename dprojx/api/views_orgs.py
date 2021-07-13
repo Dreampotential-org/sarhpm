@@ -46,19 +46,18 @@ def add_member(request):
     name = request.data['name']
     password = request.data['password']
     admin = request.data['admin']
-    organization = request.data['organization']
-    print(email)
-    print(name)
-    print(password)
-    print(admin)
-    print(organization)
+    try:
+        organization = request.data['organization']
+    except:
+        organization = None
+
     '''email = 'unitednuman@hotmail.com'
     name = 'numan'
     password = 'pass@123'
     admin = 'true'
     organization = 2'''
     email = email.lower()
-    if email is None or name is None or password is None or admin is None or organization is None:
+    if email is None or name is None or password is None or admin is None:
         data = {
             'status': False,
             'error': 'Missing parameters'
@@ -143,6 +142,7 @@ def edit_member(request):
         user = User.objects.filter(id=data['id']).first()
         if user:
             if not data.get('password'):
+
                 User.objects.filter(id=user.id).update(email=data['email'],
                                                        username=data['email'],
                                                        first_name=data['first_name'],
