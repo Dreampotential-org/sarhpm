@@ -94,7 +94,7 @@ class CustomOrganization(admin.ModelAdmin):
 
 class CustomOrganizationMember(admin.ModelAdmin):
     list_display = [
-        'user',
+        'user', 'organization'
     ]
     ordering = ('-id',)
 
