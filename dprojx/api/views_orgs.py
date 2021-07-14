@@ -4,15 +4,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
-from api.serializers import (
-    UserSerializer, UserProfileSerializer, GpsCheckinSerializer,
-    VideoUploadSerializer
-)
 from rest_framework import response, status
-from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload
-from dappx.models import UserMonitor, SubscriptionEvent
+from dappx.models import UserProfileInfo
+from dappx.models import UserMonitor
 from dappx.models import OrganizationMember
-from dappx.models import MonitorFeedback
 from dappx.models import Organization
 from dappx.views import _create_user
 from dappx.models import UserProfileInfo
@@ -94,18 +89,29 @@ def add_member(request):
 
 
 @api_view(['GET'])
-#@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def get_member(request):
-    orgs = OrganizationMember.objects.all()
+    print(request.user.email)
+    user = User.objects.filter(username=request.user.email).first()
+    # user is a member of
+    organization_member = OrganizationMember.objects.filter(user=user).first()
+    if not organization_member:
+        return Response([])
+
     resp = []
-    for org in orgs:
-        user = User.objects.filter(id=org.user_id).first()
-        resp.append({'id': org.id,
-                     'user_id': org.user_id,
-                     'Admin ': org.admin,
-                     'Email': user.email,
-                     'Name': user.first_name,
-                     'Organization_Name': org.organization_id})
+
+    # get members of organization_member
+    organization_members = OrganizationMember.objects.filter(
+        organization=organization_member.organization
+    )
+    print(organization_members)
+    for organization_member in organization_members:
+        resp.append({'id': organization_member.organization.id,
+                     'user_id': organization_member.user_id,
+                     'Admin ': organization_member.admin,
+                     'Email': organization_member.user.email,
+                     'Name': organization_member.user.first_name,
+                     'Organization_Name': organization_member.organization.id})
 
     results = sorted(resp, key=lambda i: i['id'], reverse=True)
     paginator = PageNumberPagination()
@@ -184,6 +190,7 @@ def remove_member(request, id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def search_member(request, name):
+    print("HERE")
     # name = request.data.get('name').lower()
     # look up user
     user = User.objects.filter(username=request.user.email).first()
