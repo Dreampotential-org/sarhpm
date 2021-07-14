@@ -1,12 +1,8 @@
-import time
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import PasswordResetForm
-from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
 from rest_framework.pagination import PageNumberPagination
 from api.serializers import (
     UserSerializer, UserProfileSerializer, GpsCheckinSerializer,
@@ -189,9 +185,16 @@ def remove_member(request, id):
 @permission_classes([IsAuthenticated])
 def search_member(request, name):
     # name = request.data.get('name').lower()
+    # look up user
+    user = User.objects.filter(username=request.user.email).first()
+    org = OrganizationMember.objects.filter(user=user).first()
+
     print("name : ", name)
     if name != 'all':
-        org_member = OrganizationMember.objects.filter(user__first_name__icontains=name).all()
+        org_member = OrganizationMember.objects.filter(
+            organization=org.organization,
+            user__first_name__icontains=name
+        ).all()
         resp = []
         for org in org_member:
             user = User.objects.filter(id=org.user_id).first()
@@ -209,7 +212,9 @@ def search_member(request, name):
             return paginator.get_paginated_response(page)
         return Response(results)
     else:
-        org_member = OrganizationMember.objects.all()
+        org_member = OrganizationMember.objects.filter(
+            organization=org.organization,
+        ).all()
         resp = []
         for org in org_member:
             user = User.objects.filter(id=org.user_id).first()
