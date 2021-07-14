@@ -7,7 +7,7 @@ from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload, UserMonitor
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password','first_name']
+        fields = ['id', 'username', 'email', 'password', 'first_name']
 
 
 class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
@@ -55,28 +55,24 @@ class UserMonitorSerializer(serializers.ModelSerializer):
             for item in gps:
 
                 if item.user_id == instance.user_id:
-                    logitude = item.lng
-                    latitude = item.lat
-                    msg = item.msg
                     Dict["GPS_Location " + str(num)] = {
                         "type": "gps",
-                        "long": logitude,
-                        "latitude": latitude,
-                        "message": msg}
+                        "long": item.lng,
+                        "latitude": item.lat,
+                        "message": item.msg}
                 num = num + 1
-            data.update(Dict)
+            gps = {"gps": Dict}
+            data.update(gps)
         if video is not None:
             Dict = {}
             num = 0
             for item in video:
 
                 if item.user_id == instance.user_id:
-                    videoUrl = item.videoUrl
-                    created_at = item.created_at
-                    id = item.id
                     Dict['video ' + str(num)] = {"type": "video",
-                                                 "created_date": created_at,
-                                                 "video_url": videoUrl}
+                                                 "created_date": item.created_at,
+                                                 "video_url": item.videoUrl}
                 num = num + 1
-            data.update(Dict)
+            video = {"video": Dict}
+            data.update(video)
         return data

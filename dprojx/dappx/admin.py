@@ -96,6 +96,8 @@ class CustomOrganizationMember(admin.ModelAdmin):
     list_display = [
         'user',
     ]
+    list_per_page = 10
+    list_max_show_all = 20
     ordering = ('-id',)
 
 
