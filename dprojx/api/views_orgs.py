@@ -32,34 +32,34 @@ from rest_framework import generics, status, pagination
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def add_member(request):
     email = request.data['email']
     name = request.data['name']
     password = request.data['password']
     admin = request.data['admin']
-    try:
-        organization = request.data['organization']
-    except:
-        organization = None
 
-    '''email = 'unitednuman@hotmail.com'
-    name = 'numan'
-    password = 'pass@123'
-    admin = 'true'
-    organization = 2'''
+    user = User.objects.filter(username=request.user.email).first()
+    organization_member = OrganizationMember.objects.filter(user=user).first()
+    if not organization_member:
+        print("Member not in org")
+        return Response("Member not in org yet",
+                        status=status.HTTP_201_CREATED)
+
     email = email.lower()
     if email is None or name is None or password is None or admin is None:
         data = {
             'status': False,
             'error': 'Missing parameters'
         }
+        print("missing param")
         return Response(data, status=status.HTTP_400_BAD_REQUEST)
     if admin == 'true':
         value = True
     else:
         value = False
-    user = User.objects.filter(email=email).first()
 
+    user = User.objects.filter(email=email).first()
     if not user:
         user = User.objects.create(
             username=email,
@@ -72,17 +72,20 @@ def add_member(request):
             user=user,
             name=name
         )
+
     user = User.objects.filter(username=email).first()
     if user:
-        User.objects.filter(email=email).update(is_staff=value, first_name=name)
         org_member = OrganizationMember.objects.filter(user=user).first()
         if not org_member:
+            print("adding to org")
+            # add to org
             org_member = OrganizationMember()
             org_member.user = user
             org_member.admin = value
-            org_member.organization_id = organization
+            org_member.organization = organization_member.organization
             org_member.save()
         else:
+            print("already in org")
             return Response({'message': 'User is already a organization member'})
 
     return Response("Member Added", status=status.HTTP_201_CREATED)
