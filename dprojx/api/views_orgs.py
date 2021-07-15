@@ -4,6 +4,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
+from api.serializers import (
+    UserSerializer, UserProfileSerializer, GpsCheckinSerializer,
+    VideoUploadSerializer, OrganizationMemberSerializer
+)
 from rest_framework import response, status
 from dappx.models import UserProfileInfo
 from dappx.models import UserMonitor
@@ -31,6 +35,27 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, status, pagination
 
 
+class OrganizationMemberView(generics.GenericAPIView):
+    queryset = OrganizationMember.objects.all()
+    serializer_class = OrganizationMemberSerializer
+
+    @swagger_auto_schema(manual_parameters=[
+
+        openapi.Parameter('search', openapi.IN_QUERY, description="Search by name",
+                          type=openapi.TYPE_STRING,
+                          required=False, default=None),
+
+    ])
+    def get(self, request, *args, **kwargs):
+        search = self.request.GET.get("search")
+        if search:
+            org_member = OrganizationMember.objects.filter(user__first_name__icontains=search).all()
+        else:
+            org_member = OrganizationMember.objects.all()
+
+        paginated_response = self.paginate_queryset(org_member)
+        serialized = self.get_serializer(paginated_response, many=True)
+        return self.get_paginated_response(serialized.data)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def list_org_clients(request):
@@ -107,9 +132,8 @@ def add_member(request):
     return Response("Member Added", status=status.HTTP_201_CREATED)
 
 
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
+'''@api_view(['GET'])
+# @permission_classes([IsAuthenticated])
 def get_member(request):
     print(request.user.email)
     user = User.objects.filter(username=request.user.email).first()
@@ -140,6 +164,7 @@ def get_member(request):
     if page is not None:
         return paginator.get_paginated_response(page)
     return Response(results)
+'''
 
 
 @api_view(['PUT'])
@@ -207,7 +232,7 @@ def remove_member(request, id):
         return Response({'status': 'Not  Found'}, 204)
 
 
-@api_view(['GET'])
+'''@api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def search_member(request, name):
     print("HERE")
@@ -258,7 +283,7 @@ def search_member(request, name):
         if page is not None:
             return paginator.get_paginated_response(page)
         return Response(results)
-
+'''
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -358,15 +383,15 @@ class UserMonitorView(generics.GenericAPIView):
 
     @swagger_auto_schema(manual_parameters=[
 
-        openapi.Parameter('name', openapi.IN_QUERY, description="Search by name",
+        openapi.Parameter('search', openapi.IN_QUERY, description="Search by name",
                           type=openapi.TYPE_STRING,
                           required=False, default=None),
 
     ])
     def get(self, request, *args, **kwargs):
-        name = self.request.GET.get("name")
-        if name:
-            user_monitor = UserMonitor.objects.filter(user__first_name__icontains=name).all()
+        search = self.request.GET.get("search")
+        if search:
+            user_monitor = UserMonitor.objects.filter(user__first_name__icontains=search).all()
         else:
             user_monitor = UserMonitor.objects.all()
 

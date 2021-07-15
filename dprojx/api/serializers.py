@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload, UserMonitor
+from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload, UserMonitor, OrganizationMember, Organization
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -41,7 +41,8 @@ class UserMonitorSerializer(serializers.ModelSerializer):
 
     def get_detailed_data(self, instance):
         return {
-            'User': UserSerializer(instance.user).data
+            'User': UserSerializer(instance.user).data,
+            #'GPS': GpsCheckinSerializer(instance.gps_user.all(), many=True).data
         }
 
     def to_representation(self, instance):
@@ -76,3 +77,26 @@ class UserMonitorSerializer(serializers.ModelSerializer):
             video = {"video": Dict}
             data.update(video)
         return data
+
+
+class OrganizationMemberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrganizationMember
+        fields = '__all__'
+
+    def get_detailed_data(self, instance):
+        return {
+            'User': UserSerializer(instance.user).data,
+            'Organization': OrganizationSerializer(instance.organization).data
+        }
+
+    def to_representation(self, instance):
+        data = super(OrganizationMemberSerializer, self).to_representation(instance)
+        data.update(self.get_detailed_data(instance))
+        return data
+
+
+class OrganizationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Organization
+        fields = '__all__'
