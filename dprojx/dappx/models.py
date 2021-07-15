@@ -97,7 +97,9 @@ class OrganizationMember(models.Model):
 
 
 class OrganizationMemberMonitor(models.Model):
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
+    organization_member = models.ForeignKey(
+        to=OrganizationMember,
+        on_delete=models.CASCADE, default="")
     organization = models.ForeignKey(to=Organization,
                                      on_delete=models.CASCADE,
                                      blank=True, null=True)

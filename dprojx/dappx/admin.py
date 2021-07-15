@@ -103,7 +103,7 @@ class CustomOrganizationMember(admin.ModelAdmin):
 
 class CustomOrganizationMemberMonitor(admin.ModelAdmin):
     list_display = [
-        'user',
+        'organization_member', 'organization'
     ]
     ordering = ('-id',)
 
