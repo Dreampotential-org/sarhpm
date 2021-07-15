@@ -54,11 +54,16 @@ urlpatterns = [
 
     path(r'add_patient/', views_orgs.add_patient, name='add_patient'),
     path('edit_patient/', views_orgs.edit_patient, name='edit_patient'),
-    path('list-patients-v3/', views_orgs.UserMonitorView.as_view(), name='list_patients'),
-    path('list-patients-v3/<int:id>', views_orgs.UserMonitorViewDetails.as_view(), name='list_patients'),
+    path('list-patients-v3/', views_orgs.UserMonitorView.as_view(),
+         name='list_patients'),
+    path('list-patients-v3/<int:id>',
+         views_orgs.UserMonitorViewDetails.as_view(), name='list_patients'),
 
     # path('list-member-client/', views_orgs.list_member_clients,
     #     name='list_member_clients'),
+
+    path('list-org-client/', views_orgs.list_org_clients,
+         name='list_org_clients'),
 
     # path('add-member-clients/', views_orgs.add_member_clients,
     #     name='list_member_client'),

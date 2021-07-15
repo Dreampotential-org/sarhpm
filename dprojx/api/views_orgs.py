@@ -31,6 +31,22 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, status, pagination
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_org_clients(request):
+    user = User.objects.filter(username=request.user.email).first()
+    organization_member = OrganizationMember.objects.filter(user=user).first()
+    if not organization_member:
+        return Response("Member not in org",
+                        status=status.HTTP_201_CREATED)
+
+    clients = UserProfileInfo.objects.filter(
+        user_org=organization_member.organization).values()
+
+
+    return Response(clients)
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_member(request):
@@ -371,3 +387,7 @@ class UserMonitorViewDetails(generics.GenericAPIView):
             user_monitor.delete()
             return response.Response("Data Deleted", status=status.HTTP_202_ACCEPTED)
         return response.Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+
+
