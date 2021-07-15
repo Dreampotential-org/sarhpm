@@ -47,9 +47,10 @@ urlpatterns = [
          views.add_organization_member, name='add_organization_member'),
 
     path(r'add_member/', views_orgs.add_member),
-    path('get_member/', views_orgs.get_member, name='get_member'),
+    #path('get_member/', views_orgs.get_member, name='get_member'),
+    path('get_member/', views_orgs.OrganizationMemberView.as_view(), name='get_member'),
     path('remove_member/<int:id>', views_orgs.remove_member, name='remove_member'),
-    path('search_member/<str:name>', views_orgs.search_member, name='search_member'),
+    #path('search_member/<str:name>', views_orgs.search_member, name='search_member'),
     path('edit_member/', views_orgs.edit_member, name='edit_member'),
 
     path(r'add_patient/', views_orgs.add_patient, name='add_patient'),
