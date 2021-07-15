@@ -57,5 +57,16 @@ urlpatterns = [
     path('list-patients-v3/', views_orgs.UserMonitorView.as_view(), name='list_patients'),
     path('list-patients-v3/<int:id>', views_orgs.UserMonitorViewDetails.as_view(), name='list_patients'),
 
+    # path('list-member-client/', views_orgs.list_member_clients,
+    #     name='list_member_clients'),
+
+    # path('add-member-clients/', views_orgs.add_member_clients,
+    #     name='list_member_clients'),
+
+    # path('remove-member-clients/', views_orgs.remove_member_clients,
+    #     name='list_member_clients'),
+
+
+
     # path('list-events/', views.list_events, name='list_events'),
 ]

@@ -91,6 +91,7 @@ def add_member(request):
     return Response("Member Added", status=status.HTTP_201_CREATED)
 
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_member(request):
