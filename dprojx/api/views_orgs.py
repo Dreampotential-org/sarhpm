@@ -1,22 +1,17 @@
-import time
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import PasswordResetForm
-from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
 from rest_framework.pagination import PageNumberPagination
 from api.serializers import (
     UserSerializer, UserProfileSerializer, GpsCheckinSerializer,
     VideoUploadSerializer, OrganizationMemberSerializer
 )
 from rest_framework import response, status
-from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload
-from dappx.models import UserMonitor, SubscriptionEvent
+from dappx.models import UserProfileInfo
+from dappx.models import UserMonitor
 from dappx.models import OrganizationMember
-from dappx.models import MonitorFeedback
 from dappx.models import Organization
 from dappx.views import _create_user
 from dappx.models import UserProfileInfo
@@ -61,37 +56,51 @@ class OrganizationMemberView(generics.GenericAPIView):
         paginated_response = self.paginate_queryset(org_member)
         serialized = self.get_serializer(paginated_response, many=True)
         return self.get_paginated_response(serialized.data)
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_org_clients(request):
+    user = User.objects.filter(username=request.user.email).first()
+    organization_member = OrganizationMember.objects.filter(user=user).first()
+    if not organization_member:
+        return Response("Member not in org",
+                        status=status.HTTP_201_CREATED)
+
+    clients = UserProfileInfo.objects.filter(
+        user_org=organization_member.organization).values()
+
+
+    return Response(clients)
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def add_member(request):
     email = request.data['email']
     name = request.data['name']
     password = request.data['password']
     admin = request.data['admin']
-    try:
-        organization = request.data['organization']
-    except:
-        organization = None
 
-    '''email = 'unitednuman@hotmail.com'
-    name = 'numan'
-    password = 'pass@123'
-    admin = 'true'
-    organization = 2'''
+    user = User.objects.filter(username=request.user.email).first()
+    organization_member = OrganizationMember.objects.filter(user=user).first()
+    if not organization_member:
+        print("Member not in org")
+        return Response("Member not in org yet",
+                        status=status.HTTP_201_CREATED)
+
     email = email.lower()
     if email is None or name is None or password is None or admin is None:
         data = {
             'status': False,
             'error': 'Missing parameters'
         }
+        print("missing param")
         return Response(data, status=status.HTTP_400_BAD_REQUEST)
     if admin == 'true':
         value = True
     else:
         value = False
-    user = User.objects.filter(email=email).first()
 
+    user = User.objects.filter(email=email).first()
     if not user:
         user = User.objects.create(
             username=email,
@@ -104,17 +113,20 @@ def add_member(request):
             user=user,
             name=name
         )
+
     user = User.objects.filter(username=email).first()
     if user:
-        User.objects.filter(email=email).update(is_staff=value, first_name=name)
         org_member = OrganizationMember.objects.filter(user=user).first()
         if not org_member:
+            print("adding to org")
+            # add to org
             org_member = OrganizationMember()
             org_member.user = user
             org_member.admin = value
-            org_member.organization_id = organization
+            org_member.organization = organization_member.organization
             org_member.save()
         else:
+            print("already in org")
             return Response({'message': 'User is already a organization member'})
 
     return Response("Member Added", status=status.HTTP_201_CREATED)
@@ -123,16 +135,27 @@ def add_member(request):
 '''@api_view(['GET'])
 # @permission_classes([IsAuthenticated])
 def get_member(request):
-    orgs = OrganizationMember.objects.all()
+    print(request.user.email)
+    user = User.objects.filter(username=request.user.email).first()
+    # user is a member of
+    organization_member = OrganizationMember.objects.filter(user=user).first()
+    if not organization_member:
+        return Response([])
+
     resp = []
-    for org in orgs:
-        user = User.objects.filter(id=org.user_id).first()
-        resp.append({'id': org.id,
-                     'user_id': org.user_id,
-                     'Admin ': org.admin,
-                     'Email': user.email,
-                     'Name': user.first_name,
-                     'Organization_Name': org.organization_id})
+
+    # get members of organization_member
+    organization_members = OrganizationMember.objects.filter(
+        organization=organization_member.organization
+    )
+    print(organization_members)
+    for organization_member in organization_members:
+        resp.append({'id': organization_member.organization.id,
+                     'user_id': organization_member.user_id,
+                     'Admin ': organization_member.admin,
+                     'Email': organization_member.user.email,
+                     'Name': organization_member.user.first_name,
+                     'Organization_Name': organization_member.organization.id})
 
     results = sorted(resp, key=lambda i: i['id'], reverse=True)
     paginator = PageNumberPagination()
@@ -212,10 +235,18 @@ def remove_member(request, id):
 '''@api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def search_member(request, name):
+    print("HERE")
     # name = request.data.get('name').lower()
+    # look up user
+    user = User.objects.filter(username=request.user.email).first()
+    org = OrganizationMember.objects.filter(user=user).first()
+
     print("name : ", name)
     if name != 'all':
-        org_member = OrganizationMember.objects.filter(user__first_name__icontains=name).all()
+        org_member = OrganizationMember.objects.filter(
+            organization=org.organization,
+            user__first_name__icontains=name
+        ).all()
         resp = []
         for org in org_member:
             user = User.objects.filter(id=org.user_id).first()
@@ -233,7 +264,9 @@ def search_member(request, name):
             return paginator.get_paginated_response(page)
         return Response(results)
     else:
-        org_member = OrganizationMember.objects.all()
+        org_member = OrganizationMember.objects.filter(
+            organization=org.organization,
+        ).all()
         resp = []
         for org in org_member:
             user = User.objects.filter(id=org.user_id).first()
@@ -379,3 +412,7 @@ class UserMonitorViewDetails(generics.GenericAPIView):
             user_monitor.delete()
             return response.Response("Data Deleted", status=status.HTTP_202_ACCEPTED)
         return response.Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+
+
