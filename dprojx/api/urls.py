@@ -61,10 +61,10 @@ urlpatterns = [
     #     name='list_member_clients'),
 
     # path('add-member-clients/', views_orgs.add_member_clients,
-    #     name='list_member_clients'),
+    #     name='list_member_client'),
 
     # path('remove-member-clients/', views_orgs.remove_member_clients,
-    #     name='list_member_clients'),
+    #     name='list_member_client'),
 
 
 
