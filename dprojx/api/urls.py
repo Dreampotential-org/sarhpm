@@ -59,5 +59,5 @@ urlpatterns = [
     path('get_organization_id/', views_orgs.UserOrganizationIDView.as_view(), name='get_organization_id'),
 
 
-    # path('list-events/', views.list_events, name='list_events'),
+    # path('list-events/', views.list_events, name='list_events'),  
 ]
