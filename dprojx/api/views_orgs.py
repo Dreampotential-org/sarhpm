@@ -1,17 +1,22 @@
+import time
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import PasswordResetForm
+from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
 from rest_framework.pagination import PageNumberPagination
 from api.serializers import (
     UserSerializer, UserProfileSerializer, GpsCheckinSerializer,
     VideoUploadSerializer, OrganizationMemberSerializer
 )
 from rest_framework import response, status
-from dappx.models import UserProfileInfo
-from dappx.models import UserMonitor
+from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload
+from dappx.models import UserMonitor, SubscriptionEvent
 from dappx.models import OrganizationMember
+from dappx.models import MonitorFeedback
 from dappx.models import Organization
 from dappx.views import _create_user
 from dappx.models import UserProfileInfo
@@ -33,6 +38,7 @@ from django.conf import settings
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, status, pagination
+from django.db.models import Q
 
 
 class OrganizationMemberView(generics.GenericAPIView):
@@ -41,66 +47,104 @@ class OrganizationMemberView(generics.GenericAPIView):
 
     @swagger_auto_schema(manual_parameters=[
 
-        openapi.Parameter('search', openapi.IN_QUERY, description="Search by name",
+        openapi.Parameter('search', openapi.IN_QUERY, description="Search by name and email",
                           type=openapi.TYPE_STRING,
                           required=False, default=None),
 
     ])
     def get(self, request, *args, **kwargs):
-        search = self.request.GET.get("search")
+        user = request.user
+        if user.is_anonymous:
+            return response.Response("Login first", status=status.HTTP_400_BAD_REQUEST)
+
+        org = OrganizationMember.objects.filter(user_id=user.id).first()
+        search = request.GET.get('search')
         if search:
-            org_member = OrganizationMember.objects.filter(user__first_name__icontains=search).all()
+            if org is None:
+                org_member = OrganizationMember.objects.filter(Q(user__first_name__icontains=search) |
+                                                               Q(user__email__icontains=search))
+            else:
+                if org.organization_id:
+                    org_member = OrganizationMember.objects.filter((Q(user__first_name__icontains=search) |
+                                                                    Q(user__email__icontains=search)) & Q(
+                        organization_id=org.organization_id))
+                else:
+                    org_member = OrganizationMember.objects.filter(Q(user__first_name__icontains=search) |
+                                                                   Q(user__email__icontains=search))
+
         else:
-            org_member = OrganizationMember.objects.all()
+            if org is None:
+                org_member = OrganizationMember.objects.all()
+            else:
+                if org.organization_id:
+                    org_member = OrganizationMember.objects.filter(organization_id=org.organization_id)
+                else:
+                    org_member = OrganizationMember.objects.all()
 
         paginated_response = self.paginate_queryset(org_member)
         serialized = self.get_serializer(paginated_response, many=True)
         return self.get_paginated_response(serialized.data)
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def list_org_clients(request):
-    user = User.objects.filter(username=request.user.email).first()
-    organization_member = OrganizationMember.objects.filter(user=user).first()
-    if not organization_member:
-        return Response("Member not in org",
-                        status=status.HTTP_201_CREATED)
-
-    clients = UserProfileInfo.objects.filter(
-        user_org=organization_member.organization).values()
 
 
-    return Response(clients)
+class UserOrganizationIDView(generics.GenericAPIView):
+    queryset = OrganizationMember.objects.all()
+    serializer_class = OrganizationMemberSerializer
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        if user.is_anonymous:
+            return response.Response("Login first", status=status.HTTP_400_BAD_REQUEST)
+        else:
+            org = OrganizationMember.objects.filter(user_id=user.id).first()
+            org_patient = UserMonitor.objects.filter(user_id=user.id).first()
+            if org is None and org_patient is None:
+                data = {"organization_id": None,
+                        "Patient_org_id": None}
+                return response.Response(data)
+            elif org and org_patient:
+                data = {"organization_id": org.organization_id,
+                        "Patient_org_id": org_patient.organization_id}
+                return response.Response(data)
+            elif org is None and org_patient:
+                data = {"organization_id": None,
+                        "Patient_org_id": org_patient.organization_id}
+                return response.Response(data)
+            elif org and org_patient is None:
+                data = {"organization_id": org.organization_id,
+                        "Patient_org_id": None}
+
+                return response.Response(data)
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
 def add_member(request):
     email = request.data['email']
     name = request.data['name']
     password = request.data['password']
     admin = request.data['admin']
+    try:
+        organization = request.data['organization_id']
+    except:
+        organization = None
 
-    user = User.objects.filter(username=request.user.email).first()
-    organization_member = OrganizationMember.objects.filter(user=user).first()
-    if not organization_member:
-        print("Member not in org")
-        return Response("Member not in org yet",
-                        status=status.HTTP_201_CREATED)
-
+    '''email = 'unitednuman@hotmail.com'
+    name = 'numan'
+    password = 'pass@123'
+    admin = 'true'
+    organization = 2'''
     email = email.lower()
     if email is None or name is None or password is None or admin is None:
         data = {
             'status': False,
             'error': 'Missing parameters'
         }
-        print("missing param")
         return Response(data, status=status.HTTP_400_BAD_REQUEST)
     if admin == 'true':
         value = True
     else:
         value = False
-
     user = User.objects.filter(email=email).first()
+
     if not user:
         user = User.objects.create(
             username=email,
@@ -113,58 +157,20 @@ def add_member(request):
             user=user,
             name=name
         )
-
     user = User.objects.filter(username=email).first()
     if user:
+        User.objects.filter(email=email).update(is_staff=value, first_name=name)
         org_member = OrganizationMember.objects.filter(user=user).first()
         if not org_member:
-            print("adding to org")
-            # add to org
             org_member = OrganizationMember()
             org_member.user = user
             org_member.admin = value
-            org_member.organization = organization_member.organization
+            org_member.organization_id = organization
             org_member.save()
         else:
-            print("already in org")
             return Response({'message': 'User is already a organization member'})
 
     return Response("Member Added", status=status.HTTP_201_CREATED)
-
-
-'''@api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-def get_member(request):
-    print(request.user.email)
-    user = User.objects.filter(username=request.user.email).first()
-    # user is a member of
-    organization_member = OrganizationMember.objects.filter(user=user).first()
-    if not organization_member:
-        return Response([])
-
-    resp = []
-
-    # get members of organization_member
-    organization_members = OrganizationMember.objects.filter(
-        organization=organization_member.organization
-    )
-    print(organization_members)
-    for organization_member in organization_members:
-        resp.append({'id': organization_member.organization.id,
-                     'user_id': organization_member.user_id,
-                     'Admin ': organization_member.admin,
-                     'Email': organization_member.user.email,
-                     'Name': organization_member.user.first_name,
-                     'Organization_Name': organization_member.organization.id})
-
-    results = sorted(resp, key=lambda i: i['id'], reverse=True)
-    paginator = PageNumberPagination()
-    paginator.page_size = 10
-    page = paginator.paginate_queryset(results, request)
-    if page is not None:
-        return paginator.get_paginated_response(page)
-    return Response(results)
-'''
 
 
 @api_view(['PUT'])
@@ -232,65 +238,16 @@ def remove_member(request, id):
         return Response({'status': 'Not  Found'}, 204)
 
 
-'''@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def search_member(request, name):
-    print("HERE")
-    # name = request.data.get('name').lower()
-    # look up user
-    user = User.objects.filter(username=request.user.email).first()
-    org = OrganizationMember.objects.filter(user=user).first()
-
-    print("name : ", name)
-    if name != 'all':
-        org_member = OrganizationMember.objects.filter(
-            organization=org.organization,
-            user__first_name__icontains=name
-        ).all()
-        resp = []
-        for org in org_member:
-            user = User.objects.filter(id=org.user_id).first()
-            resp.append({'id': org.id,
-                         'user_id': org.user_id,
-                         'Admin ': org.admin,
-                         'Email': user.email,
-                         'Name': user.first_name})
-
-        results = sorted(resp, key=lambda i: i['id'], reverse=True)
-        paginator = PageNumberPagination()
-        paginator.page_size = 10
-        page = paginator.paginate_queryset(results, request)
-        if page is not None:
-            return paginator.get_paginated_response(page)
-        return Response(results)
-    else:
-        org_member = OrganizationMember.objects.filter(
-            organization=org.organization,
-        ).all()
-        resp = []
-        for org in org_member:
-            user = User.objects.filter(id=org.user_id).first()
-            resp.append({'id': org.id,
-                         'user_id': org.user_id,
-                         'Admin ': org.admin,
-                         'Email': user.email,
-                         'Name': user.first_name})
-
-        results = sorted(resp, key=lambda i: i['id'], reverse=True)
-        paginator = PageNumberPagination()
-        paginator.page_size = 10
-        page = paginator.paginate_queryset(results, request)
-        if page is not None:
-            return paginator.get_paginated_response(page)
-        return Response(results)
-'''
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_patient(request):
     email = request.data['email']
     name = request.data['name']
     password = request.data['password']
+    try:
+        organization = request.data['organization_id']
+    except:
+        organization = None
 
     '''email = 'smarttest@hotmail.com'
     name = 'smart'
@@ -305,14 +262,18 @@ def add_patient(request):
         return Response(data, status=status.HTTP_400_BAD_REQUEST)
     user = User.objects.filter(email=email).first()
     if not user:
-        User.objects.create(
+        user = User.objects.create(
             username=email,
             email=email,
             first_name=name,
             password=make_password(password)
 
         )
-
+        UserProfileInfo.objects.create(
+            user=user,
+            name=name  
+        )
+ 
     user = User.objects.filter(email=email).first()
     if user:
         user_monitor = UserMonitor.objects.filter(user=user).first()
@@ -320,6 +281,7 @@ def add_patient(request):
             user_monitor = UserMonitor()
             user_monitor.user = user
             user_monitor.notify_email = email
+            user_monitor.organization_id = organization
             user_monitor.save()
             notify_monitor(request, email)
             return Response({
@@ -383,19 +345,39 @@ class UserMonitorView(generics.GenericAPIView):
 
     @swagger_auto_schema(manual_parameters=[
 
-        openapi.Parameter('search', openapi.IN_QUERY, description="Search by name",
+        openapi.Parameter('search', openapi.IN_QUERY, description="Search by name and Email",
                           type=openapi.TYPE_STRING,
                           required=False, default=None),
 
     ])
     def get(self, request, *args, **kwargs):
         search = self.request.GET.get("search")
-        if search:
-            user_monitor = UserMonitor.objects.filter(user__first_name__icontains=search).all()
-        else:
-            user_monitor = UserMonitor.objects.all()
+        user = request.user
+        if user.is_anonymous:
+            return response.Response("Login first", status=status.HTTP_400_BAD_REQUEST)
 
-        # user_monitor = user_monitor.exclude("password")
+        org = UserMonitor.objects.filter(user_id=user.id).first()
+        if search:
+            if org is None:
+                user_monitor = UserMonitor.objects.filter(Q(user__first_name__icontains=search) |
+                                                          Q(user__email__icontains=search))
+            else:
+                if org.organization_id:
+                    user_monitor = UserMonitor.objects.filter((Q(user__first_name__icontains=search) |
+                                                               Q(user__email__icontains=search)) & Q(
+                        organization_id=org.organization_id))
+                else:
+                    user_monitor = UserMonitor.objects.filter(Q(user__first_name__icontains=search) |
+                                                              Q(user__email__icontains=search))
+
+        else:
+            if org is None:
+                user_monitor = UserMonitor.objects.all()
+            else:
+                if org.organization_id:
+                    user_monitor = UserMonitor.objects.filter(organization_id=org.organization_id)
+                else:
+                    user_monitor = UserMonitor.objects.all()
 
         paginated_response = self.paginate_queryset(user_monitor)
         serialized = self.get_serializer(paginated_response, many=True)
@@ -412,7 +394,3 @@ class UserMonitorViewDetails(generics.GenericAPIView):
             user_monitor.delete()
             return response.Response("Data Deleted", status=status.HTTP_202_ACCEPTED)
         return response.Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
-
-

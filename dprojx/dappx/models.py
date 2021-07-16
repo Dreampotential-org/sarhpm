@@ -78,31 +78,26 @@ class SubscriptionEvent(models.Model):
     paying = models.BooleanField(default=False)
 
 
-class UserMonitor(models.Model):
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
-    notify_email = models.EmailField(max_length=512, blank=True, null=True)
-
-
 class Organization(models.Model):
     name = models.CharField(max_length=256, blank=True, null=True)
     logo = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
+class UserMonitor(models.Model):
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
+    notify_email = models.EmailField(max_length=512, blank=True, null=True)
+    organization = models.ForeignKey(to=Organization, on_delete=models.CASCADE, null=True, blank=True)
+
+
 class OrganizationMember(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
     admin = models.BooleanField(default=False, db_index=True)
-    organization = models.ForeignKey(to=Organization,
-                                     on_delete=models.CASCADE, default="")
+    organization = models.ForeignKey(to=Organization, on_delete=models.CASCADE, null=True, blank=True)
 
 
 class OrganizationMemberMonitor(models.Model):
-    organization_member = models.ForeignKey(
-        to=OrganizationMember,
-        on_delete=models.CASCADE, default="")
-    organization = models.ForeignKey(to=Organization,
-                                     on_delete=models.CASCADE,
-                                     blank=True, null=True)
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
 
 
 class UserProfileInfo(models.Model):

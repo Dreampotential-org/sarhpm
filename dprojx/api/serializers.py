@@ -15,7 +15,7 @@ class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = UserProfileInfo
-        fields = ['user']
+        fields = ['user', 'user_org_id']
 
 
 class GpsCheckinSerializer(serializers.HyperlinkedModelSerializer):
@@ -42,7 +42,9 @@ class UserMonitorSerializer(serializers.ModelSerializer):
     def get_detailed_data(self, instance):
         return {
             'User': UserSerializer(instance.user).data,
-            #'GPS': GpsCheckinSerializer(instance.gps_user.all(), many=True).data
+            # 'Profile': UserProfileSerializer(instance.user).data
+            # 'GPS': GpsCheckinSerializer(instance.gps_user.all(), many=True).data
+            'Organization': OrganizationSerializer(instance.organization).data
         }
 
     def to_representation(self, instance):
@@ -50,6 +52,7 @@ class UserMonitorSerializer(serializers.ModelSerializer):
         data.update(self.get_detailed_data(instance))
         gps = GpsCheckin.objects.filter(user_id=instance.user_id)
         video = VideoUpload.objects.filter(user_id=instance.user_id)
+
         if gps is not None:
             Dict = {}
             num = 0
@@ -76,6 +79,7 @@ class UserMonitorSerializer(serializers.ModelSerializer):
                 num = num + 1
             video = {"video": Dict}
             data.update(video)
+
         return data
 
 
@@ -88,6 +92,7 @@ class OrganizationMemberSerializer(serializers.ModelSerializer):
         return {
             'User': UserSerializer(instance.user).data,
             'Organization': OrganizationSerializer(instance.organization).data
+
         }
 
     def to_representation(self, instance):
