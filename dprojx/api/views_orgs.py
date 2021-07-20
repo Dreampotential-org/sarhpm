@@ -375,11 +375,12 @@ def list_org_clients(request):
             client=client['user_id']
         )
         client['org_monitors'] = []
+        client['email'] = User.objects.filter(
+            id=client['user_id']).first().email
         for org_monitor in org_monitors:
             profile = UserProfileInfo.objects.filter(
                 user=org_monitor.user
             ).first()
-            client['email'] = org_monitor.client.email
             client['org_monitors'].append({
                 'id': org_monitor.id,
                 'email': org_monitor.user.email,
