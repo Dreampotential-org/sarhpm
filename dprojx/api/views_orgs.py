@@ -65,7 +65,8 @@ class UserOrganizationIDView(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         user = request.user
         if user.is_anonymous:
-            return response.Response("Login first", status=status.HTTP_400_BAD_REQUEST)
+            return response.Response("Login first",
+                                     status=status.HTTP_400_BAD_REQUEST)
         else:
             org = OrganizationMember.objects.filter(user_id=user.id).first()
             org_patient = UserMonitor.objects.filter(user_id=user.id).first()
