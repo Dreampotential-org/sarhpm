@@ -18,26 +18,15 @@ from dappx.models import UserMonitor, SubscriptionEvent
 from dappx.models import OrganizationMember
 from dappx.models import MonitorFeedback
 from dappx.models import Organization
-from dappx.views import _create_user
 from dappx.models import UserProfileInfo
 from dappx import email_utils
 from dappx.views import convert_and_save_video, stream_video
 from dappx.notify_utils import notify_gps_checkin, notify_monitor
-from dappx.notify_utils import notify_feedback
-from dappx import constants
-from dappx import utils
-from common import config
-from dappx.models import UserMonitor, UserProfileInfo
 from api.serializers import (UserMonitorSerializer)
-from magic_link.models import MagicLink
-from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
 
-from django.http import Http404
-from django.conf import settings
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import generics, status, pagination
+from rest_framework import generics
 from django.db.models import Q
 
 
@@ -58,28 +47,17 @@ class OrganizationMemberView(generics.GenericAPIView):
             return response.Response("Login first", status=status.HTTP_400_BAD_REQUEST)
 
         org = OrganizationMember.objects.filter(user_id=user.id).first()
+        if not org:
+            return Response("Member not in org",
+                             status=status.HTTP_201_CREATED)
+
         search = request.GET.get('search')
         if search:
-            if org is None:
-                org_member = OrganizationMember.objects.filter(Q(user__first_name__icontains=search) |
-                                                               Q(user__email__icontains=search))
-            else:
-                if org.organization_id:
-                    org_member = OrganizationMember.objects.filter((Q(user__first_name__icontains=search) |
-                                                                    Q(user__email__icontains=search)) & Q(
-                        organization_id=org.organization_id))
-                else:
-                    org_member = OrganizationMember.objects.filter(Q(user__first_name__icontains=search) |
-                                                                   Q(user__email__icontains=search))
-
+            org_member = OrganizationMember.objects.filter((Q(user__first_name__icontains=search) |
+                                                            Q(user__email__icontains=search)) & Q(
+                organization_id=org.organization_id))
         else:
-            if org is None:
-                org_member = OrganizationMember.objects.all()
-            else:
-                if org.organization_id:
-                    org_member = OrganizationMember.objects.filter(organization_id=org.organization_id)
-                else:
-                    org_member = OrganizationMember.objects.all()
+            org_member = OrganizationMember.objects.filter(organization_id=org.organization_id)
 
         paginated_response = self.paginate_queryset(org_member)
         serialized = self.get_serializer(paginated_response, many=True)
