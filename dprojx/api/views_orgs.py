@@ -368,6 +368,23 @@ def list_org_clients(request):
     clients = UserProfileInfo.objects.filter(
         user_org=organization_member.organization).values()
 
+
+    for client in clients:
+        # include organization_member_monitors here
+        org_monitors = OrganizationMemberMonitor.objects.filter(
+            client=client['user_id']
+        )
+        client['org_monitors'] = []
+        for org_monitor in org_monitors:
+            profile = UserProfileInfo.objects.filter(
+                user=org_monitor.user
+            ).first()
+            client['org_monitors'].append({
+                'email': org_monitor.user.email,
+                'id': org_monitor.user.id,
+                'name': profile.name,
+            })
+
     return Response(clients)
 
 
