@@ -153,7 +153,6 @@ def add_member(request):
 def edit_member(request):
     data = {k: v for k, v in request.data.items()}
 
-    print(data)
     if data['is_superuser'] == 'true':
         value = True
     else:
@@ -273,7 +272,6 @@ def add_patient(request):
 def edit_patient(request):
     data = {k: v for k, v in request.data.items()}
 
-    print(data)
     if not data.get('email') or not data.get('first_name'):
         return Response({
             'message': 'Missing parameters. Email and name is required'
@@ -463,6 +461,8 @@ def list_organizations(request):
 
 
 def get_org_members(organization):
+    if not organization:
+        return []
     return OrganizationMember.objects.filter(
         organization=organization)
 
@@ -474,6 +474,8 @@ def set_org(request):
         user__username=request.user.email
     ).first()
 
+    ### add activit tracking
+
     if profile.user_org:
         # alert members user has changed profiles
         pre_org_members = get_org_members(profile.user_org)
@@ -483,17 +485,7 @@ def set_org(request):
                 reply_to=request.user.email,
                 subject='useIAM: %s has left your Organization'
                         % profile.name,
-                message="Activity will no longer be sent to your Organization")
-    else:
-        # alert members user has changed profiles
-        pre_org_members = get_org_members(profile.user_org)
-        for org_member in pre_org_members:
-            email_utils.send_raw_email(
-                to_email=org_member.user.email,
-                reply_to=request.user.email,
-                subject='useIAM: %s has joined your Organization'
-                        % profile.name,
-                message="Need to map member to Organization Member Monitors")
+                message_text="Activity will no longer be sent to your Organization")
 
     # lets the user clear org
     if (request.data.get("org_id") == 'NaN'):
@@ -501,6 +493,17 @@ def set_org(request):
     else:
         org = Organization.objects.get(id=request.data.get("org_id"))
         profile.user_org = org
+
     profile.save()
+
+    # alert members user has changed profiles
+    pre_org_members = get_org_members(profile.user_org)
+    for org_member in pre_org_members:
+        email_utils.send_raw_email(
+            to_email=org_member.user.email,
+            reply_to=request.user.email,
+            subject='useIAM: %s has joined your Organization'
+                    % profile.name,
+            message_text="Need to map member to Organization Member Monitors")
 
     return Response({'status': 'okay'})
