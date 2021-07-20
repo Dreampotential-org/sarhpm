@@ -60,7 +60,6 @@ urlpatterns = [
     path('list-org-client/', views_orgs.list_org_clients, name='list_org_clients'),
     path('add-member-client/',
           views_orgs.add_member_client, name='add_member_client'),
-
-
-    # path('list-events/', views.list_events, name='list_events'),  
+    path('delete-member-client/',
+          views_orgs.delete_member_client, name='delete_member_client'),
 ]

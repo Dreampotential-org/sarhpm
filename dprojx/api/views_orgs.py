@@ -368,7 +368,6 @@ def list_org_clients(request):
     clients = UserProfileInfo.objects.filter(
         user_org=organization_member.organization).values()
 
-
     for client in clients:
         # include organization_member_monitors here
         org_monitors = OrganizationMemberMonitor.objects.filter(
@@ -412,7 +411,7 @@ def add_member_client(request):
         return Response("error user not in org",
                         status=status.HTTP_201_CREATED)
 
-    client = User.objects.filter(id=request.data['client_id']).first()
+    client = User.objects.filter(id=int(request.data['client_id'])).first()
 
     organization_member_monitor = OrganizationMemberMonitor()
     organization_member_monitor.user = user
@@ -420,3 +419,23 @@ def add_member_client(request):
     organization_member_monitor.save()
 
     return Response("Success Added", status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def delete_member_client(request):
+    user = User.objects.filter(username=request.user.email).first()
+    organization_member = OrganizationMember.objects.filter(user=user).first()
+    if not organization_member:
+        return Response("Member not in org",
+                        status=status.HTTP_201_CREATED)
+
+    org_member_monitor = int(request.data['org_member_monitor'])
+
+    # XXX todo add to activity log, notify user via email
+    organization_member_monitor = OrganizationMemberMonitor.objects.filter(
+        id=org_member_monitor)
+    print(organization_member_monitor)
+    if organization_member_monitor:
+        organization_member_monitor.delete()
+        return Response("Deleted Added", status=status.HTTP_201_CREATED)
+    return Response("Not Found", status=status.HTTP_201_CREATED)
