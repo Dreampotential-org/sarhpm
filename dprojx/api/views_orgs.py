@@ -1,3 +1,4 @@
+from dappx import email_utils
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
@@ -48,7 +49,7 @@ class OrganizationMemberView(generics.GenericAPIView):
             org_member = OrganizationMember.objects.filter(
                 (Q(user__first_name__icontains=search) |
                  Q(user__email__icontains=search)) & Q(
-                organization_id=org.organization_id))
+                 organization_id=org.organization_id))
         else:
             org_member = OrganizationMember.objects.filter(
                 organization_id=org.organization_id)
@@ -97,7 +98,7 @@ def add_member(request):
     admin = request.data['admin']
     try:
         organization = request.data['organization_id']
-    except:
+    except KeyError:
         organization = None
 
     '''email = 'unitednuman@hotmail.com'
@@ -132,7 +133,7 @@ def add_member(request):
         )
     user = User.objects.filter(username=email).first()
     if user:
-        User.objects.filter(email=email).update(is_staff=value, first_name=name)
+        User.objects.filter(email=email).update(first_name=name)
         org_member = OrganizationMember.objects.filter(user=user).first()
         if not org_member:
             org_member = OrganizationMember()
@@ -281,19 +282,20 @@ def edit_patient(request):
     data['email'] = data['email'].lower()
     try:
         try:
-            user = User.objects.filter(id=data['id']).update(email=data['email'],
-                                                             username=data['email'],
-                                                             first_name=data['first_name'])
+            user = User.objects.filter(id=data['id']).update(
+                username=data['email'],
+                first_name=data['first_name'])
         except:
             pass
         try:
             u = UserMonitor.objects.filter(user_id=user.id).first()
-            UserMonitor.objects.filter(id=u.id).update(notify_email=data['email'])
+            UserMonitor.objects.filter(id=u.id).update(
+                notify_email=data['email'])
         except:
             pass
 
         return response.Response(status=status.HTTP_200_OK)
-    except:
+    except Exception:
         return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -368,17 +370,23 @@ def list_org_clients(request):
 
     clients = UserProfileInfo.objects.filter(
         user_org=organization_member.organization).values()
+    print(clients)
 
     for client in clients:
         # include organization_member_monitors here
         org_monitors = OrganizationMemberMonitor.objects.filter(
             client=client['user_id']
         )
+        print(org_monitors)
         client['org_monitors'] = []
         for org_monitor in org_monitors:
+            print("S##")
+            print(org_monitor)
+            print(org_monitor.user)
             profile = UserProfileInfo.objects.filter(
                 user=org_monitor.user
             ).first()
+            print(profile)
             client['org_monitors'].append({
                 'id': org_monitor.id,
                 'email': org_monitor.user.email,
@@ -421,6 +429,7 @@ def add_member_client(request):
 
     return Response("Success Added", status=status.HTTP_201_CREATED)
 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def delete_member_client(request):
@@ -440,3 +449,58 @@ def delete_member_client(request):
         organization_member_monitor.delete()
         return Response("Deleted Added", status=status.HTTP_201_CREATED)
     return Response("Not Found", status=status.HTTP_201_CREATED)
+
+
+@api_view(['GET'])
+def list_organizations(request):
+    orgs = Organization.objects.all()
+    resp = []
+    for org in orgs:
+        resp.append({'id': org.id,
+                     'logo': org.logo,
+                     'name': org.name})
+    return Response(resp)
+
+
+def get_org_members(organization):
+    return OrganizationMember.objects.filter(
+        organization=organization)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def set_org(request):
+    profile = UserProfileInfo.objects.filter(
+        user__username=request.user.email
+    ).first()
+
+    if profile.user_org:
+        # alert members user has changed profiles
+        pre_org_members = get_org_members(profile.user_org)
+        for org_member in pre_org_members:
+            email_utils.send_raw_email(
+                to_email=org_member.user.email,
+                reply_to=request.user.email,
+                subject='useIAM: %s has left your Organization'
+                        % profile.name,
+                message="Activity will no longer be sent to your Organization")
+    else:
+        # alert members user has changed profiles
+        pre_org_members = get_org_members(profile.user_org)
+        for org_member in pre_org_members:
+            email_utils.send_raw_email(
+                to_email=org_member.user.email,
+                reply_to=request.user.email,
+                subject='useIAM: %s has joined your Organization'
+                        % profile.name,
+                message="Need to map member to Organization Member Monitors")
+
+    # lets the user clear org
+    if (request.data.get("org_id") == 'NaN'):
+        profile.user_org = None
+    else:
+        org = Organization.objects.get(id=request.data.get("org_id"))
+        profile.user_org = org
+    profile.save()
+
+    return Response({'status': 'okay'})

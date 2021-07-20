@@ -306,35 +306,6 @@ def send_feedback(request):
 
 
 @api_view(['GET'])
-def list_organizations(request):
-    orgs = Organization.objects.all()
-    resp = []
-    for org in orgs:
-        resp.append({'id': org.id,
-                     'logo': org.logo,
-                     'name': org.name})
-    return Response(resp)
-
-
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def set_org(request):
-    profile = UserProfileInfo.objects.filter(
-        user__username=request.user.email
-    ).first()
-
-    # lets the user clear org
-    if (request.data.get("org_id") == 'NaN'):
-        profile.user_org = None
-    else:
-        org = Organization.objects.get(id=request.data.get("org_id"))
-        profile.user_org = org
-    profile.save()
-
-    return Response({'status': 'okay'})
-
-
-@api_view(['GET'])
 def review_video(request):
     token = Token.objects.get(key=request.GET.get("token"))
     logger.info("requesting video as user: %s" % token.user.email)
