@@ -1,27 +1,17 @@
-import time
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import PasswordResetForm
-from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
-from rest_framework.pagination import PageNumberPagination
 from api.serializers import (
-    UserSerializer, UserProfileSerializer, GpsCheckinSerializer,
-    VideoUploadSerializer, OrganizationMemberSerializer
+    OrganizationMemberSerializer
 )
 from rest_framework import response, status
-from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload
-from dappx.models import UserMonitor, SubscriptionEvent
-from dappx.models import OrganizationMember
-from dappx.models import MonitorFeedback
-from dappx.models import Organization
 from dappx.models import UserProfileInfo
-from dappx import email_utils
-from dappx.views import convert_and_save_video, stream_video
-from dappx.notify_utils import notify_gps_checkin, notify_monitor
+from dappx.models import UserMonitor
+from dappx.models import OrganizationMember
+from dappx.models import Organization
+from dappx.notify_utils import notify_monitor
 from api.serializers import (UserMonitorSerializer)
 
 from drf_yasg import openapi
@@ -36,7 +26,8 @@ class OrganizationMemberView(generics.GenericAPIView):
 
     @swagger_auto_schema(manual_parameters=[
 
-        openapi.Parameter('search', openapi.IN_QUERY, description="Search by name and email",
+        openapi.Parameter('search', openapi.IN_QUERY,
+                          description="Search by name and email",
                           type=openapi.TYPE_STRING,
                           required=False, default=None),
 
@@ -44,20 +35,23 @@ class OrganizationMemberView(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         user = request.user
         if user.is_anonymous:
-            return response.Response("Login first", status=status.HTTP_400_BAD_REQUEST)
+            return response.Response("Login first",
+                                     status=status.HTTP_400_BAD_REQUEST)
 
         org = OrganizationMember.objects.filter(user_id=user.id).first()
         if not org:
             return Response("Member not in org",
-                             status=status.HTTP_201_CREATED)
+                            status=status.HTTP_201_CREATED)
 
         search = request.GET.get('search')
         if search:
-            org_member = OrganizationMember.objects.filter((Q(user__first_name__icontains=search) |
-                                                            Q(user__email__icontains=search)) & Q(
+            org_member = OrganizationMember.objects.filter(
+                (Q(user__first_name__icontains=search) |
+                 Q(user__email__icontains=search)) & Q(
                 organization_id=org.organization_id))
         else:
-            org_member = OrganizationMember.objects.filter(organization_id=org.organization_id)
+            org_member = OrganizationMember.objects.filter(
+                organization_id=org.organization_id)
 
         paginated_response = self.paginate_queryset(org_member)
         serialized = self.get_serializer(paginated_response, many=True)
@@ -146,7 +140,8 @@ def add_member(request):
             org_member.organization_id = organization
             org_member.save()
         else:
-            return Response({'message': 'User is already a organization member'})
+            return Response({
+                'message': 'User is already a organization member'})
 
     return Response("Member Added", status=status.HTTP_201_CREATED)
 
@@ -249,9 +244,9 @@ def add_patient(request):
         )
         UserProfileInfo.objects.create(
             user=user,
-            name=name  
+            name=name
         )
- 
+
     user = User.objects.filter(email=email).first()
     if user:
         user_monitor = UserMonitor.objects.filter(user=user).first()
@@ -370,5 +365,6 @@ class UserMonitorViewDetails(generics.GenericAPIView):
         if kwargs.get('id'):
             user_monitor = UserMonitor.objects.get(id=kwargs.get('id'))
             user_monitor.delete()
-            return response.Response("Data Deleted", status=status.HTTP_202_ACCEPTED)
+            return response.Response("Data Deleted",
+                                     status=status.HTTP_202_ACCEPTED)
         return response.Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
