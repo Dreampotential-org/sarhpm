@@ -13,7 +13,7 @@ from api.serializers import (
 )
 from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload
 from dappx.models import UserMonitor, SubscriptionEvent
-from dappx.models import OrganizationMember
+from dappx.models import OrganizationMember, OrganizationMemberMonitor
 from dappx.models import MonitorFeedback
 from dappx.models import Organization
 from dappx.views import _create_user
@@ -241,6 +241,14 @@ def get_video_info(request):
     # get monitors of user
     user_monitors = UserMonitor.objects.filter(user=video.user).all()
     user_monitor_emails = [u.notify_email for u in user_monitors]
+
+    # include monitors from org
+    org_monitors = OrganizationMemberMonitor.objects.filter(
+        client=video.user)
+    for org_monitor in org_monitors:
+        if org_monitor.user.email not in user_monitor_emails:
+            user_monitor_emails.append(org_monitor.user.email)
+
     logger.info("User %s monitors are %s"
                 % (video.user.email, user_monitor_emails))
 
@@ -321,6 +329,14 @@ def review_video(request):
     # get monitors of user
     user_monitors = UserMonitor.objects.filter(user=video.user).all()
     user_monitor_emails = [u.notify_email for u in user_monitors]
+
+
+    org_monitors = OrganizationMemberMonitor.objects.filter(
+        client=video.user)
+    for org_monitor in org_monitors:
+        if org_monitor.user.email not in user_monitor_emails:
+            user_monitor_emails.append(org_monitor.user.email)
+
     logger.info("User %s monitors are %s"
                 % (video.user.email, user_monitor_emails))
 
