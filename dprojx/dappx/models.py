@@ -87,13 +87,13 @@ class Organization(models.Model):
 class UserMonitor(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
     notify_email = models.EmailField(max_length=512, blank=True, null=True)
-    organization = models.ForeignKey(to=Organization, on_delete=models.CASCADE, null=True, blank=True)
 
 
 class OrganizationMember(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
     admin = models.BooleanField(default=False, db_index=True)
-    organization = models.ForeignKey(to=Organization, on_delete=models.CASCADE, null=True, blank=True)
+    organization = models.ForeignKey(to=Organization, on_delete=models.CASCADE,
+                                     null=True, blank=True)
 
 
 class OrganizationMemberMonitor(models.Model):

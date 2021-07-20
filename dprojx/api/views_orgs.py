@@ -318,7 +318,8 @@ class UserMonitorView(generics.GenericAPIView):
 
     @swagger_auto_schema(manual_parameters=[
 
-        openapi.Parameter('search', openapi.IN_QUERY, description="Search by name and Email",
+        openapi.Parameter('search', openapi.IN_QUERY,
+                          description="Search by name and Email",
                           type=openapi.TYPE_STRING,
                           required=False, default=None),
 
@@ -327,31 +328,16 @@ class UserMonitorView(generics.GenericAPIView):
         search = self.request.GET.get("search")
         user = request.user
         if user.is_anonymous:
-            return response.Response("Login first", status=status.HTTP_400_BAD_REQUEST)
+            return response.Response("Login first",
+                                     status=status.HTTP_400_BAD_REQUEST)
 
-        org = UserMonitor.objects.filter(user_id=user.id).first()
         if search:
-            if org is None:
-                user_monitor = UserMonitor.objects.filter(Q(user__first_name__icontains=search) |
-                                                          Q(user__email__icontains=search))
-            else:
-                if org.organization_id:
-                    user_monitor = UserMonitor.objects.filter((Q(user__first_name__icontains=search) |
-                                                               Q(user__email__icontains=search)) & Q(
-                        organization_id=org.organization_id))
-                else:
-                    user_monitor = UserMonitor.objects.filter(Q(user__first_name__icontains=search) |
-                                                              Q(user__email__icontains=search))
-
+            # xxx todo add search filter back..
+            user_monitor = UserMonitor.objects.filter(
+                notify_email=user.email)
         else:
-            if org is None:
-                user_monitor = UserMonitor.objects.all()
-            else:
-                if org.organization_id:
-                    user_monitor = UserMonitor.objects.filter(organization_id=org.organization_id)
-                else:
-                    user_monitor = UserMonitor.objects.all()
-
+            user_monitor = UserMonitor.objects.filter(
+                notify_email=user.email)
         paginated_response = self.paginate_queryset(user_monitor)
         serialized = self.get_serializer(paginated_response, many=True)
         return self.get_paginated_response(serialized.data)

@@ -44,7 +44,7 @@ class UserMonitorSerializer(serializers.ModelSerializer):
             'User': UserSerializer(instance.user).data,
             # 'Profile': UserProfileSerializer(instance.user).data
             # 'GPS': GpsCheckinSerializer(instance.gps_user.all(), many=True).data
-            'Organization': OrganizationSerializer(instance.organization).data
+            # 'Organization': OrganizationSerializer(instance.organization).data
         }
 
     def to_representation(self, instance):
