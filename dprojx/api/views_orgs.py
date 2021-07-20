@@ -380,8 +380,9 @@ def list_org_clients(request):
                 user=org_monitor.user
             ).first()
             client['org_monitors'].append({
+                'id': org_monitor.id,
                 'email': org_monitor.user.email,
-                'id': org_monitor.user.id,
+                'user_id': org_monitor.user.id,
                 'name': profile.name,
             })
 
