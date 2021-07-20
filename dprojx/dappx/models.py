@@ -98,6 +98,9 @@ class OrganizationMember(models.Model):
 
 class OrganizationMemberMonitor(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
+    client = models.ForeignKey(to=User,
+                               on_delete=models.CASCADE, default="",
+                               related_name='%(class)s_requests_created')
 
 
 class UserProfileInfo(models.Model):

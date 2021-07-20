@@ -9,7 +9,7 @@ from api.serializers import (
 from rest_framework import response, status
 from dappx.models import UserProfileInfo
 from dappx.models import UserMonitor
-from dappx.models import OrganizationMember
+from dappx.models import OrganizationMember, OrganizationMemberMonitor
 from dappx.models import Organization
 from dappx.notify_utils import notify_monitor
 from api.serializers import (UserMonitorSerializer)
@@ -369,3 +369,36 @@ def list_org_clients(request):
         user_org=organization_member.organization).values()
 
     return Response(clients)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_member_client(request):
+    print("SDFDSF")
+    user = User.objects.filter(username=request.user.email).first()
+    organization_member = OrganizationMember.objects.filter(user=user).first()
+    if not organization_member:
+        return Response("Member not in org",
+                        status=status.HTTP_201_CREATED)
+
+    member_to_add_client = request.data['member_id']
+
+    # look up member by id and see if they are in org
+    user = User.objects.filter(id=int(member_to_add_client)).first()
+    if not user:
+        return Response("error not user", status=status.HTTP_201_CREATED)
+
+    org_member_check = OrganizationMember.objects.filter(user=user).first()
+    if org_member_check.organization.id != organization_member.organization.id:
+        print("User not in org")
+        return Response("error user not in org",
+                        status=status.HTTP_201_CREATED)
+
+    client = User.objects.filter(id=request.data['client_id']).first()
+
+    organization_member_monitor = OrganizationMemberMonitor()
+    organization_member_monitor.user = user
+    organization_member_monitor.client = client
+    organization_member_monitor.save()
+
+    return Response("Success Added", status=status.HTTP_201_CREATED)
