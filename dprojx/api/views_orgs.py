@@ -13,7 +13,7 @@ from dappx.models import UserMonitor
 from dappx.models import OrganizationMember, OrganizationMemberMonitor
 from dappx.models import Organization
 from dappx.notify_utils import notify_monitor
-from api.serializers import (UserMonitorSerializer)
+from api.serializers import UserMonitorSerializer
 
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -362,29 +362,24 @@ class UserMonitorViewDetails(generics.GenericAPIView):
 def list_org_clients(request):
     user = User.objects.filter(username=request.user.email).first()
     organization_member = OrganizationMember.objects.filter(user=user).first()
-    if not organization_member:
-        return Response("Member not in org",
+    if not organization_member or not organization_member.organization:
+        return Response([],
                         status=status.HTTP_201_CREATED)
 
     clients = UserProfileInfo.objects.filter(
         user_org=organization_member.organization).values()
-    print(clients)
 
     for client in clients:
         # include organization_member_monitors here
         org_monitors = OrganizationMemberMonitor.objects.filter(
             client=client['user_id']
         )
-        print(org_monitors)
         client['org_monitors'] = []
         for org_monitor in org_monitors:
-            print("S##")
-            print(org_monitor)
-            print(org_monitor.user)
             profile = UserProfileInfo.objects.filter(
                 user=org_monitor.user
             ).first()
-            print(profile)
+            client['email'] = org_monitor.client.email
             client['org_monitors'].append({
                 'id': org_monitor.id,
                 'email': org_monitor.user.email,
@@ -398,7 +393,6 @@ def list_org_clients(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_member_client(request):
-    print("SDFDSF")
     user = User.objects.filter(username=request.user.email).first()
     organization_member = OrganizationMember.objects.filter(user=user).first()
     if not organization_member:

@@ -83,6 +83,9 @@ class Organization(models.Model):
     logo = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.name
+
 
 class UserMonitor(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
@@ -94,6 +97,9 @@ class OrganizationMember(models.Model):
     admin = models.BooleanField(default=False, db_index=True)
     organization = models.ForeignKey(to=Organization, on_delete=models.CASCADE,
                                      null=True, blank=True)
+
+    class Meta:
+        unique_together = (("user"),)
 
 
 class OrganizationMemberMonitor(models.Model):

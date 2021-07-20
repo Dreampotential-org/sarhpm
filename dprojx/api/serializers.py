@@ -91,7 +91,7 @@ class OrganizationMemberSerializer(serializers.ModelSerializer):
     def get_detailed_data(self, instance):
         return {
             'User': UserSerializer(instance.user).data,
-            'Organization': OrganizationSerializer(instance.organization).data
+            'Organization': OrganizationSerializer(instance.organization).data,
 
         }
 
