@@ -8,6 +8,7 @@ from rest_framework.response import Response
 
 from dappx.models import UserMonitor, UserProfileInfo
 from dappx.models import GpsCheckin, VideoUpload
+from dappx.models import OrganizationMemberMonitor
 from common import config
 import urllib.parse
 
@@ -191,8 +192,16 @@ def list_patient_events_v2(request):
         user = User.objects.filter(username=patient).first()
         profile = UserProfileInfo.objects.filter(user=user).first()
         profiles_map[user.email] = profile
-        allowed = UserMonitor.objects.filter(
-            notify_email=request.user.email, user=user).first()
+
+        allowed_members = OrganizationMemberMonitor.objects.filter(
+            client=user)
+        for allowed_member in allowed_members:
+            if allowed_member.user.email == request.user.email:
+                allowed = True
+                break
+        else:
+            allowed = UserMonitor.objects.filter(
+                notify_email=request.user.email, user=user).first()
 
         if not allowed:
             return Response({

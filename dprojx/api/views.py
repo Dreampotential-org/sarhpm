@@ -155,7 +155,6 @@ def add_organization_member(request):
     return Response(data)
 
 
-
 @api_view(['PUT', 'GET'])
 @permission_classes([IsAuthenticated])
 def add_monitor(request):
@@ -208,8 +207,6 @@ def get_video_info(request):
 
     try:
         int(request.GET.get("id"))
-        # if we get here this is gps-checkin
-        # test
         video = GpsCheckin.objects.filter(
             id=int(request.GET.get("id"))).first()
         resp_body['type'] = 'gps'
@@ -329,7 +326,6 @@ def review_video(request):
     # get monitors of user
     user_monitors = UserMonitor.objects.filter(user=video.user).all()
     user_monitor_emails = [u.notify_email for u in user_monitors]
-
 
     org_monitors = OrganizationMemberMonitor.objects.filter(
         client=video.user)
@@ -469,7 +465,7 @@ def profile(request):
         org = {
         }
 
-    return Response({
+    ret = {
         'user_org': org,
         'days_sober': utils.calc_days_sober(profile),
         'sober_date': profile.sober_date,
@@ -480,7 +476,17 @@ def profile(request):
         'paying': True,
         'iap_blurb': profile.iap_blurb,
         'stripe_subscription_id': profile.stripe_subscription_id,
-    }, 201)
+    }
+
+    org_member = OrganizationMember.objects.filter(user=request.user).first()
+    if org_member:
+        ret['org_member'] = {'name': org_member.organization.name,
+                             'logo': org_member.organization.logo}
+    else:
+        ret['org_member'] = {}
+    print(ret)
+
+    return Response(ret, 201)
 
 
 @api_view(['POST'])
