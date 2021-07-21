@@ -36,6 +36,8 @@ urlpatterns = [
     path('list_organizations/', views_orgs.list_organizations,
          name='list_organizations'),
     path('set-org/', views_orgs.set_org, name='set_org'),
+    path('get-last-patient-event/', views_admin.get_last_patient_event,
+          name='get_last_patient_event'),
     path('list-patients/', views_admin.list_patients, name='list_patients'),
     path('list-patient-events/', views_admin.list_patient_events,
          name='list_patient_events'),
