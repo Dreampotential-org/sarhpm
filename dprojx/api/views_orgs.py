@@ -454,6 +454,17 @@ def list_organizations(request):
                      'name': org.name})
     return Response(resp)
 
+@api_view(['GET'])
+def get_org(request):
+    print(request.GET.get("id"))
+    orgs = Organization.objects.filter(id=int(request.GET.get('id')))
+    resp = []
+    for org in orgs:
+        resp.append({'id': org.id,
+                     'logo': org.logo,
+                     'name': org.name})
+    return Response(resp)
+
 
 def get_org_members(organization):
     if not organization:

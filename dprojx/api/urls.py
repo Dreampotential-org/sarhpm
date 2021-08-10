@@ -62,6 +62,7 @@ urlpatterns = [
 
     path('get_organization_id/', views_orgs.UserOrganizationIDView.as_view(), name='get_organization_id'),
     path('list-org-client/', views_orgs.list_org_clients, name='list_org_clients'),
+    path('get_org/', views_orgs.get_org, name='get_org'),
     path('add-member-client/',
           views_orgs.add_member_client, name='add_member_client'),
     path('delete-member-client/',
