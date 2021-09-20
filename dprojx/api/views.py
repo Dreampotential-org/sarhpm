@@ -1,3 +1,4 @@
+import random
 import time
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordResetForm
@@ -15,7 +16,6 @@ from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload
 from dappx.models import UserMonitor, SubscriptionEvent
 from dappx.models import OrganizationMember, OrganizationMemberMonitor
 from dappx.models import MonitorFeedback
-from dappx.models import Organization
 from dappx.views import _create_user
 from dappx import email_utils
 from dappx.views import convert_and_save_video, stream_video
@@ -88,7 +88,7 @@ def video_upload(request):
     logger.error(request.data)
     video = request.data.get('video')
     if not video:
-        logger.error("no vidoe file foudn")
+        logger.error("no video file found")
         return Response({'message': 'video is required'}, 400)
 
     video = convert_and_save_video(video, request)
@@ -98,9 +98,9 @@ def video_upload(request):
 @api_view(['POST'])
 def create_user(request):
     data = {k: v for k, v in request.data.items()}
-    if not data.get('email') or not data.get('password'):
+    if not data.get('email'):
         return Response({
-            'message': 'Missing parameters. Email and password is required'
+            'message': 'Missing parameters. Email is required'
         })
 
     if not data.get('days_sober'):
@@ -110,18 +110,56 @@ def create_user(request):
     user = User.objects.filter(username=data['email']).first()
 
     if user:
+        email_user_login_code(user)
         return Response({'message': 'User already exists'})
 
     _create_user(**data)
 
     user = User.objects.filter(username=data['email']).first()
     token = Token.objects.get_or_create(user=user)
+    email_user_login_code(user)
 
     data.pop('password')
     data['message'] = "User created"
     data['token'] = token[0].key
 
     return Response(data)
+
+
+@api_view(['POST'])
+def login_user_code(request):
+    data = {k: v for k, v in request.data.items()}
+    if not data.get('email') or not data.get('code'):
+        return Response({
+            'message': 'Missing parameters. Email and Code is required'
+        })
+
+    data['email'] = data['email'].lower()
+    print(data)
+    user = User.objects.filter(username=data['email']).first()
+    user_profile = UserProfileInfo.objects.filter(user=user).first()
+    print(user_profile)
+    print(request)
+    if user_profile.login_code and user_profile.login_code == data['code']:
+        token = Token.objects.get_or_create(user=user)
+        # clear the login_code!
+        user_profile.login_code = None
+        user_profile.save()
+        data['token'] = token[0].key
+        return Response(data)
+
+    return Response({'message': 'Error validating code'}, 407)
+
+
+def email_user_login_code(user):
+    user_profile = UserProfileInfo.objects.filter(user=user).first()
+    user_profile.login_code = random.randint(1000, 9999)
+    user_profile.save()
+
+    email_utils.send_email(
+        to_email=user.email,
+        subject='useIAM: Your Login Code',
+        message="Here is the code to login: %s" % user_profile.login_code)
 
 
 @api_view(['POST'])

@@ -127,6 +127,8 @@ class UserProfileInfo(models.Model):
                                  on_delete=models.CASCADE,
                                  blank=True, null=True)
 
+    login_code = models.CharField(max_length=17, blank=True, null=True)
+
     def __str__(self):
         return self.user.username
 

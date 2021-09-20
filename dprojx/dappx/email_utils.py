@@ -20,7 +20,7 @@ def send_raw_email(to_email, reply_to, subject,
     message_text = message_html
     BODY_TEXT = re.sub('<[^<]+?>', '', message_html)
 
-    SENDER = "useIAM Journal <no-reply@useiam.com>"
+    SENDER = "useIAM <no-reply@useiam.com>"
     msg = MIMEMultipart('mixed')
     msg.set_charset("utf-8")
     msg['Subject'] = subject
@@ -57,8 +57,7 @@ def send_raw_email(to_email, reply_to, subject,
 
 
 def send_email(to_email, subject, message):
-    SENDER = "Pam Report <no-reply@app.usepam.com>"
-
+    SENDER = "useIAM <no-reply@useiam.com>"
     # Replace recipient@example.com with a "To" address. If your account
     # is still in the sandbox, this address must be verified.
     RECIPIENT = to_email
