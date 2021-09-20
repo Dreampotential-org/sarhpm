@@ -132,7 +132,7 @@ def login_user_code(request):
     if not data.get('email') or not data.get('code'):
         return Response({
             'message': 'Missing parameters. Email and Code is required'
-        })
+        }, 407)
 
     data['email'] = data['email'].lower()
     print(data)
@@ -140,7 +140,8 @@ def login_user_code(request):
     user_profile = UserProfileInfo.objects.filter(user=user).first()
     print(user_profile)
     print(request)
-    if user_profile.login_code and user_profile.login_code == data['code']:
+    if (data['code'] and user_profile.login_code and
+            user_profile.login_code == data['code']):
         token = Token.objects.get_or_create(user=user)
         # clear the login_code!
         user_profile.login_code = None
