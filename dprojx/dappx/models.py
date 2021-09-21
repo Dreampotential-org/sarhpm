@@ -114,6 +114,7 @@ class UserProfileInfo(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=17, blank=True, null=True)
     name = models.CharField(max_length=17, blank=True, null=True)
+    phone_num = models.CharField(max_length=17, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     notify_email = models.EmailField(max_length=512, blank=True, null=True)
     days_sober = models.PositiveIntegerField(default=0, null=True)
