@@ -109,6 +109,7 @@ def create_user(request):
     data['email'] = data['email'].lower()
     user = User.objects.filter(username=data['email']).first()
 
+    logger.info("Create user %s" % data)
     if user:
         email_user_login_code(user)
         return Response({'message': 'User already exists'})
@@ -140,15 +141,18 @@ def login_user_code(request):
     user_profile = UserProfileInfo.objects.filter(user=user).first()
     print(user_profile)
     print(request)
+    logger.info("Verify code: %s" % data)
     if (data['code'] and user_profile.login_code and
             user_profile.login_code == data['code']):
         token = Token.objects.get_or_create(user=user)
+        logger.info("Code verify success")
         # clear the login_code!
         user_profile.login_code = None
         user_profile.save()
         data['token'] = token[0].key
         return Response(data)
 
+    logger.info("Error verify code success")
     return Response({'message': 'Error validating code'}, 407)
 
 
