@@ -82,6 +82,7 @@ class Organization(models.Model):
     name = models.CharField(max_length=256, blank=True, null=True)
     logo = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    hostname = models.CharField(max_length=500, default="")
 
     def __str__(self):
         return self.name
