@@ -95,6 +95,20 @@ def video_upload(request):
     return Response({'videoUrl': video.videoUrl})
 
 
+def passthrough_domain(source):
+    pass
+
+
+def is_passthrough_domain(source):
+    passthrough_domains = [
+    #    'cardoneaccountability.com',
+    #    'localhost:8081',
+    ]
+    if source in passthrough_domains:
+        return True
+    return False
+
+
 @api_view(['POST'])
 def create_user(request):
     data = {k: v for k, v in request.data.items()}
@@ -115,14 +129,18 @@ def create_user(request):
         return Response({'message': 'User already exists'})
 
     _create_user(**data)
-
     user = User.objects.filter(username=data['email']).first()
-    token = Token.objects.get_or_create(user=user)
-    email_user_login_code(user)
+
+    # some interesting logic exists here. If domain is passthrough
+    # we auto login user to account using trust model only for new accounts.
+    if not is_passthrough_domain(data.get("source")):
+        email_user_login_code(user)
+    else:
+        token = Token.objects.get_or_create(user=user)
+        data['token'] = token[0].key
 
     data.pop('password')
     data['message'] = "User created"
-    data['token'] = token[0].key
 
     return Response(data)
 
