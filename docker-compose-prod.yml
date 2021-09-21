@@ -21,5 +21,4 @@ services:
             - ./dprojx/static:/var/data/dprojx/static
         ports:
             - 8844:80
-            - 8089:80
         restart: always
