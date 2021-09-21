@@ -168,7 +168,8 @@ def login_user_code(request):
         user_profile.login_code = None
 
         # check set hostname org
-        org = Organization.filter(hostname=data['source'].lower()).first()
+        org = Organization.objects.filter(
+            hostname=data['source'].lower()).first()
         if org:
             user_profile.user_org = org
         user_profile.save()
