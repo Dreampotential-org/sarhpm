@@ -21,7 +21,7 @@ def get_user_monitors(request):
     notify_group = [u.notify_email for u in users]
 
     # check notify_all setting
-    user_profile = UserProfileInfo.objects.filter(user=user)
+    user_profile = UserProfileInfo.objects.filter(user=user).first()
     if user_profile.user_org and user_profile.user_org.notify_all:
         # notify all org members
         org_monitors = OrganizationMember.objects.filter(
