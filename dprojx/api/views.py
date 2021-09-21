@@ -15,7 +15,7 @@ from api.serializers import (
 from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload
 from dappx.models import UserMonitor, SubscriptionEvent
 from dappx.models import OrganizationMember, OrganizationMemberMonitor
-from dappx.models import MonitorFeedback
+from dappx.models import MonitorFeedback, Organization
 from dappx.views import _create_user
 from dappx import email_utils
 from dappx.views import convert_and_save_video, stream_video
@@ -101,8 +101,7 @@ def passthrough_domain(source):
 
 def is_passthrough_domain(source):
     passthrough_domains = [
-    #    'cardoneaccountability.com',
-    #    'localhost:8081',
+        # 'cardoneaccountability.com',
     ]
     if source in passthrough_domains:
         return True
@@ -124,6 +123,7 @@ def create_user(request):
     user = User.objects.filter(username=data['email']).first()
 
     logger.info("Create user %s" % data)
+
     if user:
         email_user_login_code(user)
         return Response({'message': 'User already exists'})
@@ -166,8 +166,14 @@ def login_user_code(request):
         logger.info("Code verify success")
         # clear the login_code!
         user_profile.login_code = None
+
+        # check set hostname org
+        org = Organization.filter(hostname=data['source'].lower()).first()
+        if org:
+            user_profile.user_org = org
         user_profile.save()
         data['token'] = token[0].key
+
         return Response(data)
 
     logger.info("Error verify code success")
