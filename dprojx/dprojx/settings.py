@@ -100,7 +100,7 @@ DATABASES = {
         'NAME': 'db',
         'USER': 'postgres',
         'PORT': '5432',
-        'HOST': 'useiam-v3.cb7bl0nt7fvo.us-east-2.rds.amazonaws.com',
+        'HOST': 'useiam-restore.cb7bl0nt7fvo.us-east-2.rds.amazonaws.com',
         'PASSWORD': 'MzFmZDI0NTUyNGIwOWNmNzcyOWEwYTQ1',
     }
 }
