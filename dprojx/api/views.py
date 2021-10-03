@@ -125,7 +125,7 @@ def create_user(request):
     logger.info("Create user %s" % data)
 
     if user:
-        email_user_login_code(user, data.get("source"))
+        email_user_login_code(user, data.get("source"), data.get('page'))
         return Response({'message': 'User already exists'})
 
     _create_user(**data)
@@ -134,7 +134,7 @@ def create_user(request):
     # some interesting logic exists here. If domain is passthrough
     # we auto login user to account using trust model only for new accounts.
     if not is_passthrough_domain(data.get("source")):
-        email_user_login_code(user, data.get("source"))
+        email_user_login_code(user, data.get("source"), data.get("page"))
     else:
         token = Token.objects.get_or_create(user=user)
         data['token'] = token[0].key
@@ -181,14 +181,19 @@ def login_user_code(request):
     return Response({'message': 'Error validating code'}, 407)
 
 
-def email_user_login_code(user, source):
+def email_user_login_code(user, source, page):
     user_profile = UserProfileInfo.objects.filter(user=user).first()
     user_profile.login_code = random.randint(1000, 9999)
     user_profile.save()
 
-    direct_link = (
-        "https://%s?email=%s&code=%s" %
-        (source, user.email, user_profile.login_code))
+    if 'index' in page:
+        direct_link = (
+            "https://%s?email=%s&code=%s" %
+            (source, user.email, user_profile.login_code))
+    else:
+        direct_link = (
+            "https://%s/review-video.html?email=%s&code=%s" %
+            (source, user.email, user_profile.login_code))
 
     email_utils.send_email(
         to_email=user.email,
