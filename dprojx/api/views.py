@@ -183,7 +183,7 @@ def login_user_code(request):
 
 def email_user_login_code(user, data):
     source = data.get("source")
-    page = data.get("page")
+    page = data.get("page", "")
     user_profile = UserProfileInfo.objects.filter(user=user).first()
     user_profile.login_code = random.randint(1000, 9999)
     user_profile.save()
