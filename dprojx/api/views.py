@@ -188,7 +188,7 @@ def email_user_login_code(user, data):
     user_profile.login_code = random.randint(1000, 9999)
     user_profile.save()
 
-    if 'index' in page:
+    if 'index' in page or page is '':
         direct_link = (
             "https://%s?email=%s&code=%s" %
             (source, user.email, user_profile.login_code))
