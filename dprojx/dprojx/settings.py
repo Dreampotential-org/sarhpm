@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'api',
     'magic_link',
     'drf_yasg',
+    'dbbackup',
 ]
 
 # CORS_ORIGIN_WHITELIST = ['v2-local.postmunk.me']
@@ -97,11 +98,11 @@ WSGI_APPLICATION = 'dprojx.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'db',
+        'NAME': 'postgres',
         'USER': 'postgres',
         'PORT': '5432',
-        'HOST': 'useiam-restore.cb7bl0nt7fvo.us-east-2.rds.amazonaws.com',
-        'PASSWORD': 'MzFmZDI0NTUyNGIwOWNmNzcyOWEwYTQ1',
+        'HOST': 'database-2.cscuw6ktirtf.us-east-2.rds.amazonaws.com',
+        'PASSWORD': 'ZWY3ZWRmOGNjZDViMGM0YmUzZGZiYjIz',
     }
 }
 
