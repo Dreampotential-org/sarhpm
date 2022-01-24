@@ -44,9 +44,9 @@ def send_raw_email(to_email, reply_to, subject,
     # attachmensts
     # XXX remove hard coded client
     client = boto3.client(
-        'ses', aws_access_key_id='AKIAIHFAW4CMLKGZJWQQ',
-        aws_secret_access_key='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',
-        region_name='us-east-1')
+        'ses', aws_access_key_id='AKIARWLPGYIKWTF4OEPZ',
+        aws_secret_access_key='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',
+        region_name='us-east-2')
     try:
         print(
             client.send_raw_email(
@@ -68,7 +68,7 @@ def send_email(to_email, subject, message):
     # CONFIGURATION_SET = "ConfigSet"
 
     # If necessary, replace us-west-2 with the AWS Region you're using for Amazon SES.
-    AWS_REGION = "us-east-1"
+    AWS_REGION = "us-east-2"
 
     # The subject line for the email.
     SUBJECT = subject
@@ -78,8 +78,8 @@ def send_email(to_email, subject, message):
 
     # The character encoding for the email.
     CHARSET = "UTF-8"
-    ACCESS_KEY = 'AKIAIHFAW4CMLKGZJWQQ'
-    SECRET_KEY = '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'
+    ACCESS_KEY = 'AKIARWLPGYIKWTF4OEPZ'
+    SECRET_KEY = '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'
 
     # Create a new SES resource and specify a region.
     client = boto3.client('ses',

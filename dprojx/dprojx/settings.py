@@ -19,9 +19,9 @@ ALLOWED_HOSTS = ['*', 'beachcomber.usepam.com', 'localhost', '127.0.0.1']
 
 BASE_URL = 'app.usepam.com'
 EMAIL_BACKEND = 'django_ses.SESBackend'
-AWS_ACCESS_KEY_ID = 'AKIAIHFAW4CMLKGZJWQQ'
-AWS_SECRET_ACCESS_KEY = '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'
-DEFAULT_FROM_EMAIL = 'noreply@app.usepam.com'
+AWS_ACCESS_KEY_ID = 'AKIARWLPGYIKWTF4OEPZ'
+AWS_SECRET_ACCESS_KEY = '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'
+DEFAULT_FROM_EMAIL = 'noreply@useiam.com'
 
 SITE_ID = 1
 
