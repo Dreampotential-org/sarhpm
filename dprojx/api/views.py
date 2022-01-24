@@ -133,11 +133,11 @@ def create_user(request):
 
     # some interesting logic exists here. If domain is passthrough
     # we auto login user to account using trust model only for new accounts.
-    if not is_passthrough_domain(data.get("source")):
-        email_user_login_code(user, data)
-    else:
-        token = Token.objects.get_or_create(user=user)
-        data['token'] = token[0].key
+    # if not is_passthrough_domain(data.get("source")):
+    #     email_user_login_code(user, data)
+    # else:
+    token = Token.objects.get_or_create(user=user)
+    data['token'] = token[0].key
 
     data.pop('password')
     data['message'] = "User created"
@@ -182,6 +182,7 @@ def login_user_code(request):
 
 
 def email_user_login_code(user, data):
+    return
     source = data.get("source")
     page = data.get("page", "")
     user_profile = UserProfileInfo.objects.filter(user=user).first()
