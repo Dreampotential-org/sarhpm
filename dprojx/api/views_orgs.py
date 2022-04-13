@@ -1,6 +1,8 @@
 from dappx import email_utils
+from django.http import JsonResponse
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -13,6 +15,7 @@ from dappx.models import UserMonitor
 from dappx.models import OrganizationMember, OrganizationMemberMonitor
 from dappx.models import Organization
 from dappx.notify_utils import notify_monitor
+from dappx.views import upload_org_logo
 from api.serializers import UserMonitorSerializer
 
 from drf_yasg import openapi
@@ -390,6 +393,19 @@ def list_org_clients(request):
 
     return Response(clients)
 
+@api_view(['POST'])
+def add_org_clients(request):
+    return Response("Success Added", status=status.HTTP_201_CREATED)
+
+
+@csrf_exempt
+def add_org_clients(request):
+    if request.method == 'POST' and request.FILES['file']:
+
+        myfile = request.FILES['file']
+        url = upload_org_logo(myfile, request)
+
+        return JsonResponse({'error': url}, status=200)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
