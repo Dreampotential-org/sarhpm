@@ -6,6 +6,10 @@ from dappx.models import User
 from dappx.models import VideoUpload
 from dappx.models import UserMonitor
 from dappx.models import MonitorFeedback
+from dappx.models import SubscriptionEvent
+from dappx.models import Organization
+from dappx.models import OrganizationMember
+from dappx.models import OrganizationMemberMonitor
 
 from django.utils.html import format_html
 
@@ -74,9 +78,43 @@ class CustomMonitorFeedback(admin.ModelAdmin):
     ordering = ('-id',)
 
 
+class CustomSubscriptionEvent(admin.ModelAdmin):
+    list_display = [
+        'created_at', 'user', 'paying', 'subscription_id',
+    ]
+    ordering = ('-id',)
+
+
+class CustomOrganization(admin.ModelAdmin):
+    list_display = [
+        'name', 'logo'
+    ]
+    ordering = ('-id',)
+
+
+class CustomOrganizationMember(admin.ModelAdmin):
+    list_display = [
+        'user',
+    ]
+    ordering = ('-id',)
+    #list_per_page = 10
+    #list_max_show_all = 50
+
+
+class CustomOrganizationMemberMonitor(admin.ModelAdmin):
+    list_display = [
+        'user', 'client'
+    ]
+    ordering = ('-id',)
+
+
 # Register your models here.
 admin.site.register(UserProfileInfo, UserProfileInfoAdmin)
 admin.site.register(GpsCheckin, CustomGpsCheckin)
 admin.site.register(VideoUpload, CustomVideoUpload)
 admin.site.register(UserMonitor, CustomUserMonitor)
 admin.site.register(MonitorFeedback, CustomMonitorFeedback)
+admin.site.register(SubscriptionEvent, CustomSubscriptionEvent)
+admin.site.register(Organization, CustomOrganization)
+admin.site.register(OrganizationMember, CustomOrganizationMember)
+admin.site.register(OrganizationMemberMonitor, CustomOrganizationMemberMonitor)

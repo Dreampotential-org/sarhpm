@@ -1,3 +1,4 @@
+import random
 import time
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordResetForm
@@ -6,14 +7,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
-from dprojx.settings import website_url
 
 from api.serializers import (
     UserSerializer, UserProfileSerializer, GpsCheckinSerializer,
     VideoUploadSerializer
 )
-from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload, UserMonitor
-from dappx.models import MonitorFeedback
+from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload
+from dappx.models import UserMonitor, SubscriptionEvent
+from dappx.models import OrganizationMember, OrganizationMemberMonitor
+from dappx.models import MonitorFeedback, Organization
 from dappx.views import _create_user
 from dappx import email_utils
 from dappx.views import convert_and_save_video, stream_video
@@ -86,19 +88,32 @@ def video_upload(request):
     logger.error(request.data)
     video = request.data.get('video')
     if not video:
-        logger.error("no vidoe file foudn")
+        logger.error("no video file found")
         return Response({'message': 'video is required'}, 400)
 
     video = convert_and_save_video(video, request)
     return Response({'videoUrl': video.videoUrl})
 
 
+def passthrough_domain(source):
+    pass
+
+
+def is_passthrough_domain(source):
+    passthrough_domains = [
+        # 'cardoneaccountability.com',
+    ]
+    if source in passthrough_domains:
+        return True
+    return False
+
+
 @api_view(['POST'])
 def create_user(request):
     data = {k: v for k, v in request.data.items()}
-    if not data.get('email') or not data.get('password'):
+    if not data.get('email'):
         return Response({
-            'message': 'Missing parameters. Email and password is required'
+            'message': 'Missing parameters. Email is required'
         })
 
     if not data.get('days_sober'):
@@ -107,17 +122,120 @@ def create_user(request):
     data['email'] = data['email'].lower()
     user = User.objects.filter(username=data['email']).first()
 
+    logger.info("Create user %s" % data)
+
     if user:
+        email_user_login_code(user, data)
         return Response({'message': 'User already exists'})
 
     _create_user(**data)
-
     user = User.objects.filter(username=data['email']).first()
+
+    # some interesting logic exists here. If domain is passthrough
+    # we auto login user to account using trust model only for new accounts.
+    # if not is_passthrough_domain(data.get("source")):
+    #     email_user_login_code(user, data)
+    # else:
     token = Token.objects.get_or_create(user=user)
+    data['token'] = token[0].key
 
     data.pop('password')
     data['message'] = "User created"
-    data['token'] = token[0].key
+
+    return Response(data)
+
+
+@api_view(['POST'])
+def login_user_code(request):
+    data = {k: v for k, v in request.data.items()}
+    if not data.get('email') or not data.get('code'):
+        return Response({
+            'message': 'Missing parameters. Email and Code is required'
+        }, 407)
+
+    data['email'] = data['email'].lower()
+    print(data)
+    user = User.objects.filter(username=data['email']).first()
+    user_profile = UserProfileInfo.objects.filter(user=user).first()
+    print(user_profile)
+    print(request)
+    logger.info("Verify code: %s" % data)
+    if (data['code'] and user_profile.login_code and
+            user_profile.login_code == data['code']):
+        token = Token.objects.get_or_create(user=user)
+        logger.info("Code verify success")
+        # clear the login_code!
+        user_profile.login_code = None
+
+        # check set hostname org
+        org = Organization.objects.filter(
+            hostname=data['source'].lower()).first()
+        if org:
+            user_profile.user_org = org
+        user_profile.save()
+        data['token'] = token[0].key
+
+        return Response(data)
+
+    logger.info("Error verify code success")
+    return Response({'message': 'Error validating code'}, 407)
+
+
+def email_user_login_code(user, data):
+    return
+    source = data.get("source")
+    page = data.get("page", "")
+    user_profile = UserProfileInfo.objects.filter(user=user).first()
+    user_profile.login_code = random.randint(1000, 9999)
+    user_profile.save()
+
+    if 'index' in page or page is '':
+        direct_link = (
+            "https://%s?email=%s&code=%s" %
+            (source, user.email, user_profile.login_code))
+    else:
+        direct_link = (
+            "https://%s/review-video.html?email=%s&code=%s" %
+            (source, user.email, user_profile.login_code))
+        if data.get("id"):
+            direct_link = direct_link + "&id=%s" % data.get("id")
+        if data.get("user"):
+            direct_link = direct_link + "&user=%s" % data.get("user")
+
+    email_utils.send_email(
+        to_email=user.email,
+        subject='useIAM: Your Login Code',
+        message="Click here to login: %s or enter code %s" %
+        (direct_link, user_profile.login_code))
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_organization_member(request):
+    data = {k: v for k, v in request.data.items()}
+    if not data.get('email') or not data.get('password'):
+        return Response({
+            'message': 'Missing parameters. Email and password is required'
+        })
+
+    data['email'] = data['email'].lower()
+    user = User.objects.filter(username=data['email']).first()
+
+    if not user:
+        _create_user(**data)
+
+    user = User.objects.filter(username=data['email']).first()
+    if user:
+        org_member = OrganizationMember.objects.filter(user=user).first()
+        if not org_member:
+            org_member = OrganizationMember()
+            org_member.user = user
+            org_member.save()
+
+        return Response({'message': 'User already exists'})
+
+    data.pop('password')
+    data['message'] = "User created"
 
     return Response(data)
 
@@ -174,8 +292,6 @@ def get_video_info(request):
 
     try:
         int(request.GET.get("id"))
-        # if we get here this is gps-checkin
-        # test
         video = GpsCheckin.objects.filter(
             id=int(request.GET.get("id"))).first()
         resp_body['type'] = 'gps'
@@ -207,6 +323,14 @@ def get_video_info(request):
     # get monitors of user
     user_monitors = UserMonitor.objects.filter(user=video.user).all()
     user_monitor_emails = [u.notify_email for u in user_monitors]
+
+    # include monitors from org
+    org_monitors = OrganizationMemberMonitor.objects.filter(
+        client=video.user)
+    for org_monitor in org_monitors:
+        if org_monitor.user.email not in user_monitor_emails:
+            user_monitor_emails.append(org_monitor.user.email)
+
     logger.info("User %s monitors are %s"
                 % (video.user.email, user_monitor_emails))
 
@@ -241,7 +365,8 @@ def send_feedback(request):
         video = GpsCheckin.objects.filter(
             id=int(request.GET.get("id"))).first()
     except ValueError:
-        path = '/media/%s/%s' % (request.GET.get("user"), request.GET.get("id"))
+        path = '/media/%s/%s' % (request.GET.get("user"),
+                                 request.GET.get("id"))
         video = VideoUpload.objects.filter(videoUrl=path).first()
 
     if not video:
@@ -286,6 +411,13 @@ def review_video(request):
     # get monitors of user
     user_monitors = UserMonitor.objects.filter(user=video.user).all()
     user_monitor_emails = [u.notify_email for u in user_monitors]
+
+    org_monitors = OrganizationMemberMonitor.objects.filter(
+        client=video.user)
+    for org_monitor in org_monitors:
+        if org_monitor.user.email not in user_monitor_emails:
+            user_monitor_emails.append(org_monitor.user.email)
+
     logger.info("User %s monitors are %s"
                 % (video.user.email, user_monitor_emails))
 
@@ -334,7 +466,8 @@ def get_activity(request):
 
 @api_view(['PUT', 'GET'])
 def profile(request):
-    logger.info("get profile info %s" % request.user.email)
+    logger.info("get profile info %s %s"
+                % (request.data.get("paying"), request.user.email))
     profile = UserProfileInfo.objects.filter(
         user__username=request.user.email
     ).first()
@@ -344,11 +477,23 @@ def profile(request):
     active_monitor = False
 
     if request.method == 'PUT':
-        if request.data.get('paying'):
-            paying = request.data.get("paying")
+        if str(request.data.get("paying")).lower() in ['true', 'false']:
+            paying = request.data.get("paying").lower()
+            profile.iap_blurb = request.data.get("iap_blurb")
             if paying == 'true':
                 profile.paying = True
-                profile.iap_blurb = request.data.get("iap_blurb")
+            else:
+                profile.paying = False
+
+            user = User.objects.filter(username=request.user.email).first()
+            logger.info("Creating subscription event: %s %s %s" %
+                        (profile.paying, user,
+                         request.data.get("iap_blurb")))
+            # keep track of subscription events
+            SubscriptionEvent(
+                user=user, subscription_id=request.data.get("iap_blurb"),
+                paying=profile.paying).save()
+
         if request.data.get('days_sober'):
             profile.days_sober = request.data.get('days_sober')
 
@@ -395,16 +540,38 @@ def profile(request):
         monitors = [u.notify_email for u in users]
     # Check to see to see if monitor_user is on platform
 
-    return Response({
+    print(profile.user_org)
+    if profile.user_org:
+        org = {
+            'name': profile.user_org.name,
+            'logo': profile.user_org.logo,
+        }
+    else:
+        org = {
+        }
+
+    ret = {
+        'user_org': org,
         'days_sober': utils.calc_days_sober(profile),
         'sober_date': profile.sober_date,
         'notify_email': profile.notify_email,
         'active_monitor': active_monitor,
         'monitors': monitors,
-        'paying': profile.paying,
+        # 'paying': profile.paying,
+        'paying': True,
         'iap_blurb': profile.iap_blurb,
         'stripe_subscription_id': profile.stripe_subscription_id,
-    }, 201)
+    }
+
+    org_member = OrganizationMember.objects.filter(user=request.user).first()
+    if org_member:
+        ret['org_member'] = {'name': org_member.organization.name,
+                             'logo': org_member.organization.logo}
+    else:
+        ret['org_member'] = {}
+    print(ret)
+
+    return Response(ret, 201)
 
 
 @api_view(['POST'])
@@ -432,7 +599,7 @@ def forgot_password(request):
             request=request,
             html_email_template_name='registration/password_reset_email.html',
             extra_email_context={
-                'agent_name': 'Hassan',
+                'agent_name': '',
                 'reset_url': settings.WEBSITE_URL + 'reset-password.html'
             }
         )
@@ -447,25 +614,24 @@ def forgot_password(request):
 @api_view(['POST'])
 def send_magic_link(request):
     email = request.data['email']
+    mode = request.data['mode']
     name = email.strip().split('@')
-    print(name[0], "@@@@@@@@@@")
     user = User.objects.filter(username=email).first()
     if not user:
         password = User.objects.make_random_password()
-        print("password" , password)
+        print("password", password)
         data = {
             'username': email,
-            'email':email,
+            'email': email,
             'notify_email': email,
             'password': password,
             'name': name[0],
-            'phone':'',
-            'days_sober':0,
-            'sober_date':0,
-            'source':None
+            'phone': '',
+            'days_sober': 0,
+            'sober_date': 0,
+            'source': None
         }
         _create_user(**data)
-    print(email)
     if email is None:
         data = {
             'status': False,
@@ -476,19 +642,28 @@ def send_magic_link(request):
     user = get_object_or_404(User, email=email)
     link = MagicLink.objects.create(user=user)
     if link:
-        login_url = str(website_url + str(link.token))
-        email_utils.send_email(
-            # to_email=settings.DEFAULT_FROM_EMAIL,
-            to_email=email,
-            subject='useIAM: %s added you as a monitor'
-                    % email,
-            message="please click on this link %s for login " % login_url
-        )
-        print(login_url)
-        data = {
-            'status': True,
-            'token': link.token
-        }
+        if mode == 'web':
+            login_url = settings.WEBSITE_URL + '?token=' + str(link.token)
+            email_utils.send_email(
+                to_email=email,
+                subject='useIAM: Magic Link to Login',
+                message="please click on this link %s for login " % login_url
+            )
+            data = {
+                'status': True,
+                'token': link.token
+            }
+        else:
+            login_url = "useiam://?token=" + str(link.token)
+            email_utils.send_email(
+                to_email=email,
+                subject='useIAM: Magic Link to Login',
+                message="please click on this link %s for login " % login_url
+            )
+            data = {
+                'status': True,
+                'token': link.token
+            }
     else:
         data = {
             'status': False,
@@ -522,7 +697,7 @@ def auth_magic_link(request):
     data = {
         'status': True,
         'auth_token': token.key,
-        #'user': serialized.data
+        # 'user': serialized.data
     }
 
     return Response(data, status=status.HTTP_201_CREATED)

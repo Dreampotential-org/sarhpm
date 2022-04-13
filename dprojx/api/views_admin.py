@@ -8,6 +8,7 @@ from rest_framework.response import Response
 
 from dappx.models import UserMonitor, UserProfileInfo
 from dappx.models import GpsCheckin, VideoUpload
+from dappx.models import OrganizationMemberMonitor
 from common import config
 import urllib.parse
 
@@ -100,10 +101,13 @@ def list_patient_events(request):
     # get all patients
     if not patient:
         patients = UserMonitor.objects.filter(
-            notify_email=request.user.email).all()
+            notify_email=request.user.email
+        ).all()
 
         for patient in patients:
-            profile = UserProfileInfo.objects.filter(user=patient.user).first()
+            profile = UserProfileInfo.objects.filter(
+                user=patient.user
+            ).first()
             profiles_map[patient.user.email] = profile
             users.append(patient.user)
 
@@ -168,6 +172,66 @@ def list_patient_events(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def get_last_patient_event(request):
+    user_id = request.GET.get("user_id")
+    print(user_id)
+    user = User.objects.filter(id=int(user_id)).first()
+    print(user.email)
+
+    allowed_members = OrganizationMemberMonitor.objects.filter(
+        client=user)
+    print(allowed_members)
+    for allowed_member in allowed_members:
+        if allowed_member.user.email == request.user.email:
+            allowed = True
+            break
+    else:
+        allowed = UserMonitor.objects.filter(
+            notify_email=request.user.email).first()
+
+    if not allowed:
+        return Response({
+            'status': "%s not viewable by %s" % (user_id,
+                                                 request.user.email)
+        })
+
+    profile = UserProfileInfo.objects.filter(user=user).first()
+    video_event = VideoUpload.objects.filter(
+        user=user
+    ).order_by('-created_at').first()
+    gps_event = GpsCheckin.objects.filter(
+        user=user
+    ).order_by('-created_at').first()
+
+    if video_event and gps_event:
+        if video_event.created_at > gps_event.created_at:
+            return Response({
+                'id': video_event.video_id(),
+                'user': profile.user_hash,
+            })
+        else:
+            return Response({
+                'id': gps_event.id,
+                'user': profile.user_hash,
+            })
+
+    if not video_event and gps_event:
+        return Response({
+            'id': gps_event.id,
+            'user': profile.user_hash,
+        })
+
+    if video_event and not gps_event:
+        return Response({
+            'id': video_event.video_id(),
+            'user': profile.user_hash,
+        })
+    return Response('no_events')
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def list_patient_events_v2(request):
     # find users who have set this user as a monitor
 
@@ -191,8 +255,16 @@ def list_patient_events_v2(request):
         user = User.objects.filter(username=patient).first()
         profile = UserProfileInfo.objects.filter(user=user).first()
         profiles_map[user.email] = profile
-        allowed = UserMonitor.objects.filter(
-            notify_email=request.user.email, user=user).first()
+
+        allowed_members = OrganizationMemberMonitor.objects.filter(
+            client=user)
+        for allowed_member in allowed_members:
+            if allowed_member.user.email == request.user.email:
+                allowed = True
+                break
+        else:
+            allowed = UserMonitor.objects.filter(
+                notify_email=request.user.email, user=user).first()
 
         if not allowed:
             return Response({

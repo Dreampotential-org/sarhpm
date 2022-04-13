@@ -4,8 +4,8 @@ from django.contrib.sites.models import Site
 import requests
 import json
 
-from .models import UserMonitor
-from .models import UserProfileInfo
+from .models import UserMonitor, OrganizationMemberMonitor
+from .models import UserProfileInfo, OrganizationMember
 from . import email_utils
 from . import constants
 from common import config
@@ -17,7 +17,27 @@ logger = config.get_logger()
 def get_user_monitors(request):
     user = User.objects.filter(username=request.user.email).first()
     users = UserMonitor.objects.filter(user=user).all()
-    return [u.notify_email for u in users]
+
+    notify_group = [u.notify_email for u in users]
+
+    # check notify_all setting
+    user_profile = UserProfileInfo.objects.filter(user=user).first()
+    if user_profile.user_org and user_profile.user_org.notify_all:
+        # notify all org members
+        org_monitors = OrganizationMember.objects.filter(
+            organization=user_profile.user_org)
+
+    else:
+        org_monitors = OrganizationMemberMonitor.objects.filter(
+            client=user)
+
+    print("ORG MONITORS")
+    print(org_monitors)
+    for org_monitor in org_monitors:
+        if org_monitor.user.email not in notify_group:
+            notify_group.append(org_monitor.user.email)
+    print(notify_group)
+    return notify_group
 
 
 def get_user_profile(user):

@@ -267,10 +267,12 @@ def _create_user(**data):
         ).first()
 
     user_form = UserForm(data)
-    profile_form = UserProfileInfoForm(data)
-
-    print("user form ",user_form)
-
+    profile_data = {}
+    profile_data['name'] = data['name']
+    profile_data['notify_email'] = data['email']
+    profile_data['days_sober'] = '0'
+    profile_form = UserProfileInfoForm(profile_data)
+    print("user form ", user_form)
     if user_form.is_valid() and profile_form.is_valid():
         print("Enter in this form")
         user = user_form.save()

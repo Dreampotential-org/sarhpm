@@ -1,4 +1,4 @@
-Django==2.2.13
+Django==2.2.16
 django-phonenumber-field
 phonenumbers
 django-ses
@@ -7,10 +7,13 @@ boto3
 requests
 django-crispy-forms
 Pillow
-psycopg2-binary
+psycopg2-binary==2.8.6
 gunicorn
 newrelic
 django-allauth
 django-rest-auth
 django-cors-headers
 stripe
+django-magic-link
+drf_yasg
+django-dbbackup

@@ -19,9 +19,9 @@ ALLOWED_HOSTS = ['*', 'beachcomber.usepam.com', 'localhost', '127.0.0.1']
 
 BASE_URL = 'app.usepam.com'
 EMAIL_BACKEND = 'django_ses.SESBackend'
-AWS_ACCESS_KEY_ID = 'AKIAIHFAW4CMLKGZJWQQ'
-AWS_SECRET_ACCESS_KEY = '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'
-DEFAULT_FROM_EMAIL = 'noreply@app.usepam.com'
+AWS_ACCESS_KEY_ID = 'AKIARWLPGYIKWTF4OEPZ'
+AWS_SECRET_ACCESS_KEY = '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'
+DEFAULT_FROM_EMAIL = 'noreply@useiam.com'
 
 SITE_ID = 1
 
@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'dappx',
     'api',
     'magic_link',
+    'drf_yasg',
+    'dbbackup',
 ]
 
 # CORS_ORIGIN_WHITELIST = ['v2-local.postmunk.me']
@@ -96,11 +98,11 @@ WSGI_APPLICATION = 'dprojx.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'db',
+        'NAME': 'postgres',
         'USER': 'postgres',
         'PORT': '5432',
-        'HOST': 'useiam-v3.cb7bl0nt7fvo.us-east-2.rds.amazonaws.com',
-        'PASSWORD': 'MzFmZDI0NTUyNGIwOWNmNzcyOWEwYTQ1',
+        'HOST': 'database-2.cscuw6ktirtf.us-east-2.rds.amazonaws.com',
+        'PASSWORD': 'ZWY3ZWRmOGNjZDViMGM0YmUzZGZiYjIz',
     }
 }
 
