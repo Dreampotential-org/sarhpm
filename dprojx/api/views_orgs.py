@@ -402,10 +402,24 @@ def add_org_clients(request):
 def add_org_clients(request):
     if request.method == 'POST' and request.FILES['file']:
 
+        name = request.POST.get('name')
+        hostname = request.POST.get('hostname')
+        
         myfile = request.FILES['file']
-        url = upload_org_logo(myfile, request)
+        logo_path = upload_org_logo(myfile, request)
+        logo_url = request.build_absolute_uri(logo_path)
 
-        return JsonResponse({'error': url}, status=200)
+        Organization.objects.create(
+            name=name,
+            hostname=hostname,
+            logo=logo_url, 
+        )
+
+        return JsonResponse({
+            'name': name,
+            'hostname': hostname,
+            'logo': logo_url
+        }, status=200) 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
