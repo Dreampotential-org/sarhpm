@@ -392,12 +392,9 @@ def list_org_clients(request):
             })
 
     return Response(clients)
+    
 
 @api_view(['POST'])
-def add_org_clients(request):
-    return Response("Success Added", status=status.HTTP_201_CREATED)
-
-
 @csrf_exempt
 def add_org_clients(request):
     if request.method == 'POST' and request.FILES['file']:
