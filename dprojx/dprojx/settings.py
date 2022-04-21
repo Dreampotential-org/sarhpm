@@ -143,6 +143,7 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 WEBSITE_URL = 'https://m.useiam.com/'
+SERVER_URL = 'https://prod-api.useiam.com/'
 
 
 # DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'

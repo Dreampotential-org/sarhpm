@@ -34,6 +34,7 @@ urlpatterns = [
     path('add-monitor/', views.add_monitor, name='add_monitor'),
     path('remove-monitor/', views.remove_monitor, name='remove_monitor'),
     path('review-video/', views.review_video, name='review_video'),
+    path('view-org-logo/<str:name>/', views.view_org_logo, name='view_org_logo'),
     path('get-activity/', views.get_activity, name='get_activity'),
     path('send-feedback/', views.send_feedback, name='send_feedback'),
     path('get-video-info/', views.get_video_info, name='get_video_info'),

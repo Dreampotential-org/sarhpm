@@ -22,6 +22,7 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics
 from django.db.models import Q
+from django.conf import settings
 
 
 class OrganizationMemberView(generics.GenericAPIView):
@@ -403,8 +404,8 @@ def add_org_clients(request):
         hostname = request.POST.get('hostname')
         
         myfile = request.FILES['file']
-        logo_path = upload_org_logo(myfile, request)
-        logo_url = request.build_absolute_uri(logo_path)
+        save_image_name = upload_org_logo(myfile, request)
+        logo_url = settings.SERVER_URL+'api/view-org-logo/'+save_image_name
 
         Organization.objects.create(
             name=name,

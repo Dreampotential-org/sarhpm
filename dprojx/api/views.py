@@ -1,7 +1,9 @@
 import random
 import time
+from os.path import dirname, join
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordResetForm
+from django.http import HttpResponse
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
@@ -701,3 +703,12 @@ def auth_magic_link(request):
     }
 
     return Response(data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['GET'])
+def view_org_logo(request, name):
+    link = 'media/img/'+name
+    project_root = dirname(dirname(__file__))
+    output_path = join(project_root, link)
+    image_data = open(output_path, "rb").read()
+    return HttpResponse(image_data, content_type="image/png")

@@ -215,15 +215,18 @@ def convert_and_save_video(myfile, request):
 
 def upload_org_logo(myfile, request):
     fs = FileSystemStorage()
-
+    uid = uuid.uuid4()
     uploaded_name = (
-        "%s/%s-%s" % ('img', uuid.uuid4(), myfile.name)
+        "%s/%s-%s" % ('img', uid, myfile.name)
     ).lower()
 
     filename = fs.save(uploaded_name, myfile)
-    uploaded_file_url = fs.url(filename)
 
-    return uploaded_file_url
+    save_filename = (
+        "%s-%s" % (uid, myfile.name)
+    ).lower()
+
+    return save_filename
 
 
 @csrf_exempt
