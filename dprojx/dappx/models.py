@@ -141,3 +141,11 @@ class UserProfileInfo(models.Model):
                 self.user.email.encode('utf-8')
             ).hexdigest()
         super(UserProfileInfo, self).save(*args, **kwargs)
+
+
+class UserLead(models.Model):
+    phone = models.CharField(max_length=17, blank=True, null=True)
+    name = models.CharField(max_length=17, blank=True, null=True)
+    website = models.CharField(max_length=17, blank=True, null=True)
+    email = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
