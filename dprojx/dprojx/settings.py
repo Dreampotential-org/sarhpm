@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
-    'dappx',
+    'dappx.apps.DappxConfig',
     'api',
     'magic_link',
     'drf_yasg',

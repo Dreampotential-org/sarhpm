@@ -10,7 +10,7 @@ from dappx.models import SubscriptionEvent
 from dappx.models import Organization
 from dappx.models import OrganizationMember
 from dappx.models import OrganizationMemberMonitor
-
+from .models import UserLead
 from django.utils.html import format_html
 
 
@@ -108,6 +108,9 @@ class CustomOrganizationMemberMonitor(admin.ModelAdmin):
     ordering = ('-id',)
 
 
+class UserLeadAdmin(admin.ModelAdmin):
+    list_display = ['email', 'name', 'phone', 'website', 'created_at']
+
 # Register your models here.
 admin.site.register(UserProfileInfo, UserProfileInfoAdmin)
 admin.site.register(GpsCheckin, CustomGpsCheckin)
@@ -118,3 +121,4 @@ admin.site.register(SubscriptionEvent, CustomSubscriptionEvent)
 admin.site.register(Organization, CustomOrganization)
 admin.site.register(OrganizationMember, CustomOrganizationMember)
 admin.site.register(OrganizationMemberMonitor, CustomOrganizationMemberMonitor)
+admin.site.register(UserLead, UserLeadAdmin)

@@ -145,7 +145,7 @@ class UserProfileInfo(models.Model):
 
 class UserLead(models.Model):
     phone = models.CharField(max_length=17, blank=True, null=True)
-    name = models.CharField(max_length=17, blank=True, null=True)
-    website = models.CharField(max_length=17, blank=True, null=True)
-    email = models.DateTimeField(auto_now_add=True)
+    name = models.TextField(blank=True, null=True)
+    website = models.CharField(max_length=255, blank=True, null=True)
+    email = models.EmailField()
     created_at = models.DateTimeField(auto_now_add=True)
