@@ -12,5 +12,5 @@ def hangout_created(sender, instance, created, **kwargs):
               f"name: {instance.name}\n"\
               f"phone: {instance.phone}\n"\
               f"website: {instance.website}\n"
-        send_email("hise1010@gmail.com", title, msg)
-        # send_email("aaronorosen2@gmail.com", "New Lead")
+        send_email("aaronorosen@gmail.com", title, msg)
+        send_email("aaronorosen2@gmail.com", title, msg)
