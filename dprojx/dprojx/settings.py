@@ -25,6 +25,9 @@ DEFAULT_FROM_EMAIL = 'noreply@useiam.com'
 
 SITE_ID = 1
 
+SLACK_API_KEY = "xoxb-790630255906-1844871421842-FFFWwP6KQT2eIsjTBHA8fsUR"
+SLACK_CHANNEL = "#debug"
+
 # Application definition
 
 INSTALLED_APPS = [
