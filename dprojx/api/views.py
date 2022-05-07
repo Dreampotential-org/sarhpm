@@ -317,14 +317,28 @@ def get_video_info(request):
     ).first()
 
     feedbacks = video.monitor_feedback.all()
-    video_feedback = [
-        {'user': feedback.user.email, 'message': feedback.message,
-         'created_at': time.mktime(feedback.created_at.timetuple())}
-        for feedback in feedbacks]
-
     # get monitors of user
     user_monitors = UserMonitor.objects.filter(user=video.user).all()
     user_monitor_emails = [u.notify_email for u in user_monitors]
+
+    video_feedback = []
+
+    # here we only show feedback comments to owner of content otherwise if
+    # request is from montior user we just show their feedbacks
+    if token.user.email == video.user.email:
+        video_feedback = [
+            {'user': feedback.user.email, 'message': feedback.message,
+             'created_at': time.mktime(feedback.created_at.timetuple())}
+            for feedback in feedbacks]
+    elif token.user.email in user_monitor_emails:
+        for feedback in feedbacks:
+            if feedback.user.email == token.user.email:
+                video_feedback.append({'user': feedback.user.email,
+                                       'message': feedback.message,
+                                       'created_at': time.mktime(
+                                            feedback.created_at.timetuple())
+                                       })
+
 
     # include monitors from org
     org_monitors = OrganizationMemberMonitor.objects.filter(
