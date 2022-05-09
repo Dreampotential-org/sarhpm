@@ -17,3 +17,5 @@ stripe
 django-magic-link
 drf_yasg
 django-dbbackup
+slack
+slackclient
