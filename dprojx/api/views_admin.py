@@ -229,14 +229,13 @@ def get_last_patient_event(request):
     return Response('no_events')
 
 
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def list_patient_events_v2(request):
     # find users who have set this user as a monitor
 
     filter_type = request.GET.get("filter_type")
-    patient = urllib.parse.unquote(request.GET.get("email"))
+    patient = urllib.parse.unquote(request.GET.get("email", ''))
     users = []
     profiles_map = {}
 
@@ -250,6 +249,9 @@ def list_patient_events_v2(request):
                 user=patient.user).first()
             profiles_map[patient.user.email] = profile
             users.append(patient.user)
+
+        # XXX need to add code to grab events for other patients set
+        # to same org user as user requesting and de-dup list.
 
     else:
         user = User.objects.filter(username=patient).first()
@@ -308,7 +310,9 @@ def list_patient_events_v2(request):
 
     events = sorted(events, key=lambda i: i['created_at'], reverse=True)
 
+    # XXX we are just limiting to last 30 events
+    # need to add pagination support.
     return Response({
         'events': sorted(events,
-                         key=lambda i: i['created_at'], reverse=True)[0:20]
+                         key=lambda i: i['created_at'], reverse=True)[0:30]
     })
