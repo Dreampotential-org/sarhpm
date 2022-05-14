@@ -318,9 +318,9 @@ def list_patient_events_v2(request):
 
     events = sorted(events, key=lambda i: i['created_at'], reverse=True)
 
-    # XXX we are just limiting to last 30 events
-    # need to add pagination support.
-    return Response({
-        'events': sorted(events,
-                         key=lambda i: i['created_at'], reverse=True)[0:30]
-    })
+    paginator = PageNumberPagination()
+    paginator.page_size = 30
+
+    page = paginator.paginate_queryset(events, request)
+    if page is not None:
+        return paginator.get_paginated_response(page)
