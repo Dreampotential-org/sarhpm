@@ -6,7 +6,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from dappx.models import UserMonitor, UserProfileInfo
+from dappx.models import UserMonitor, UserProfileInfo, OrganizationMember
 from dappx.models import GpsCheckin, VideoUpload
 from dappx.models import OrganizationMemberMonitor
 from common import config
@@ -250,8 +250,16 @@ def list_patient_events_v2(request):
             profiles_map[patient.user.email] = profile
             users.append(patient.user)
 
-        # XXX need to add code to grab events for other patients set
-        # to same org user as user requesting and de-dup list.
+        member_org = OrganizationMember.objects.filter(
+            user=request.user).first()
+
+        member_profiles = UserProfileInfo.objects.filter(
+            user_org=member_org.organization
+        ).all()
+
+        for member_profile in member_profiles:
+            profiles_map[member_profile.user.email] = member_profile
+            users.append(member_profile.user)
 
     else:
         user = User.objects.filter(username=patient).first()
