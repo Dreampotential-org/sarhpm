@@ -95,6 +95,7 @@ class UserMonitor(models.Model):
 
 
 class OrganizationMember(models.Model):
+    #should add unique to user not unique together
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
     admin = models.BooleanField(default=False, db_index=True)
     organization = models.ForeignKey(to=Organization, on_delete=models.CASCADE,
@@ -105,6 +106,7 @@ class OrganizationMember(models.Model):
 
 
 class OrganizationMemberMonitor(models.Model):
+    # if you want default to be null specify null = True in user and client
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
     client = models.ForeignKey(to=User,
                                on_delete=models.CASCADE, default="",

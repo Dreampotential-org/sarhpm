@@ -11,6 +11,8 @@ from dappx.models import GpsCheckin, VideoUpload
 from dappx.models import OrganizationMemberMonitor
 from common import config
 import urllib.parse
+from itertools import chain
+import operator
 
 logger = config.get_logger()
 
@@ -233,7 +235,7 @@ def get_last_patient_event(request):
 @permission_classes([IsAuthenticated])
 def list_patient_events_v2(request):
     # find users who have set this user as a monitor
-
+    start = time.time()
     filter_type = request.GET.get("filter_type")
     patient = urllib.parse.unquote(request.GET.get("email", ''))
     users = []
@@ -252,14 +254,7 @@ def list_patient_events_v2(request):
 
         member_org = OrganizationMember.objects.filter(
             user=request.user).first()
-
-        member_profiles = UserProfileInfo.objects.filter(
-            user_org=member_org.organization
-        ).all()
-
-        for member_profile in member_profiles:
-            profiles_map[member_profile.user.email] = member_profile
-            users.append(member_profile.user)
+        users = User.objects.filter(userprofileinfo__user_org=member_org.organization).all()
 
     else:
         user = User.objects.filter(username=patient).first()
@@ -284,43 +279,50 @@ def list_patient_events_v2(request):
 
         users.append(user)
 
-    print("len %s" % len(users))
-    video_events = []
-    gps_events = []
-    for user in users:
-        video_events += VideoUpload.objects.filter(user=user).all()
-        gps_events += GpsCheckin.objects.filter(user=user).all()
-
-    events = []
-    if filter_type == 'gps' or not filter_type:
-        for event in gps_events:
-            t = event.created_at
-            events.append({
-                'id': event.id,
-                'type': 'gps',
-                'lat': event.lat,
-                'lng': event.lng,
-                'msg': event.msg,
-                'name': profiles_map[event.user.email].name,
-                'email': event.user.email,
-                'created_at': time.mktime(t.timetuple())})
-
-    if filter_type == 'video' or not filter_type:
-        for event in video_events:
-            t = event.created_at
-            events.append({
-                'id': event.video_id(),
-                'type': 'video',
-                'email': event.user.email,
-                'name': profiles_map[event.user.email].name,
-                'url': event.video_api_link(),
-                'created_at': time.mktime(t.timetuple())})
-
-    events = sorted(events, key=lambda i: i['created_at'], reverse=True)
-
+    if not filter_type:
+        video_events = VideoUpload.objects.filter(user__in=users).all()
+        gps_events = GpsCheckin.objects.filter(user__in=users).all()
+        events = chain(video_events, gps_events)
+        events = sorted(events, key=operator.attrgetter('created_at'), reverse=True)
+    elif filter_type == 'video':
+        events = VideoUpload.objects.filter(user__in=users).oreder_by('created_at').all()
+    elif filter_type == 'gps':
+        events = GpsCheckin.objects.filter(user__in=users).oreder_by('created_at').all()
+    else:
+        events = []
     paginator = PageNumberPagination()
     paginator.page_size = 30
+    paginate_queryset = paginator.paginate_queryset(events, request)
+    data = []
+    for obj in paginate_queryset:
+        if isinstance(obj, GpsCheckin):
+            t = obj.created_at
+            data.append({
+                'id': obj.id,
+                'type': 'gps',
+                'lat': obj.lat,
+                'lng': obj.lng,
+                'msg': obj.msg,
+                # 'name': profiles_map[obj.user.email].name,
+                'name': obj.user.userprofileinfo.name,
+                'email': obj.user.email,
+                'created_at': time.mktime(t.timetuple())
+            })
+        elif isinstance(obj, VideoUpload):
+            t = obj.created_at
+            url = obj.videoUrl.split('/')
+            data.append({
+                'id': url[-1],
+                # "id": obj.video_id(),
+                'type': 'video',
+                'email': obj.user.email,
+                'name': obj.user.userprofileinfo.name,
+                # 'name': profiles_map[obj.user.email].name,
+                'url': '/api/review-video?id=%s&user=%s' % (url[-1], url[2]),
+                # 'url': obj.video_api_link(),
+                'created_at': time.mktime(t.timetuple())
+            })
+    print(f"time to events serializer is {time.time() - start}")
 
-    page = paginator.paginate_queryset(events, request)
-    if page is not None:
-        return paginator.get_paginated_response(page)
+    return Response(data)
+
