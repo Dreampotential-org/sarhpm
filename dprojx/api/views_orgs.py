@@ -402,6 +402,9 @@ def add_org_clients(request):
 
         name = request.POST.get('name')
         hostname = request.POST.get('hostname')
+        address = request.POST.get('address')
+        city = request.POST.get('city')
+        state = request.POST.get('state')
         
         myfile = request.FILES['file']
         save_image_name = upload_org_logo(myfile, request)
@@ -410,13 +413,19 @@ def add_org_clients(request):
         Organization.objects.create(
             name=name,
             hostname=hostname,
-            logo=logo_url, 
+            logo=logo_url,
+            address=address,
+            city=city,
+            state=state,
         )
 
         return JsonResponse({
             'name': name,
             'hostname': hostname,
-            'logo': logo_url
+            'logo': logo_url,
+            'address': address,
+            'city': city,
+            'state': state
         }, status=200) 
 
 @api_view(['POST'])
