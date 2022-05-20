@@ -310,15 +310,14 @@ def list_patient_events_v2(request):
             })
         elif isinstance(obj, VideoUpload):
             t = obj.created_at
-            url = obj.videoUrl.split('/')
             data.append({
-                'id': url[-1],
+                'id': obj.video_id(),
                 # "id": obj.video_id(),
                 'type': 'video',
                 'email': obj.user.email,
                 'name': obj.user.userprofileinfo.name,
                 # 'name': profiles_map[obj.user.email].name,
-                'url': '/api/review-video?id=%s&user=%s' % (url[-1], url[2]),
+                'url': obj.video_api_link(),
                 # 'url': obj.video_api_link(),
                 'created_at': time.mktime(t.timetuple())
             })
