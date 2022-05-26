@@ -96,7 +96,7 @@ def list_patient_events(request):
     # find users who have set this user as a monitor
 
     filter_type = request.GET.get("filter_type")
-    patient = urllib.parse.unquote(request.GET.get("email"))
+    patient = urllib.parse.unquote(request.GET.get("email", ""))
     users = []
     profiles_map = {}
 
@@ -107,6 +107,7 @@ def list_patient_events(request):
         ).all()
 
         for patient in patients:
+            # XXX hassan make query in bulk
             profile = UserProfileInfo.objects.filter(
                 user=patient.user
             ).first()
@@ -131,9 +132,11 @@ def list_patient_events(request):
     print("len %s" % len(users))
     video_events = []
     gps_events = []
+    # XXX hassan figure out to do in bulk
     for user in users:
         video_events += VideoUpload.objects.filter(user=user).all()
         gps_events += GpsCheckin.objects.filter(user=user).all()
+
 
     events = []
     if filter_type == 'gps' or not filter_type:
