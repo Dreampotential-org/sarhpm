@@ -86,6 +86,7 @@ class Organization(models.Model):
     address = models.CharField(max_length=500, blank=True, null=True)
     city = models.CharField(max_length=255, blank=True, null=True)
     state = models.CharField(max_length=255, blank=True, null=True)
+    phone_no = models.CharField(max_length=100, blank=True, null=True)
     notify_all = models.BooleanField(default=False, db_index=True)
 
     def __str__(self):
