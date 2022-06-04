@@ -18,4 +18,5 @@ django-magic-link
 drf_yasg
 django-dbbackup
 slack
-slackclient
+pandas
+slackclient==2.1.0

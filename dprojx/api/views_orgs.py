@@ -405,6 +405,7 @@ def add_org_clients(request):
         address = request.POST.get('address')
         city = request.POST.get('city')
         state = request.POST.get('state')
+        phone_no = request.POST.get('phone_no')
         
         myfile = request.FILES['file']
         save_image_name = upload_org_logo(myfile, request)
@@ -417,6 +418,7 @@ def add_org_clients(request):
             address=address,
             city=city,
             state=state,
+            phone_no=phone_no
         )
 
         return JsonResponse({
@@ -425,7 +427,8 @@ def add_org_clients(request):
             'logo': logo_url,
             'address': address,
             'city': city,
-            'state': state
+            'state': state,
+            'phone_no': phone_no
         }, status=200) 
 
 @api_view(['POST'])
