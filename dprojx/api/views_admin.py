@@ -166,7 +166,7 @@ def list_patient_events(request):
     events = sorted(events, key=lambda i: i['created_at'], reverse=True)
 
     paginator = PageNumberPagination()
-    paginator.page_size = 10
+    paginator.page_size = 50
 
     page = paginator.paginate_queryset(events, request)
     if page is not None:
