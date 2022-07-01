@@ -59,7 +59,7 @@ class CustomGpsCheckin(admin.ModelAdmin):
 
 class UserProfileInfoAdmin(admin.ModelAdmin):
     list_display = [
-        'id', 'user', 'notify_email', 'created_at', 'paying', 'iap_blurb',
+        'id', 'user', 'name', 'created_at', 'paying', 'iap_blurb',
     ]
     ordering = ('-id',)
 
