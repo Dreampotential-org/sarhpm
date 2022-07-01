@@ -133,7 +133,7 @@ class UserProfileInfo(models.Model):
     paying = models.BooleanField(default=False)
     iap_blurb = models.TextField(default="")
     user_org = models.ForeignKey(to=Organization,
-                                 on_delete=models.CASCADE,
+                                 on_delete=models.SET_NULL,
                                  blank=True, null=True)
 
     login_code = models.CharField(max_length=17, blank=True, null=True)
