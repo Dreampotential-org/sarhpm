@@ -137,6 +137,7 @@ class UserProfileInfo(models.Model):
                                  blank=True, null=True)
 
     login_code = models.CharField(max_length=17, blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.user.username

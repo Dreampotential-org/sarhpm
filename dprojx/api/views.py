@@ -242,6 +242,19 @@ def add_organization_member(request):
     return Response(data)
 
 
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def set_note(request):
+    user_profile = UserProfileInfo.objects.filter(user=request.user).first()
+    user_profile.notes = request.data.get('notes')
+    user_profile.save()
+
+    return Response({
+        'response': 'okay',
+    }, 201)
+
+
+
 @api_view(['PUT', 'GET'])
 @permission_classes([IsAuthenticated])
 def add_monitor(request):

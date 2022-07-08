@@ -1,27 +1,10 @@
 ## Running For Development Environment
 ---
 
-Run the following command
+virtualenv -p python3 venv
+source venv/bin/activate
+pip install -r requirements.txt
 
-```bash
-docker-compose run --service project
-```
-
-## Running For Staging Environment
----
-
-Run the following command
-
-```bash
-./buildkite/pipeline.sh
-```
-or
-
-```bash
-docker-compose -f docker-compose-staging.yml down
-docker-compose build
-docker-compose -f docker-compose-staging.yml up -d
-```
 ```
 
 

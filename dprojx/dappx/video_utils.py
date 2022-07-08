@@ -49,6 +49,7 @@ def convert_video(myfile, request):
     filename = fs.save(uploaded_name, myfile)
     uploaded_file_url = fs.url(filename)
     print(uploaded_name)
+    # this is android device
     if uploaded_name[-4:] == '.mov':
         # ffmpeg!
         uploaded_file_url = convert_file(uploaded_file_url)
