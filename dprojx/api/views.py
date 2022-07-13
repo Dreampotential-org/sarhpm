@@ -584,6 +584,7 @@ def profile(request):
         'days_sober': utils.calc_days_sober(profile),
         'sober_date': profile.sober_date,
         'notify_email': profile.notify_email,
+        'notes': profile.notes,
         'active_monitor': active_monitor,
         'monitors': monitors,
         # 'paying': profile.paying,
