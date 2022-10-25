@@ -39,18 +39,7 @@ class Profile(models.Model):
         unique_together = ('phone',)
 
 
-class TagEntry(models.Model):
-    assigned_by = models.ForeignKey(to=get_user_model(),
-                                    on_delete=models.CASCADE,
-                                    default="")
-    tag = models.TextField(default="", max_length=150)
-    assigned_to = models.ForeignKey(to=get_user_model(),
-                                    on_delete=models.CASCADE,
-                                    default="")
-    created_at = models.DateTimeField(auto_now_add=True)
-
-
-class UserMonitor(models.Model):
+class UserEventNotify(models.Model):
     user = models.ForeignKey(to=get_user_model(),
                              on_delete=models.CASCADE,
                              default="", blank=True, null=True)
@@ -59,9 +48,6 @@ class UserMonitor(models.Model):
 
 
 class GpsC(models.Model):
-    profile = models.ForeignKey(to=get_user_model(),
-                                on_delete=models.CASCADE,
-                                default="", blank=True, null=True)
     msg = models.CharField(max_length=2000, default='')
     lat = models.CharField(max_length=500, default='')
     lng = models.CharField(max_length=500, default='')
@@ -146,7 +132,6 @@ class UserGpsEntry(models.Model):
     user = models.ForeignKey(to=get_user_model(),
                              on_delete=models.CASCADE,
                              default="", blank=True, null=True)
-
 
     latitude = models.DecimalField(max_digits=9, decimal_places=6,
                                    blank=True, null=True)
