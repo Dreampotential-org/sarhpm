@@ -99,15 +99,21 @@ WSGI_APPLICATION = 'dprojx.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
+db_user = os.environ.get('db_user', 'postgresuser')
+db_password = os.environ.get('db_password', 'postgrespassword')
+db_name = os.environ.get('db_user', 'postgres')
+db_host = os.environ.get('db_host', 'localhost')
+db_port = os.environ.get('db_port', '5433')
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PORT': '5432',
-        'HOST': 'database-2.cscuw6ktirtf.us-east-2.rds.amazonaws.com',
-        'PASSWORD': 'ZWY3ZWRmOGNjZDViMGM0YmUzZGZiYjIz',
+        'NAME': db_name,
+        'USER': db_user,
+        'HOST': db_host,
+        'PORT': db_port,
+        'PASSWORD': db_password,
+
     }
 }
 

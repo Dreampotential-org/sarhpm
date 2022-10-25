@@ -1,0 +1,21 @@
+version: '3.3'
+
+services:
+    db:
+        image: postgis/postgis
+        ports:
+            - 5443:5432
+        volumes:
+            - /opt/postgres-useiam-base:/var/lib/postgresql/data
+        environment:
+            POSTGRES_DB: postgresdb
+            POSTGRES_USER: postgresuser
+            POSTGRES_PASSWORD: postgrespassword
+        networks:
+            - backend
+
+networks:
+    backend:
+        external:
+            name: chiroposture_network
+
