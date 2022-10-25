@@ -16,13 +16,16 @@ class Upload(models.Model):
 
 
 class AdminFeedback(models.Model):
-    user = models.ForeignKey(to=get_user_model(), on_delete=models.CASCADE,
-                             default="")
+    user = models.ForeignKey(
+        to=get_user_model(), on_delete=models.CASCADE, default="")
     message = models.TextField(default="")
     created_at = models.DateTimeField(auto_now_add=True)
 
 
 class Member(models.Model):
+    user = models.ForeignKey(to=get_user_model(),
+                             on_delete=models.CASCADE,
+                             blank=True, null=True)
     phone = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=128, blank=True, null=True)
     bio = models.CharField(max_length=255, blank=True, null=True)
@@ -51,7 +54,7 @@ class MemberMonitor(models.Model):
     notify_email = models.EmailField(max_length=512, blank=True, null=True)
 
 
-class GpsCheckin(models.Model):
+class GpsC(models.Model):
     member = models.ForeignKey(to=Member, on_delete=models.CASCADE,
                                default="", blank=True, null=True)
     msg = models.CharField(max_length=2000, default='')
@@ -63,7 +66,7 @@ class GpsCheckin(models.Model):
                              default="", blank=True, null=True)
 
 
-class VideoUpload(models.Model):
+class VideoCU(models.Model):
     videoUrl = models.CharField(max_length=500)
     member = models.ForeignKey(to=Member, on_delete=models.CASCADE,
                                default="", blank=True, null=True)

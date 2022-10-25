@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'magic_link',
     'drf_yasg',
     'dbbackup',
+    'sa',
 ]
 
 # CORS_ORIGIN_WHITELIST = ['v2-local.postmunk.me']
@@ -153,8 +154,8 @@ CSRF_COOKIE_HTTPONLY = False
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-WEBSITE_URL = 'https://m.useiam.com/'
-SERVER_URL = 'https://prod-api.useiam.com/'
+WEBSITE_URL = 'https://m.lifeforceenergy.us/'
+SERVER_URL = 'https://api.lifeforceenergy.us/'
 
 
 # DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'

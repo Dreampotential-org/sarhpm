@@ -42,6 +42,7 @@ urlpatterns = [
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('admin/', admin.site.urls),
     url(r'^api/', include('api.urls')),
+    url(r'^sa/', include('sa.urls')),
     url(r'^dprojx/api/', include('dappx.api.urls')),
     url(r'^rest-auth/', include('rest_auth.urls')),
     url(r'^rest-auth/registration/account-confirm-email/(?P<key>[-:\w]+)/$',
