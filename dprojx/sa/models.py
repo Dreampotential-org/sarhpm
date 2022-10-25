@@ -22,7 +22,7 @@ class AdminFeedback(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-class Member(models.Model):
+class Profile(models.Model):
     user = models.ForeignKey(to=get_user_model(),
                              on_delete=models.CASCADE,
                              blank=True, null=True)
@@ -41,48 +41,54 @@ class Member(models.Model):
 
 class TagEntry(models.Model):
     assigned_by = models.ForeignKey(to=get_user_model(),
-                                    on_delete=models.CASCADE, default="")
+                                    on_delete=models.CASCADE,
+                                    default="")
     tag = models.TextField(default="", max_length=150)
-    assigned_to = models.ForeignKey(to=Member, on_delete=models.CASCADE,
+    assigned_to = models.ForeignKey(to=get_user_model(),
+                                    on_delete=models.CASCADE,
                                     default="")
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-class MemberMonitor(models.Model):
-    member = models.ForeignKey(to=Member, on_delete=models.CASCADE,
-                               default="")
-    notify_email = models.EmailField(max_length=512, blank=True, null=True)
+class UserMonitor(models.Model):
+    user = models.ForeignKey(to=get_user_model(),
+                             on_delete=models.CASCADE,
+                             default="", blank=True, null=True)
+    notify_email = models.EmailField(
+        max_length=512, blank=True, null=True)
 
 
 class GpsC(models.Model):
-    member = models.ForeignKey(to=Member, on_delete=models.CASCADE,
-                               default="", blank=True, null=True)
+    profile = models.ForeignKey(to=get_user_model(),
+                                on_delete=models.CASCADE,
+                                default="", blank=True, null=True)
     msg = models.CharField(max_length=2000, default='')
     lat = models.CharField(max_length=500, default='')
     lng = models.CharField(max_length=500, default='')
     created_at = models.DateTimeField(auto_now_add=True)
     admin_feedback = models.ManyToManyField(AdminFeedback)
-    user = models.ForeignKey(to=get_user_model(), on_delete=models.CASCADE,
+    user = models.ForeignKey(to=get_user_model(),
+                             on_delete=models.CASCADE,
                              default="", blank=True, null=True)
 
 
 class VideoCU(models.Model):
     videoUrl = models.CharField(max_length=500)
-    member = models.ForeignKey(to=Member, on_delete=models.CASCADE,
-                               default="", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     source = models.CharField(max_length=500, default="")
     video_uuid = models.CharField(max_length=500, default='')
     admin_feedback = models.ManyToManyField(AdminFeedback)
-    user = models.ForeignKey(to=get_user_model(), on_delete=models.CASCADE,
+    user = models.ForeignKey(to=get_user_model(),
+                             on_delete=models.CASCADE,
                              default="", blank=True, null=True)
 
 
 class MyMed(models.Model):
-    member = models.ForeignKey(to=Member, on_delete=models.CASCADE,
-                               default="")
     name = models.CharField(max_length=2000, default='')
     dosage = models.CharField(max_length=2000, default='')
+    user = models.ForeignKey(to=get_user_model(),
+                             on_delete=models.CASCADE,
+                             default="", blank=True, null=True)
 
 
 class Question(models.Model):
@@ -103,9 +109,11 @@ class Choice(models.Model):
 
 
 class Token(models.Model):
-    member = models.ForeignKey(Member, on_delete=models.CASCADE)
     token = models.CharField(max_length=256)
     created_at = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(to=get_user_model(),
+                             on_delete=models.CASCADE,
+                             default="", blank=True, null=True)
 
 
 class Service(models.Model):
@@ -126,17 +134,20 @@ class Service(models.Model):
                                     blank=True, null=True)
 
 
-class MemberSession(models.Model):
-    member = models.ForeignKey(to=Member, on_delete=models.CASCADE,
-                               default="", blank=True, null=True)
+class UserSession(models.Model):
     started_at = models.DateTimeField(auto_now_add=True)
     ended_at = models.DateTimeField(blank=True, null=True)
+    user = models.ForeignKey(to=get_user_model(),
+                             on_delete=models.CASCADE,
+                             default="", blank=True, null=True)
 
 
-class MemberGpsEntry(models.Model):
-    member_session = models.ForeignKey(to=MemberSession,
-                                       on_delete=models.CASCADE,
-                                       default="", blank=True, null=True)
+class UserGpsEntry(models.Model):
+    user = models.ForeignKey(to=get_user_model(),
+                             on_delete=models.CASCADE,
+                             default="", blank=True, null=True)
+
+
     latitude = models.DecimalField(max_digits=9, decimal_places=6,
                                    blank=True, null=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6,
@@ -158,5 +169,6 @@ class Location(models.Model):
 
     def save(self):
         # position: { lat: 22.7239574, lng: 75.7936379 }
-        self.position = dict({'lat': self.latitude, 'lng': self.longitude})
+        self.position = dict({'lat': self.latitude,
+                              'lng': self.longitude})
         super().save()

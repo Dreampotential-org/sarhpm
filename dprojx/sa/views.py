@@ -1,8 +1,7 @@
 import datetime
 from django.http import JsonResponse
 
-from .models import Member
-from .models import MemberSession, MemberGpsEntry
+from .models import UserSession
 from math import sin, cos, sqrt, atan2, radians
 
 from rest_framework.decorators import api_view
@@ -32,63 +31,29 @@ def get_distance(lat1, lon1, lat2, lon2):
 
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
-def set_member_info(request):
+def set_profile_info(request):
     pass
 
 
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
-def member_session_start(request):
-    try:
-        member = Member.objects.get(name=request.user)
+def start(request):
+    UserSession.objects.create(user=request.user)
 
-        if not member:
-            member = Member()
-            member.user = request.user
-            member.save()
-
-        session_create = MemberSession.objects.create(member=member)
-        member_session_start.mge = MemberGpsEntry.objects.create(
-            member_session=session_create,
-            latitude=request.data.get("latitude"),
-            longitude=request.data.get("longitude")
-        )
-        return JsonResponse({'status': 'okay'}, safe=False)
-    except Exception as e:
-        print("e", e)
-        return JsonResponse({'status': 'error'}, safe=False)
+    return JsonResponse({'status': 'okay'}, safe=False)
 
 
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
-def member_session_stop(request):
+def stop(request):
     try:
-        member = Member.objects.get(name=request.user)
-        session_create = MemberSession.objects.filter(
-            member=member
+        session_create = UserSession.objects.filter(
+            user=request.user
         ).last()
         session_create.ended_at = datetime.datetime.now()
         session_create.save()
-        mge = MemberGpsEntry.objects.create(
-            member_session=session_create,
-            latitude=request.data.get("latitude"),
-            longitude=request.data.get("longitude"))
-
-        distance = get_distance(
-            float(member_session_start.mge.latitude),
-            float(member_session_start.mge.longitude),
-            float(mge.latitude), float(mge.longitude))
-        total_time = session_create.ended_at.replace(tzinfo=None) \
-            - session_create.started_at.replace(tzinfo=None)
-        avg_speed = (distance * 1000) / total_time.seconds
-
-        data = {
-            'distance': distance,
-            'avg_speed': avg_speed,
-            'total_time': total_time.seconds
-        }
-        return JsonResponse(data, safe=False)
+        return JsonResponse({'status': 'k'},  safe=False)
     except Exception as e:
         print("🚀 ~ file: views.py ~ member_session_stop ~ e", e)
         return JsonResponse({'status': 'error'}, safe=False)
