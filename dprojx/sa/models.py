@@ -47,8 +47,13 @@ class UserEventNotify(models.Model):
         max_length=512, blank=True, null=True)
 
 
+class Device(models.Model):
+    key = models.CharField(max_length=2000, default='')
+
+
 class GpsC(models.Model):
     msg = models.CharField(max_length=2000, default='')
+    device = models.CharField(max_length=2000, default='')
     lat = models.CharField(max_length=500, default='')
     lng = models.CharField(max_length=500, default='')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -131,6 +136,10 @@ class UserSession(models.Model):
 class Session(models.Model):
     started_at = models.DateTimeField(auto_now_add=True)
     ended_at = models.DateTimeField(blank=True, null=True)
+    device = models.ForeignKey(Device,
+                               on_delete=models.CASCADE,
+                               blank=True, null=True)
+
 
 
 class SessionPoint(models.Model):
@@ -146,6 +155,9 @@ class SessionPoint(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     session = models.ForeignKey(Session, on_delete=models.CASCADE,
                                 blank=True, null=True)
+    device = models.ForeignKey(Device,
+                               on_delete=models.CASCADE,
+                               blank=True, null=True)
 
 
 class Location(models.Model):
