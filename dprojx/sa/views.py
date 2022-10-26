@@ -1,7 +1,7 @@
 import datetime
 from django.http import JsonResponse
 
-from .models import UserSession
+from .models import Session, SessionPoint
 from math import sin, cos, sqrt, atan2, radians
 
 from rest_framework.decorators import api_view
@@ -38,7 +38,19 @@ def set_profile_info(request):
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 def start(request):
-    UserSession.objects.create(user=request.user)
+    session = Session.objects.create()
+
+    return JsonResponse({'status': 'okay',
+                         'session_id': session.id}, safe=False)
+
+
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+def session_point(request):
+    session_point = SessionPoint()
+    session_point.latitude = request.data.get("latitude")
+    session_point.longitude = request.data.get("longitude")
+    session_point.save()
 
     return JsonResponse({'status': 'okay'}, safe=False)
 
@@ -47,13 +59,7 @@ def start(request):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def stop(request):
-    try:
-        session_create = UserSession.objects.filter(
-            user=request.user
-        ).last()
-        session_create.ended_at = datetime.datetime.now()
-        session_create.save()
-        return JsonResponse({'status': 'k'},  safe=False)
-    except Exception as e:
-        print("🚀 ~ file: views.py ~ member_session_stop ~ e", e)
-        return JsonResponse({'status': 'error'}, safe=False)
+    session_create = Session.objects.filter().last()
+    session_create.ended_at = datetime.datetime.now()
+    session_create.save()
+    return JsonResponse({'status': 'k'},  safe=False)

@@ -128,10 +128,15 @@ class UserSession(models.Model):
                              default="", blank=True, null=True)
 
 
-class UserGpsEntry(models.Model):
-    user = models.ForeignKey(to=get_user_model(),
-                             on_delete=models.CASCADE,
-                             default="", blank=True, null=True)
+class Session(models.Model):
+    started_at = models.DateTimeField(auto_now_add=True)
+    ended_at = models.DateTimeField(blank=True, null=True)
+
+
+class SessionPoint(models.Model):
+    # user = models.ForeignKey(to=get_user_model(),
+    #                         on_delete=models.CASCADE,
+    #                         default="", blank=True, null=True)
 
     latitude = models.DecimalField(max_digits=9, decimal_places=6,
                                    blank=True, null=True)
@@ -139,6 +144,8 @@ class UserGpsEntry(models.Model):
                                     blank=True, null=True)
     device_timestamp = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    session = models.ForeignKey(Session, on_delete=models.CASCADE,
+                                blank=True, null=True)
 
 
 class Location(models.Model):

@@ -12,7 +12,8 @@ class MonitorFeedback(models.Model):
 
 
 class GpsCheckin(models.Model):
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE,
+                             default="")
     msg = models.CharField(max_length=2000, default='')
     lat = models.CharField(max_length=500, default='')
     lng = models.CharField(max_length=500, default='')
@@ -99,8 +100,9 @@ class UserMonitor(models.Model):
 
 
 class OrganizationMember(models.Model):
-    #should add unique to user not unique together
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE, default="")
+    # should add unique to user not unique together
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE,
+                             default="")
     admin = models.BooleanField(default=False, db_index=True)
     organization = models.ForeignKey(to=Organization, on_delete=models.CASCADE,
                                      null=True, blank=True)
