@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'dbbackup',
     'sa',
+    'arfwftcem',
 ]
 
 # CORS_ORIGIN_WHITELIST = ['v2-local.postmunk.me']

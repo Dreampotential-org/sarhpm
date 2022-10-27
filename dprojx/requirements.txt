@@ -21,4 +21,5 @@ slack
 pandas
 slackclient==2.1.0
 djangorestframework-simplejwt
-allauth
+django-allauth
+pytube
