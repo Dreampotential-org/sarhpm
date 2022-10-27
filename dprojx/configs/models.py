@@ -19,6 +19,7 @@ class Upload(models.Model):
 class MediA(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     file = models.FileField(upload_to=uuid_file_path)
+    path = models.CharField(max_length=5128, blank=True, null=True)
     name = models.CharField(max_length=5128, blank=True, null=True)
     user = models.ForeignKey(to=get_user_model(),
                              on_delete=models.CASCADE,

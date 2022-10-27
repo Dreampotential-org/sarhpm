@@ -19,6 +19,7 @@ def create_sound_file():
 
     sound = MediA()
     sound.file = File(video)
+    sound.path = video
     sound.name = yt.title
     sound.save()
 
