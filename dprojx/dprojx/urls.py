@@ -43,7 +43,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^api/', include('api.urls')),
     url(r'^sa/', include('sa.urls')),
-    url(r'^acfire/', include('acfire.urls')),
+    url(r'^configs/', include('configs.urls')),
     url(r'^dprojx/api/', include('dappx.api.urls')),
     url(r'^rest-auth/', include('rest_auth.urls')),
     url(r'^rest-auth/registration/account-confirm-email/(?P<key>[-:\w]+)/$',

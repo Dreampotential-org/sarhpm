@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'dbbackup',
     'sa',
-    'acfires',
+    'configs',
 ]
 
 # CORS_ORIGIN_WHITELIST = ['v2-local.postmunk.me']
@@ -105,7 +105,7 @@ db_user = os.environ.get('db_user', 'postgresuser')
 db_password = os.environ.get('db_password', 'postgrespassword')
 db_name = os.environ.get('db_user', 'postgres')
 db_host = os.environ.get('db_host', 'localhost')
-db_port = os.environ.get('db_port', '5433')
+db_port = os.environ.get('db_port', '5444')
 
 DATABASES = {
     'default': {

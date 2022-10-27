@@ -4,9 +4,9 @@ services:
     db:
         image: postgis/postgis
         ports:
-            - 5443:5432
+            - 5444:5432
         volumes:
-            - /opt/postgres-useiam-base:/var/lib/postgresql/data
+            - /opt/sarhpm_db:/var/lib/postgresql/data
         environment:
             POSTGRES_DB: postgresdb
             POSTGRES_USER: postgresuser

@@ -1,6 +1,6 @@
 import uuid
 from django.core.management.base import BaseCommand
-from arfwftcem.models import MediA
+from configs.models import MediA
 from django.core.files import File
 
 from pytube import YouTube
