@@ -33,8 +33,6 @@ def stream_mediA(request):
 
 range_re = re.compile(r'bytes\s*=\s*(\d+)\s*-\s*(\d*)', re.I)
 class RangeFileWrapper(object):
-
-
     def __init__(self, filelike, blksize=8192, offset=0, length=None):
 
         self.filelike = filelike
@@ -66,8 +64,10 @@ class RangeFileWrapper(object):
             return data
 
 
-def stream_video(request, path):
-    path = settings.BASE_DIR + path
+def stream_video(request):
+    path = MediA.objects.get(id=request.GET.get("id")).path
+    print("HERE WE in are")
+    print(path)
     range_header = request.META.get('HTTP_RANGE', '').strip()
     range_match = range_re.match(range_header)
     size = os.path.getsize(path)
@@ -93,4 +93,3 @@ def stream_video(request, path):
         resp['Content-Length'] = str(size)
     resp['Accept-Ranges'] = 'bytes'
     return resp
-
