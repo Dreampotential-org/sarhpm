@@ -45,15 +45,15 @@ def start(request):
 def session_point(request):
 
     # XXX optimize this lookup.
-    print(request.data.get("session_id"))
-    session = Session.objects.get(id=request.data.get("session_id"))
-    print("found session %s" % session)
-    device = Device.objects.filter(
-        key=request.data.get("device_id"))[0]
+    # print(request.data.get("session_id"))
+    # session = Session.objects.get(id=request.data.get("session_id"))
+    # print("found session %s" % session)
+    # device = Device.objects.filter(
+    #    key=request.data.get("device_id"))[0]
 
     session_point = SessionPoint()
-    session_point.session = session
-    session_point.device = device
+    # session_point.session = session
+    # session_point.device = device
 
     session_point.latitude = request.data.get("latitude")
     session_point.longitude = request.data.get("longitude")
