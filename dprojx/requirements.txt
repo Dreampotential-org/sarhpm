@@ -7,7 +7,7 @@ boto3
 requests
 django-crispy-forms
 Pillow
-psycopg2-binary==2.8.6
+psycopg2-binary
 gunicorn
 newrelic
 django-allauth
@@ -23,3 +23,5 @@ slackclient==2.1.0
 djangorestframework-simplejwt
 django-allauth
 pytube
+django-extensions
+Werkzeug
