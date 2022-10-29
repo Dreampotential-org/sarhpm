@@ -141,7 +141,6 @@ class Session(models.Model):
                                blank=True, null=True)
 
 
-
 class SessionPoint(models.Model):
     # user = models.ForeignKey(to=get_user_model(),
     #                         on_delete=models.CASCADE,
@@ -160,19 +159,6 @@ class SessionPoint(models.Model):
                                blank=True, null=True)
 
 
-class Location(models.Model):
-    username = models.CharField(max_length=255)
+class Dot(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
-    image = models.ImageField(upload_to='locations/icon',
-                              null=True, blank=True)
-    position = models.CharField(max_length=60, null=True, blank=True)
-
-    def __str__(self):
-        return self.username
-
-    def save(self):
-        # position: { lat: 22.7239574, lng: 75.7936379 }
-        self.position = dict({'lat': self.latitude,
-                              'lng': self.longitude})
-        super().save()
