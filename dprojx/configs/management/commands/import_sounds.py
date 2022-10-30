@@ -15,12 +15,12 @@ def create_sound_file():
     yt.streams.filter(
         progressive=True, file_extension='mp4'
     ).order_by('resolution').desc().first().download(
-        "/tmp/%s/" % directory
+        output_path="/tmp/", filename=directory
     )
-    video = "/tmp/%s/%s" % (directory, yt.title)
+    # video = "/tmp/%s/%s" % (directory, "file")
     sound = MediA()
-    sound.file = File(video)
-    sound.path = video
+    # sound.file = File(video)
+    sound.path = "/tmp/%s" % directory
     sound.name = yt.title
     sound.save()
 

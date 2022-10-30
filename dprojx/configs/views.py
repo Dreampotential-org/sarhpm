@@ -66,7 +66,7 @@ class RangeFileWrapper(object):
 
 def stream_video(request):
     print("HERE WE in are")
-    path = "%s.mp4" % MediA.objects.get(id=request.GET.get("id")).path
+    path = "%s" % MediA.objects.get(id=request.GET.get("id")).path
     print(path)
     range_header = request.META.get('HTTP_RANGE', '').strip()
     range_match = range_re.match(range_header)
