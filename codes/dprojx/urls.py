@@ -16,7 +16,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
-from django.conf.urls import url, include
+from django.conf.urls import include
 from dappx import views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -41,25 +41,25 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('admin/', admin.site.urls),
-    url(r'^api/', include('api.urls')),
-    url(r'^sa/', include('sa.urls')),
+    path(r'^api/', include('api.urls')),
+    path(r'^sa/', include('sa.urls')),
     # url(r'^configs/', include('configs.urls')),
-    url(r'^dprojx/api/', include('dappx.api.urls')),
-    url(r'^rest-auth/', include('rest_auth.urls')),
-    url(r'^rest-auth/registration/account-confirm-email/(?P<key>[-:\w]+)/$',
-        allauthemailconfirmation, name="account_confirm_email"),
-    url(r'^rest-auth/registration/', include('rest_auth.registration.urls')),
-    url(r'^$', views.index, name='index'),
-    url(r'^log-errors/', views.post_slack_errors, name='log-errors'),
-    url(r'^record/', views.record_video_screen, name='record'),
-    url(r'^video/', views.video, name='video'),
-    url(r'^video-monitor/', views.video_monitor, name='video-monitor'),
-    url(r'^upload/', views.upload, name='upload'),
-    url(r'^special/', views.special, name='special'),
-    url(r'^dappx/', include('dappx.urls')),
-    url(r'^logout/$', views.user_logout, name='logout'),
-    url(r'^user_login/$', views.user_login, name='user_login'),
-    path('create_notify_user/<str:user_hash>/', views.create_notify_user),
-    url(r'^monitor/$', views.monitor, name='monitor'),
-    url('^', include('django.contrib.auth.urls')),
+    # path(r'^dprojx/api/', include('dappx.api.urls')),
+    # path(r'^rest-auth/', include('rest_auth.urls')),
+    # path(r'^rest-auth/registration/account-confirm-email/(?P<key>[-:\w]+)/$',
+    #    allauthemailconfirmation, name="account_confirm_email"),
+    # path(r'^rest-auth/registration/', include('rest_auth.registration.urls')),
+    # path(r'^$', views.index, name='index'),
+    # path(r'^log-errors/', views.post_slack_errors, name='log-errors'),
+    # url(r'^record/', views.record_video_screen, name='record'),
+    # url(r'^video/', views.video, name='video'),
+    # url(r'^video-monitor/', views.video_monitor, name='video-monitor'),
+    # url(r'^upload/', views.upload, name='upload'),
+    # url(r'^special/', views.special, name='special'),
+    # url(r'^dappx/', include('dappx.urls')),
+    # url(r'^logout/$', views.user_logout, name='logout'),
+    # url(r'^user_login/$', views.user_login, name='user_login'),
+    # path('create_notify_user/<str:user_hash>/', views.create_notify_user),
+    # url(r'^monitor/$', views.monitor, name='monitor'),
+    # url('^', include('django.contrib.auth.urls')),
 ]# + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

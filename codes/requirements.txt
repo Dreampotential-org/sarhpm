@@ -25,4 +25,4 @@ pytube
 django-extensions
 Werkzeug
 django-rest-auth
-
+django-phonenumber-field
