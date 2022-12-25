@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class ArfwfConfig(AppConfig):
-    name = 'arfwf'
+class ConfigsConfig(AppConfig):
+    name = 'configs'
