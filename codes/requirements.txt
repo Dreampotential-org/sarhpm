@@ -24,3 +24,5 @@ django-allauth
 pytube
 django-extensions
 Werkzeug
+django-rest-auth
+
