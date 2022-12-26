@@ -58,6 +58,20 @@ def get_distances(request):
     return JsonResponse({'dots': res}, safe=False)
 
 
+
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+def get_session_stats(request):
+    session_points = SessionPoint.objects.filter().values_list()
+    for session_point in session_points:
+        print(session_point)
+
+
+    return JsonResponse({'status': 'okay',
+                         'points': session_points}, safe=False)
+
+
+
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 def start(request):

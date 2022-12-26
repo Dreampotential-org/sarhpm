@@ -11,4 +11,5 @@ urlpatterns = [
          name="session_point"),
     path('api/get_distances', views.get_distances,
          name="get_distances"),
+    path('api/stats', views.get_session_stats, name="get_session_stats"),
 ]

@@ -39,11 +39,12 @@ schema_view = get_schema_view(
 
 
 urlpatterns = [
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0),
+         name='schema-swagger-ui'),
     path('admin/', admin.site.urls),
-    path(r'^api/', include('api.urls')),
-    path(r'^sa/', include('sa.urls')),
-    # url(r'^configs/', include('configs.urls')),
+    path('sa/', include('sa.urls')),
+    path('configs/', include('configs.urls')),
+    # path(r'^api/', include('api.urls')),
     # path(r'^dprojx/api/', include('dappx.api.urls')),
     # path(r'^rest-auth/', include('rest_auth.urls')),
     # path(r'^rest-auth/registration/account-confirm-email/(?P<key>[-:\w]+)/$',
