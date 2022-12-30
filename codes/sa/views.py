@@ -61,39 +61,76 @@ def get_distances(request):
 
 
 
+
+def get_sp_distance(session_points):
+    if not session_points:
+        return 0
+
+    session_distance = 0
+    for i in range(0, len(session_points) - 1):
+        print(session_points[i].latitude, session_points[i].longitude)
+        session_distance += get_distance(
+            session_points[i].latitude, session_points[i].longitude,
+            session_points[i + 1 ].latitude, session_points[i +1].longitude
+        )
+
+    return session_distance
+
+
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 def get_session_stats(request):
-    session_points = SessionPoint.objects.filter().order_by("-id")
+
+    total_session_points = SessionPoint.objects.filter().count()
+
+    device = Device.objects.filter(
+        key=request.GET.get("device_id")
+    ).first()
 
     sessions = Session.objects.filter(
-        device__key=request.GET.get("device_id")
-    )
+        device=device
+    ).order_by("-id")
 
-    session_response = {}
+    session_response = []
 
     for session in sessions:
-        session_response['id'] = session.id
+        print("HELLO WE ARE HERE>..")
+        print(session)
+        #session_response['id'] = session.id
+
+
+        session_points_device = SessionPoint.objects.filter(
+            device__key=request.GET.get("device_id")
+        ).order_by("-id")
 
         session_points = SessionPoint.objects.filter(
             session=session
         ).order_by("-id")
 
-        total_distance = 0
-        for i in range(0, len(session_points) - 1):
-            total_distance += get_distance(
-                session_points[i].latitude, session_points[i].longitude,
-                session_points[i + 1 ].latitude, session_points[i +1].longitude
-            )
-        session_response[session.id] = {"distance": total_distance}
+        print(session_points)
+
+        session_response.append({
+            'session_points_device_count': session_points_device,
+            'session_points': [{'lat': session_point.latitude,
+                                'lng': session_point.longitude}
+                                for session_point in session_points],
+            'session_distance': get_sp_distance(session_points),
+            "device_distances": get_sp_distance(session_points_device),
+            "session_id": session.id,
+            "points_count": len(session_points),
+        })
 
 
-    session_points = serialize("json", session_points)
-    session_points = json.loads(session_points)
+    # session_points = serialize("json", session_points)
+    # session_points = json.loads(session_points)
 
-    return JsonResponse({'status': 'okay',
-                         'device_id': request.GET.get("device_id"),
-                         'sessions_stats': session_response}, safe=False)
+    return JsonResponse({
+        'status': 'okay',
+        'query_device_id': request.GET.get("device_id"),
+        "system_session_points": total_session_points,
+        "device_session_points": len(sessions),
+        'sessions_stats': session_response}, safe=False
+    )
 
 
 
