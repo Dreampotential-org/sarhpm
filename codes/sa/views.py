@@ -12,7 +12,7 @@ from rest_framework.decorators import permission_classes
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.core.serializers import serialize
-
+from .serializer import *
 
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
@@ -103,6 +103,8 @@ def get_session_stats(request):
             device__key=request.GET.get("device_id")
         ).order_by("-id")
 
+        session_points_device_info = SessionPointserializer(session_points_device , partial = True)
+        
         session_points = SessionPoint.objects.filter(
             session=session
         ).order_by("-id")
@@ -110,7 +112,7 @@ def get_session_stats(request):
         print(session_points)
 
         session_response.append({
-            'session_points_device_count': session_points_device,
+            'session_points_device_count': session_points_device_info.data,
             'session_points': [{'lat': session_point.latitude,
                                 'lng': session_point.longitude}
                                 for session_point in session_points],
