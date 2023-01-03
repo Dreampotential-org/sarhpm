@@ -111,15 +111,22 @@ def get_session_stats(request):
 
         print(session_points)
 
+        km_for_session = get_sp_distance(session_points)                 
+        session_miles_meter = {'miles' : km_for_session*0.62137, 'meter': km_for_session *1000}
+
+        km_for_device = get_sp_distance(session_points_device)
+        device_miles_meter = {'miles' : km_for_device*0.62137, 'meter': km_for_device *1000}
+
         session_response.append({
             'session_points_device_count': session_points_device_info.data,
             'session_points': [{'lat': session_point.latitude,
                                 'lng': session_point.longitude}
                                 for session_point in session_points],
-            'session_distance': get_sp_distance(session_points),
-            "device_distances": get_sp_distance(session_points_device),
+            'session_distance': session_miles_meter,
+            "device_distances":  device_miles_meter,
             "session_id": session.id,
             "points_count": len(session_points),
+            "session_time": session.started_at
         })
 
 
@@ -167,14 +174,14 @@ def session_point(request):
 
     # XXX optimize this lookup.
     # print(request.data.get("session_id"))
-    # session = Session.objects.get(id=request.data.get("session_id"))
+    session = Session.objects.get(id=request.data.get("session_id"))
     # print("found session %s" % session)
-    # device = Device.objects.filter(
-    #    key=request.data.get("device_id"))[0]
+    device = Device.objects.filter(
+       key=request.data.get("device_id"))[0]
 
     session_point = SessionPoint()
-    # session_point.session = session
-    # session_point.device = device
+    session_point.session = session
+    session_point.device = device
 
     session_point.latitude = request.data.get("latitude")
     session_point.longitude = request.data.get("longitude")
