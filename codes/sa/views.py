@@ -64,7 +64,9 @@ def get_distances(request):
 
 def get_sp_distance(session_points):
     if not session_points:
-        return 0
+        return {'distance_miles': 0,
+                'distance_meters': 0,
+                'interval_stats': []}
 
     interval_distance = 0
     interval_stats = []
@@ -159,6 +161,7 @@ def get_session_stats(request):
     print(session_points)
 
     calcs = get_sp_distance(session_points)
+    print(calcs)
 
     return JsonResponse({
         "interval_stats": calcs['interval_stats'],
