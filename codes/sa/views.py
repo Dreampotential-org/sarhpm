@@ -66,15 +66,46 @@ def get_sp_distance(session_points):
     if not session_points:
         return 0
 
+    interval_distance = 0
+    interval_stats = []
     session_distance = 0
+    start_session = None
     for i in range(0, len(session_points) - 1):
-        print(session_points[i].latitude, session_points[i].longitude)
-        session_distance += get_distance(
+
+        # assign it to first one at start
+        if start_session is None:
+            start_session = session_points[i]
+
+        distance = get_distance(
             session_points[i].latitude, session_points[i].longitude,
             session_points[i + 1 ].latitude, session_points[i +1].longitude
         )
 
-    return session_distance
+        session_distance += distance
+        interval_distance += distance
+
+        if (0.62137 * interval_distance >= .1):
+
+            hours = float(
+                (start_session.created_at - session_points[i].created_at).seconds/
+                (60 * 60)
+            )
+            mph = (
+                (0.62137 * interval_distance) / hours
+            )
+
+            start_session = session_points[i]
+            interval_stats.append({
+                'distance': interval_distance,
+                'mph': mph,
+                'hours': hours,
+            })
+
+            interval_distance = 0
+
+    return {'distance_miles': session_distance * 0.62137,
+            'distance_meters': session_distance * 1000,
+            'interval_stats': interval_stats}
 
 def get_miles_points(session_points):
     miles = 1
@@ -117,62 +148,26 @@ def get_session_stats(request):
         key=request.GET.get("device_id")
     ).first()
 
-    sessions = Session.objects.filter(
+    session = Session.objects.filter(
         device=device
+    ).order_by("-id").first()
+
+    session_points = SessionPoint.objects.filter(
+        session=session
     ).order_by("-id")
 
-    session_response = []
+    print(session_points)
 
-    for session in sessions:
-        print("HELLO WE ARE HERE>..")
-        print(session)
-        #session_response['id'] = session.id
-
-
-        session_points_device = SessionPoint.objects.filter(
-            device__key=request.GET.get("device_id")
-        ).order_by("-id")
-
-        session_points_device_info = SessionPointserializer(session_points_device , partial = True)
-        
-        session_points = SessionPoint.objects.filter(
-            session=session
-        ).order_by("-id")
-
-        print(session_points)
-
-        km_for_session = get_sp_distance(session_points)                 
-        session_miles_meter = {'miles' : km_for_session*0.62137, 'meter': km_for_session *1000}
-
-        km_for_device = get_sp_distance(session_points_device)
-        device_miles_meter = {'miles' : km_for_device*0.62137, 'meter': km_for_device *1000}
-
-        session_miles_points =  get_miles_points(session_points[::-1])
-        session_response.append({
-            'session_points_device_count': session_points_device_info.data,
-            'session_points': [{'lat': session_point.latitude,
-                                'lng': session_point.longitude}
-                                for session_point in session_points],
-            'session_miles_points': session_miles_points,
-            'session_distance': session_miles_meter,
-            "device_distances":  device_miles_meter,
-            "session_id": session.id,
-            "points_count": len(session_points),
-            "session_time": session.started_at
-        })
-
-
-    # session_points = serialize("json", session_points)
-    # session_points = json.loads(session_points)
+    calcs = get_sp_distance(session_points)
 
     return JsonResponse({
-        'status': 'okay',
-        'query_device_id': request.GET.get("device_id"),
-        "system_session_points": total_session_points,
-        "device_session_points": len(sessions),
-        'sessions_stats': session_response}, safe=False
-    )
-
+        "interval_stats": calcs['interval_stats'],
+        'miles': calcs['distance_miles'],
+        'meters': calcs['distance_meters'],
+        "session_id": session.id,
+        "points_count": len(session_points),
+        "session_time": session.started_at
+    }, safe=False)
 
 
 @api_view(['POST'])
