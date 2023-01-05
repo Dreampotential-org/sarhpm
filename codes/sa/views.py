@@ -76,6 +76,36 @@ def get_sp_distance(session_points):
 
     return session_distance
 
+def get_miles_points(session_points):
+    miles = 1
+    if not session_points:
+        return {'miles' : 0, 'time_taken': '0:00:00'}
+    
+    session_response = []
+    
+    start_lat = session_points[0].latitude
+    start_long = session_points[0].longitude
+    session_start_time = session_points[0].created_at
+
+    for i in range(0, len(session_points) - 1):
+        session_distance_per_km = get_distance(
+            start_lat, start_long,
+            session_points[i + 1].latitude, session_points[i +1].longitude
+        )
+        session_distance_per_mile = session_distance_per_km*0.62137
+        if session_distance_per_mile >= 1:
+            time_taken = session_points[i + 1].created_at - session_start_time
+            seconds = time_taken.total_seconds() 
+            h = seconds//3600
+            m = seconds//60
+            seconds %= 60
+            time_taken = "%d:%02d:%02d" % (h,m,seconds)
+            session_response.append({ 'miles' : f"{miles-1}-{miles}" , 'time_taken' : time_taken })
+            start_lat, start_long = session_points[i + 1].latitude, session_points[i +1].longitude
+            session_start_time =  session_points[i + 1].created_at
+            miles+=1
+            
+    return session_response
 
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
@@ -117,11 +147,13 @@ def get_session_stats(request):
         km_for_device = get_sp_distance(session_points_device)
         device_miles_meter = {'miles' : km_for_device*0.62137, 'meter': km_for_device *1000}
 
+        session_miles_points =  get_miles_points(session_points[::-1])
         session_response.append({
             'session_points_device_count': session_points_device_info.data,
             'session_points': [{'lat': session_point.latitude,
                                 'lng': session_point.longitude}
                                 for session_point in session_points],
+            'session_miles_points': session_miles_points,
             'session_distance': session_miles_meter,
             "device_distances":  device_miles_meter,
             "session_id": session.id,
