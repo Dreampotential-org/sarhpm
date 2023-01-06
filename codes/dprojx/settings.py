@@ -105,7 +105,7 @@ WSGI_APPLICATION = 'dprojx.wsgi.application'
 db_user = os.environ.get('db_user', 'postgresuser')
 db_password = os.environ.get('db_password', 'postgrespassword')
 db_name = os.environ.get('db_user', 'postgres')
-db_host = os.environ.get('db_host', 'lifeforceenergy.us')
+db_host = os.environ.get('db_host', '52.14.114.204')
 db_port = os.environ.get('db_port', '5444')
 
 DATABASES = {
