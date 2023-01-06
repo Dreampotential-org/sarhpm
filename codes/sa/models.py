@@ -162,3 +162,15 @@ class SessionPoint(models.Model):
 class Dot(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
+
+
+class GXYZPoint(models.Model):
+    g = models.FloatField()
+    x = models.FloatField()
+    y = models.FloatField()
+    z = models.FloatField()
+    device_timestamp = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    device = models.ForeignKey(Device,
+                               on_delete=models.CASCADE,
+                               blank=True, null=True)
