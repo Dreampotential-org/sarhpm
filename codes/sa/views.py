@@ -231,3 +231,32 @@ def stop(request):
     session_create.ended_at = datetime.datetime.now()
     session_create.save()
     return JsonResponse({'status': 'k'},  safe=False)
+
+
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+def bulk_sync_motions(request):
+    device_id = request.data.get("device_id")
+    source = request.data.get("source")
+    motions_points = request.data.get("motions_points")
+    print("motions_points:", motions_points)
+
+    motions_points = json.loads(motions_points)
+
+    for mp in motions_points:
+        print("source:", source)
+        print("device_id:", device_id)
+        print("motions_point:", mp)
+
+        device = Device.objects.filter(key=device_id).first()
+        if not device:
+            device = Device()
+            device.key = device_id
+            device.save()
+
+        gxyz_point = GXYZPoint(g=int(mp['g']), x=int(mp['x']), y=int(mp['y']), z=int(mp['z']), device=device)
+        gxyz_point.save()
+
+        print("done!!\n")
+ 
+    return JsonResponse({'status': 'k'},  safe=False)

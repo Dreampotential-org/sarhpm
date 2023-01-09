@@ -7,6 +7,7 @@ from . import views
 urlpatterns = [
     path('api/start', views.start, name="start"),
     path('api/stop', views.stop, name="stop"),
+    path('api/bulk_sync_motions', views.bulk_sync_motions, name="bulk_sync_motions"),
     path('api/session_point', views.session_point,
          name="session_point"),
     path('api/get_distances', views.get_distances,
