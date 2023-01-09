@@ -33,7 +33,7 @@ RUN apt-get install -y libav-tools
 RUN pip3.7 install --upgrade pip
 
 
-COPY dprojx/requirements.txt /tmp/requirements.txt
+COPY codes/requirements.txt /tmp/requirements.txt
 RUN pip3.7 install -r /tmp/requirements.txt
 
 WORKDIR /home/web/pam
@@ -43,8 +43,9 @@ RUN locale-gen en_US.UTF-8
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
 
 COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY fullchain.pem /fullchain.pem
+COPY privkey.pem /privkey.pem
+# RUN chmod +x /entrypoint.sh
 
-EXPOSE 8001
-
-CMD ["python3", "manage.py runserver 0.0.0.0:8001"]
+# EXPOSE 8001
+# CMD ["python3", "manage.py runserver 0.0.0.0:8001"]
