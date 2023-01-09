@@ -36,16 +36,21 @@ RUN pip3.7 install --upgrade pip
 COPY codes/requirements.txt /tmp/requirements.txt
 RUN pip3.7 install -r /tmp/requirements.txt
 
-WORKDIR /home/web/pam
+WORKDIR /app
 
 # Set the locale
 RUN locale-gen en_US.UTF-8
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
 
-COPY entrypoint.sh /entrypoint.sh
+# COPY entrypoint.sh /entrypoint.sh
+# COPY fullchain.pem /fullchain.pem
+# COPY privkey.pem /privkey.pem
+# COPY codes /home/web/pam
+# RUN chmod +x /entrypoint.sh
+
+COPY codes ./
 COPY fullchain.pem /fullchain.pem
 COPY privkey.pem /privkey.pem
-# RUN chmod +x /entrypoint.sh
 
 # EXPOSE 8001
 # CMD ["python3", "manage.py runserver 0.0.0.0:8001"]
