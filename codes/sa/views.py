@@ -60,6 +60,7 @@ def get_distances(request):
     return JsonResponse({'dots': res}, safe=False)
 
 
+speedFlow =   ['normal','fast','tofast','slow','toslow']
 
 
 def get_sp_distance(session_points):
@@ -72,6 +73,8 @@ def get_sp_distance(session_points):
     interval_stats = []
     session_distance = 0
     start_session = None
+    complete_one_mile = 0
+    speed_per_mile_cover_last = 0
     for i in range(0, len(session_points) - 1):
 
         # assign it to first one at start
@@ -83,9 +86,13 @@ def get_sp_distance(session_points):
             session_points[i + 1 ].latitude, session_points[i +1].longitude
         )
 
+        if(complete_one_mile == 0):
+            speed_cover_per_mile = session_points[i].created_at
+        
         session_distance += distance
         interval_distance += distance
-
+        complete_one_mile += distance
+        
         if (0.62137 * interval_distance >= .1):
 
             hours = float(
@@ -101,9 +108,35 @@ def get_sp_distance(session_points):
                 'distance': interval_distance,
                 'mph': mph,
                 'hours': hours,
+                'speedFlow': 'none'
             })
 
             interval_distance = 0
+
+        if (0.62137 * complete_one_mile >= 1):
+            hours = float(
+                (speed_cover_per_mile - session_points[i].created_at).seconds/
+                (60 * 60)
+            )
+            mph = (
+                (0.62137 * complete_one_mile) / hours
+            )
+            if(speed_per_mile_cover_last == 0):
+                speed_type = speedFlow[0]
+            elif(speed_per_mile_cover_last > mph):
+                speed_type = speedFlow[1]
+            elif(speed_per_mile_cover_last < mph):
+                speed_type = speedFlow[3]
+            
+            speed_per_mile_cover_last = mph
+
+            interval_stats.append({
+            'distance': interval_distance,
+            'mph': mph,
+            'hours': hours,
+            'speedFlow': speed_type
+            })
+            complete_one_mile = 0
 
     return {'distance_miles': session_distance * 0.62137,
             'distance_meters': session_distance * 1000,
