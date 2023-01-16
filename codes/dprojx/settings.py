@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'dappx.apps.DappxConfig',
-    'api',
+    # 'api',
     'magic_link',
     'drf_yasg',
     'dbbackup',

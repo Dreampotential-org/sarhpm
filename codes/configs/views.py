@@ -6,14 +6,21 @@ import re
 from django.conf import settings
 from django.http import JsonResponse
 
-from .models import MediA
+from .models import MediA, ProfileInfo
 
 from rest_framework.decorators import api_view
 from rest_framework.decorators import authentication_classes
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.http.response import StreamingHttpResponse
 from django.core.files.storage import FileSystemStorage
+from common import config
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
+from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
 
+
+logger = config.get_logger()
 
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
@@ -93,3 +100,71 @@ def stream_video(request):
         resp['Content-Length'] = str(size)
     resp['Accept-Ranges'] = 'bytes'
     return resp
+
+
+@api_view(['POST'])
+def create_user(request):
+    data = {k: v for k, v in request.data.items()}
+    if not data.get('email'):
+        return Response({
+            'message': 'Missing parameters. Email is required'
+        })
+
+    data['email'] = data['email'].lower()
+    user = User.objects.filter(username=data['email']).first()
+
+    logger.info("Create user %s" % data)
+
+    if user:
+        return Response({'message': 'User already exists'})
+
+    # here we create the user
+    user = User()
+    user.email = data['email']
+    user.username = data['email']
+    user.set_password(data['password'])
+    user.save()
+
+    profile = ProfileInfo()
+    profile.user = user
+    profile.name = data.get('name', "")
+    profile.save()
+
+    user = authenticate(username=data['email'], password=data['password'])
+    login(request, user)
+
+    user = User.objects.filter(username=data['email']).first()
+    token = Token.objects.get_or_create(user=user)
+    data['token'] = token[0].key
+
+    data.pop('password')
+    data['message'] = "User created"
+
+    return Response(data)
+
+
+@api_view(['POST'])
+def login_user(request):
+    data = {k: v for k, v in request.data.items()}
+    if not data.get('email') or not data.get("password"):
+        return Response({
+            'message': 'Missing parameters. Email / Password is required'
+        })
+
+    data['email'] = data['email'].lower()
+
+    user = authenticate(username=data['email'], password=data['password'])
+    if not user:
+        return Response({
+            'message': 'Invalid. Email / Password is required'
+        })
+
+    login(request, user)
+
+    token = Token.objects.get_or_create(user=user)
+    data['token'] = token[0].key
+
+    data.pop('password')
+    data['message'] = "User Login"
+
+    return Response(data)
