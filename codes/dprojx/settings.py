@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'dbbackup',
     'sa',
     'configs',
+    'push_notifications'
 ]
 
 # CORS_ORIGIN_WHITELIST = ['v2-local.postmunk.me']
@@ -105,7 +106,8 @@ WSGI_APPLICATION = 'dprojx.wsgi.application'
 db_user = os.environ.get('db_user', 'postgresuser')
 db_password = os.environ.get('db_password', 'postgrespassword')
 db_name = os.environ.get('db_user', 'postgres')
-db_host = os.environ.get('db_host', '52.14.114.204')
+db_host = os.environ.get('db_host', 'localhost')
+# db_host = os.environ.get('db_host', '52.14.114.204')
 db_port = os.environ.get('db_port', '5444')
 
 DATABASES = {
@@ -168,6 +170,10 @@ try:
 except ImportError:
     pass
 
+PUSH_NOTIFICATIONS_SETTINGS = {
+        "FCM_API_KEY": "AAAAnaIALH4:APA91bHSpuphajo6SiPCCkJ7wBKFkadfuiOzI8UsPRbkL-w-Fvk_SGxrhMBr7TiukWOH3heJ6hjh9rvsB6VjEGJzsR8b8O4uiTm7DQyW8M2rmLy-x0drUNjygBOLbgxdtwL6HKxM5XRn",
+        # "APNS_CERTIFICATE": "/path/to/your/certificate.pem",
+}
 
 MAGIC_LINK = {
     "DEFAULT_EXPIRY": 300,

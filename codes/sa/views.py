@@ -14,6 +14,11 @@ from rest_framework.permissions import IsAuthenticated
 from django.core.serializers import serialize
 from .serializer import *
 
+from django.http import HttpResponse
+from push_notifications.models import GCMDevice
+import requests
+import json
+
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 def set_profile_info(request):
@@ -293,3 +298,50 @@ def bulk_sync_motions(request):
         print("done!!\n")
  
     return JsonResponse({'status': 'k'},  safe=False)
+
+from django.http import HttpResponse
+User = get_user_model()
+
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+def gsm_Add(request):
+    user = User.objects.get(id= request.data['user'])
+    fcm_registration_id = request.data['fcm_registration_id']
+    GCMDevice.objects.get_or_create(registration_id=fcm_registration_id, cloud_message_type="FCM", user=user)
+
+    return JsonResponse({'status': 'okay'}, safe=False)
+
+def send_notification(registration_ids , message_title , message_desc):
+    fcm_api = "AAAA4UE3yG0:APA91bHFb0FoLZ_oH334w2Ho5mirUlELbhHHpU16KrjIwfl4_fK-bbHcOXTSk5jw9YWIZ1ZC1u_VNaXJ54xFNHVvN4Q507ew2xQFInRMsvYCdqx8eIwO6LNIFkCcBg-k0hQbbxEYtIJx"
+    url = "https://fcm.googleapis.com/fcm/send"
+    
+    headers = {
+    "Content-Type":"application/json",
+    "Authorization": 'key='+fcm_api}
+    
+    payload = {
+        "registration_ids" :registration_ids,
+        "priority" : "high",
+        "notification" : {
+            "body" : message_desc,
+            "title" : message_title,
+            "image" : "https://i.ytimg.com/vi/m5WUPHRgdOA/hqdefault.jpg?sqp=-oaymwEXCOADEI4CSFryq4qpAwkIARUAAIhCGAE=&rs=AOn4CLDwz-yjKEdwxvKjwMANGk5BedCOXQ",
+            "icon": "https://yt3.ggpht.com/ytc/AKedOLSMvoy4DeAVkMSAuiuaBdIGKC7a5Ib75bKzKO3jHg=s900-c-k-c0x00ffffff-no-rj",
+            
+        }
+    }
+
+    result = requests.post(url,  data=json.dumps(payload), headers=headers)
+    print(result.json())
+
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+def gsm_send(request):
+    resgistration  = [ 
+    'c8x9Js32Iyat-lPXgvORjS:APA91bFpFGPwFi_vkD9V0dvl0Ct8mLBfmU5eIZ6e6NSb23AKDHRhM6vDQRypJLAWHI-IukNe-wn8FO2q1ECbsUz3rJ6HIBgDEYos_KPYciMK-bFizowmVHW4mrefnuXM6AlyGIaRFuV_'
+    ]
+    fcm_devices = GCMDevice.objects.filter(user = 1).distinct("registration_id")
+
+    # print(dir(fcm_devices))
+    send_notification(resgistration , 'testingg' , 'testing')
+    return HttpResponse("sent")
