@@ -171,7 +171,7 @@ except ImportError:
     pass
 
 PUSH_NOTIFICATIONS_SETTINGS = {
-        "FCM_API_KEY": "AAAAnaIALH4:APA91bHSpuphajo6SiPCCkJ7wBKFkadfuiOzI8UsPRbkL-w-Fvk_SGxrhMBr7TiukWOH3heJ6hjh9rvsB6VjEGJzsR8b8O4uiTm7DQyW8M2rmLy-x0drUNjygBOLbgxdtwL6HKxM5XRn",
+        "FCM_API_KEY": "AAAA4UE3yG0:APA91bHFb0FoLZ_oH334w2Ho5mirUlELbhHHpU16KrjIwfl4_fK-bbHcOXTSk5jw9YWIZ1ZC1u_VNaXJ54xFNHVvN4Q507ew2xQFInRMsvYCdqx8eIwO6LNIFkCcBg-k0hQbbxEYtIJx",
         # "APNS_CERTIFICATE": "/path/to/your/certificate.pem",
 }
 

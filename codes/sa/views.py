@@ -337,11 +337,13 @@ def send_notification(registration_ids , message_title , message_desc):
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 def gsm_send(request):
-    resgistration  = [ 
-    'c8x9Js32Iyat-lPXgvORjS:APA91bFpFGPwFi_vkD9V0dvl0Ct8mLBfmU5eIZ6e6NSb23AKDHRhM6vDQRypJLAWHI-IukNe-wn8FO2q1ECbsUz3rJ6HIBgDEYos_KPYciMK-bFizowmVHW4mrefnuXM6AlyGIaRFuV_'
-    ]
+    username = "TestUser"
+    body = f"{username} is Leading this week..."
+    title = "New Lead..."
     fcm_devices = GCMDevice.objects.filter(user = 1).distinct("registration_id")
+    resp = fcm_devices.send_message(body, badge=1, sound="default", extra={"title": title,"icon": "icon","data": "data", "image": "image"})
+    print(f"Share Moment FCM: {resp}")
 
     # print(dir(fcm_devices))
-    send_notification(resgistration , 'testingg' , 'testing')
+    # send_notification(resgistration , 'testingg' , 'testing')
     return HttpResponse("sent")
